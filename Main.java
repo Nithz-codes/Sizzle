@@ -116,22 +116,47 @@ public class Main {
 
     public static void orderFood() {
 
-        int id;
-        int quantity;
-        char more = 'N';
+    int categoryChoice;
+    String category;
+    int id;
+    int quantity;
 
-        do {
+    while (true) {
 
-            menu.displayMenu();
+        menu.displayCategories();
+
+        System.out.print("Choose Category (0 to return) : ");
+        categoryChoice = sc.nextInt();
+
+        if (categoryChoice == 0) {
+
+            return;
+
+        }
+
+        category = menu.getCategoryName(categoryChoice);
+
+        if (category == null) {
+
+            System.out.println("\nInvalid Category! Please try again.\n");
+            continue;
+
+        }
+
+        boolean stayInCategory = true;
+
+        while (stayInCategory) {
+
+            menu.displayCategoryMenu(category);
 
             System.out.print("\nEnter Item ID : ");
             id = sc.nextInt();
 
             fooditem item = menu.getfooditemById(id);
 
-            if (item == null) {
+            if (item == null || !item.getCategory().equalsIgnoreCase(category)) {
 
-                System.out.println("Invalid Item ID.");
+                System.out.println("\nInvalid Item! Please choose an item from the displayed category.");
 
                 continue;
 
@@ -142,21 +167,111 @@ public class Main {
 
             if (quantity <= 0) {
 
-                System.out.println("Invalid Quantity.");
+                System.out.println("\nQuantity must be greater than zero.");
 
                 continue;
 
             }
-
             cart.addItem(item, quantity);
+           /*  cart.addItem(item, quantity);
 
-            System.out.print("\nAdd More Items? (Y/N) : ");
+            System.out.println("\n======================================");
+            System.out.println("✅ " + quantity + " x " + item.getName() + " added to cart.");
+            System.out.println("======================================");
 
-            more = sc.next().toUpperCase().charAt(0);
+            System.out.println("\nWhat would you like to do next?");
+            System.out.println("1. Continue in " + category);
+            System.out.println("2. Browse Another Category");
+            System.out.println("3. View Cart");
+            System.out.println("4. Return to Main Menu");
+            System.out.print("Enter Choice : ");
+            */
+            System.out.println("\n======================================");
+            System.out.println("✓ " + item.getName() + " x" + quantity + " added to cart!");
+            System.out.println();
+            System.out.println("Cart Items    : " + cart.getcartitems().size());
+            System.out.printf("Current Total : ₹%.2f%n", cart.getSubtotal());
+            System.out.println("======================================");
 
-        } while (more == 'Y');
+            System.out.println("\nWhat would you like to do next?");
+            System.out.println("1. Continue Ordering");
+            System.out.println("2. Browse Another Category");
+            System.out.println("3. View Cart");
+            System.out.println("4. Proceed to Checkout");
+            System.out.println("5. Return to Main Menu");
+            System.out.print("Enter Choice : ");
+
+            int nextChoice = sc.nextInt();
+
+            switch (nextChoice) {
+
+                case 1:
+                    // Continue in the same category
+                    break;
+
+                case 2:
+                    // Browse another category
+                    stayInCategory = false;
+                    break;
+
+                case 3:
+
+                    cart.viewCart();
+
+                    System.out.println("\nWhat would you like to do next?");
+                    System.out.println("1. Continue Ordering");
+                    System.out.println("2. Browse Another Category");
+                    System.out.println("3. Proceed to Checkout");
+                    System.out.println("4. Return to Main Menu");
+                    System.out.print("Enter Choice : ");
+
+                    int cartChoice = sc.nextInt();
+
+                    switch (cartChoice) {
+
+                        case 1:
+                            break;
+
+                        case 2:
+                            stayInCategory = false;
+                            break;
+
+                        case 3:
+                            checkout();
+                            return;
+
+                        case 4:
+                            return;
+
+                        default:
+                            System.out.println("\nInvalid Choice! Continuing Order...");
+                            break;
+
+                    }
+
+                    break;
+
+                case 4:
+                    checkout();
+                    return;
+
+                case 5:
+                    return;
+
+                default:
+                    System.out.println("\nInvalid Choice! Please try again.");
+                    break;
+
+            }
+
+        }
 
     }
+
+}
+       
+
+    
         public static void checkout() {
 
         if (cart.getcartitems().isEmpty()) {
