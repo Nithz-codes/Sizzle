@@ -312,6 +312,91 @@ Each stage builds on the lessons of the one before it — logic first, structure
 
 ---
 
+## 📸 Screenshots
+
+### Version 1 — Java Console Application
+
+Console-based ordering interface.
+
+<p align="center">
+  <img src="screenshots/v1/console-homev1.png" width="900">
+</p>
+
+---
+
+### Version 2 — Enhanced Console Application
+
+Improved menu organization and billing.
+
+<p align="center">
+  <img src="screenshots/v2/console-homev2.png" width="900">
+  <img src="screenshots/v2/billing-receipt.png" width="900">
+</p>
+
+---
+
+### Version 3 — React Web Application
+
+## 🏠 Home Page
+
+<p align="center">
+  <img src="screenshots/v3/home.png" width="900">
+</p>
+
+The landing page introduces users to the application with a clean, modern interface and quick access to the menu.
+
+---
+
+## 🍔 Browse Menu
+
+<p align="center">
+  <img src="screenshots/v3/menu.png" width="900">
+</p>
+
+Users can browse food categories and view available menu items.
+
+---
+
+## 🛒 Shopping Cart
+
+<p align="center">
+  <img src="screenshots/v3/cart.png" width="900">
+</p>
+
+Items added to the cart are displayed in real time, allowing users to review their order before checkout.
+
+---
+
+## 💳 Checkout
+
+<p align="center">
+  <img src="screenshots/v3/checkout.png" width="900">
+</p>
+
+Customers can complete their order through a streamlined checkout flow.
+
+---
+
+## 🧾 Receipt
+
+<p align="center">
+  <img src="screenshots/v3/receipt.png" width="900">
+</p>
+
+After checkout, a receipt summarizes the purchased items and total amount.
+
+---
+
+## 📜 Order History
+
+<p align="center">
+  <img src="screenshots/v3/order-history.png" width="900">
+</p>
+
+View and review previously placed orders in a clean and organized interface.
+
+---
+
 ## 📁 Project Structure (Version 3)
 
 ```
