@@ -408,7 +408,7 @@ Planned enhancements for future versions of Sizzle:
 
 **[Nithish V]**
 
-- GitHub: [@Nithz-codes](https://github.com/your-username)
+- GitHub: [@Nithz-codes](https://github.com/Nithz-codes)
 - LinkedIn: [Your LinkedIn](https://linkedin.com/in/your-linkedin)
 - Portfolio: [your-portfolio.com](https://your-portfolio.com)
 
