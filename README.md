@@ -150,6 +150,15 @@ Passionate about Full Stack Development
 
 GitHub:
 -->
+
+<p align="center">
+  <img src="assets/banner.png" alt="Sizzle Banner" width="100%">
+</p>
+
+<br>
+
+# 🍽️ Sizzle
+
 ```
    _____ _ __________     __    ______
   / ___/(_)_  / __  /___ / /__ / __/ /
@@ -163,16 +172,17 @@ GitHub:
 
 ### 🍽️ Sizzle — A Restaurant Ordering App That Evolved Over Time
 
+
+
 ![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 ![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
 
-![Repo Size](https://img.shields.io/github/repo-size/your-username/sizzle?style=flat-square)
-![Last Commit](https://img.shields.io/github/last-commit/your-username/sizzle?style=flat-square)
-![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)
-![Stars](https://img.shields.io/github/stars/your-username/sizzle?style=flat-square)
+![Repo Size](https://img.shields.io/github/repo-size/Nithz-codes/sizzle?style=flat-square)
+![Last Commit](https://img.shields.io/github/last-commit/Nithz-codes/sizzle?style=flat-square)
+![Stars](https://img.shields.io/github/stars/Nithz-codes/sizzle?style=flat-square)
 
 </div>
 
@@ -409,8 +419,8 @@ Planned enhancements for future versions of Sizzle:
 **[Nithish V]**
 
 - GitHub: [@Nithz-codes](https://github.com/Nithz-codes)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/your-linkedin)
-- Portfolio: [your-portfolio.com](https://your-portfolio.com)
+- LinkedIn: [LinkedIn](https://www.linkedin.com/in/nithish-v43/)
+- Portfolio: [Portfolio.com](https://your-portfolio.com)
 
 ---
 
