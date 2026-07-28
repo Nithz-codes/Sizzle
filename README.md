@@ -314,27 +314,73 @@ Each stage builds on the lessons of the one before it — logic first, structure
 
 ## 📸 Screenshots
 
-### Version 1 — Java Console Application
+<!--### Version 1 — Java Console Application
 
 Console-based ordering interface.
 
 <p align="center">
-  <img src="screenshots/v1/console-homev1.png" width="900">
-</p>
+  <img src="screenshots/v1/console-homev1.png" width="850">
+</p> -->
+
+## 📸 Version 1 — Initial Java Console Application
+
+| Console Application |
+| :-----------------: |
+| <img src="screenshots/v1/console-homev1.png" width="500"> |
+
+The first iteration of **Sizzle**, featuring a console-based restaurant ordering system built using Java.
 
 ---
 
-### Version 2 — Enhanced Console Application
+| Menu | Receipt |
+|------|---------|
+| <img src="screenshots/v2/console-homev2.png" width="400"> | <img src="screenshots/v2/billing-receipt.png" width="400"> |
+
+---
+
+<!-- ### Version 2 — Enhanced Console Application
 
 Improved menu organization and billing.
 
 <p align="center">
-  <img src="screenshots/v2/console-homev2.png" width="900">
-  <img src="screenshots/v2/billing-receipt.png" width="900">
-</p>
+  <img src="screenshots/v2/console-homev2.png" width="850">
 
 ---
 
+  <img src="screenshots/v2/billing-receipt.png" width="850">
+</p>
+
+--- 
+
+-->
+
+## 📸 Version 3 — Modern React Web Application
+
+### 🏠 Discover & Browse
+
+| Home | Menu |
+| :--: | :--: |
+| <img src="screenshots/v3/home.png" width="450"> | <img src="screenshots/v3/menu.png" width="450"> |
+
+The application begins with a modern landing page where users can browse the restaurant menu and explore available dishes.
+
+### 🛒 Review & Checkout
+
+| Cart | Checkout |
+| :--: | :------: |
+| <img src="screenshots/v3/cart.png" width="450"> | <img src="screenshots/v3/checkout.png" width="450"> |
+
+Users can review their selected items, update quantities, and complete the checkout process with a clean and intuitive interface.
+
+### 📜 Confirmation & History
+
+| Receipt | Order History |
+| :------: | :-----------: |
+| <img src="screenshots/v3/receipt.png" width="450"> | <img src="screenshots/v3/order-history.png" width="450"> |
+
+After placing an order, users receive a detailed receipt and can review all previous orders through the built-in order history feature.
+
+<!-- 
 ### Version 3 — React Web Application
 
 ## 🏠 Home Page
@@ -396,6 +442,8 @@ After checkout, a receipt summarizes the purchased items and total amount.
 View and review previously placed orders in a clean and organized interface.
 
 ---
+
+-->
 
 ## 📁 Project Structure (Version 3)
 
