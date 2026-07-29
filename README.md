@@ -1,156 +1,4 @@
 
-<!--
-# Run and deploy your AI Studio app
-
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/35663547-6ee0-4469-959a-75c50f09f0de
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
-
-   # 🍽️ Sizzle
-
-> From a Java Console Application to a Modern React Restaurant Ordering System.
-
- Sizzle is a restaurant ordering application that showcases my journey in software development.
-
-The project began as a simple Java console application and gradually evolved into a modern React + TypeScript frontend through multiple iterations.
-
-Each major version represents a milestone in learning software architecture, UI design, version control, and frontend development.
-
-## 🚀 Project Evolution
-
-### Version 1
-✔ Java Console Application
-
-✔ Restaurant Menu
-
-✔ Cart
-
-✔ Billing
-
-✔ Receipt Generation
-
----
-
-### Version 2
-
-✔ Improved Menu Categories
-
-✔ Better Billing
-
-✔ Enhanced Checkout
-
-✔ Better User Experience
-
----
-
-### Version 3
-
-✔ React + TypeScript
-
-✔ Responsive UI
-
-✔ Live Search
-
-✔ Shopping Cart
-
-✔ Checkout Modal
-
-✔ Order History
-
-✔ Receipt View
-
-✔ Modern Design
-## 🛠 Tech Evolution
-
-Version 1
-- Java
-
-Version 2
-- Java
-- Object-Oriented Programming
-
-Version 3
-- React
-- TypeScript
-- Vite
-
-## 📸 Screenshots
-
-### Version 1
-
-### Version 2
-
-### Version 3
-
-## ✨ Features
-
-### Java Versions
-
-- Menu Management
-- Shopping Cart
-- Bill Generation
-- Receipt Printing
-- Customer Details
-
-### React Version
-
-- Responsive Design
-- Category Navigation
-- Live Search
-- Shopping Cart
-- Sticky Cart
-- Checkout
-- Receipt Generation
-- Order History
-
-- ## ⚙ Installation
-
-Clone the repository
-
-```bash
-git clone https://github.com/Nithz-codes/Sizzle.git
-cd Sizzle
-npm install
-npm run dev
-http://localhost:5173
-
-Checkout Version 1
-
-```bash
-git switch --detach v1
-
-## 🚧 Future Roadmap
-
-- Authentication
-- Backend API
-- Database Integration
-- Admin Dashboard
-- Payment Gateway
-- Order Tracking
-- User Profiles
-
-## 👨‍💻 Author
-
-Nithish
-
-Computer Science Student
-
-Passionate about Full Stack Development
-
-GitHub:
--->
-
 <p align="center">
   <img src="assets/banner.png" alt="Sizzle Banner" width="100%">
 </p>
@@ -288,39 +136,8 @@ Each stage builds on the lessons of the one before it — logic first, structure
 
 ---
 
-## 🖼️ Screenshots
-
-### Version 1 — Console App
-
-> 📸 *Add Version 1 Console Screenshot Here*
-
-### Version 2 — Enhanced Console App
-
-> 📸 *Add Version 2 Console Screenshot Here*
-
-### Version 3 — Web Application
-
-> 📸 *Add Home Page Screenshot*
-
-> 📸 *Add Menu Screenshot*
-
-> 📸 *Add Cart Screenshot*
-
-> 📸 *Add Checkout Screenshot*
-
-> 📸 *Add Receipt Screenshot*
-
----
 
 ## 📸 Screenshots
-
-<!--### Version 1 — Java Console Application
-
-Console-based ordering interface.
-
-<p align="center">
-  <img src="screenshots/v1/console-homev1.png" width="850">
-</p> -->
 
 ## 📸 Version 1 — Initial Java Console Application
 
@@ -332,27 +149,14 @@ The first iteration of **Sizzle**, featuring a console-based restaurant ordering
 
 ---
 
+## 📸 Version 2 — Enhanced Console Application
+
 | Menu | Receipt |
 |------|---------|
 | <img src="screenshots/v2/console-homev2.png" width="400"> | <img src="screenshots/v2/billing-receipt.png" width="400"> |
 
 ---
 
-<!-- ### Version 2 — Enhanced Console Application
-
-Improved menu organization and billing.
-
-<p align="center">
-  <img src="screenshots/v2/console-homev2.png" width="850">
-
----
-
-  <img src="screenshots/v2/billing-receipt.png" width="850">
-</p>
-
---- 
-
--->
 
 ## 📸 Version 3 — Modern React Web Application
 
@@ -380,98 +184,6 @@ Users can review their selected items, update quantities, and complete the check
 
 After placing an order, users receive a detailed receipt and can review all previous orders through the built-in order history feature.
 
-<!-- 
-### Version 3 — React Web Application
-
-## 🏠 Home Page
-
-<p align="center">
-  <img src="screenshots/v3/home.png" width="900">
-</p>
-
-The landing page introduces users to the application with a clean, modern interface and quick access to the menu.
-
----
-
-## 🍔 Browse Menu
-
-<p align="center">
-  <img src="screenshots/v3/menu.png" width="900">
-</p>
-
-Users can browse food categories and view available menu items.
-
----
-
-## 🛒 Shopping Cart
-
-<p align="center">
-  <img src="screenshots/v3/cart.png" width="900">
-</p>
-
-Items added to the cart are displayed in real time, allowing users to review their order before checkout.
-
----
-
-## 💳 Checkout
-
-<p align="center">
-  <img src="screenshots/v3/checkout.png" width="900">
-</p>
-
-Customers can complete their order through a streamlined checkout flow.
-
----
-
-## 🧾 Receipt
-
-<p align="center">
-  <img src="screenshots/v3/receipt.png" width="900">
-</p>
-
-After checkout, a receipt summarizes the purchased items and total amount.
-
----
-
-## 📜 Order History
-
-<p align="center">
-  <img src="screenshots/v3/order-history.png" width="900">
-</p>
-
-View and review previously placed orders in a clean and organized interface.
-
----
-
--->
-
-## 📁 Project Structure (Version 3)
-
-```
-sizzle/
-├── public/
-│   └── assets/
-├── src/
-│   ├── components/
-│   │   ├── Hero/
-│   │   ├── Sidebar/
-│   │   ├── FoodCard/
-│   │   ├── Cart/
-│   │   ├── CheckoutModal/
-│   │   └── ReceiptModal/
-│   ├── context/
-│   │   └── CartContext.tsx
-│   ├── pages/
-│   ├── data/
-│   ├── types/
-│   ├── App.tsx
-│   └── main.tsx
-├── index.html
-├── package.json
-├── tsconfig.json
-└── vite.config.ts
-```
-
 ---
 
 ## 🚀 Getting Started
@@ -485,11 +197,15 @@ git clone https://github.com/your-username/sizzle.git
 # Move into the project directory
 cd sizzle
 
+**Prerequisites:**  Node.js
+
 # Install dependencies
 npm install
 
 # Start the development server
 npm run dev
+
+View your app in AI Studio: https://ai.studio/apps/35663547-6ee0-4469-959a-75c50f09f0de
 ```
 
 The application will start locally, and you can view it in your browser at the URL shown in your terminal (typically `http://localhost:5173`).
