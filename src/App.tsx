@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { CartProvider, useCart } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { CategorySidebar } from './components/CategorySidebar';
@@ -8,6 +9,7 @@ import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { ReceiptModal } from './components/ReceiptModal';
 import { OrderHistoryModal } from './components/OrderHistoryModal';
+import { AuthModal } from './components/AuthModal';
 import { StickyCartBar } from './components/StickyCartBar';
 import { Toast } from './components/Toast';
 import { MENU_ITEMS, CATEGORIES } from './data/menuData';
@@ -279,6 +281,7 @@ const MainAppContent: React.FC = () => {
       <CheckoutModal />
       <ReceiptModal />
       <OrderHistoryModal isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} />
+      <AuthModal />
       <Toast />
 
       {/* Footer */}
@@ -321,8 +324,10 @@ const MainAppContent: React.FC = () => {
 
 export default function App() {
   return (
-    <CartProvider>
-      <MainAppContent />
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <MainAppContent />
+      </CartProvider>
+    </AuthProvider>
   );
 }
