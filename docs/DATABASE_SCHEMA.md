@@ -123,18 +123,19 @@ The following tables are planned for Phase 2 (Menu) and Phase 4 (Orders):
 
 ---
 
-## ⚙️ H2 Configuration
+## ⚙️ MySQL Configuration
 
-The backend is pre-configured with H2 in-memory database settings in `application-h2.properties`:
+The backend is configured to use MySQL 8.x exclusively via `application.properties`:
 
 ```properties
-spring.datasource.url=jdbc:h2:mem:sizzledb
-spring.datasource.driverClassName=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=
-spring.h2.console.enabled=true
-spring.h2.console.path=/h2-console
+spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/sizzle?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME:root}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:root}
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
 spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
 ```
 
 ---

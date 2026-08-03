@@ -63,7 +63,7 @@ Rather than scattering progress across multiple repositories, every evolution st
 | **Frontend** | React 19, TypeScript 5.8, Vite 6, Tailwind CSS | Web Presentation & State Management |
 | **Backend** | Java 21, Spring Boot 3.4, Spring Data JPA | REST API & Core Business Logic |
 | **Security** | Spring Security 6, JJWT, BCrypt | Stateless Authentication & Authorization |
-| **Database** | H2 (Development) / MySQL Ready | Relational Persistence |
+| **Database** | MySQL 8.x (Exclusive Database Provider) | Relational Persistence |
 | **Build Tools** | Maven, npm, esbuild | Package Management & Compilation |
 
 ---
@@ -76,7 +76,7 @@ graph TD
     API["API Client (src/services/api.ts)"]
     Backend["Spring Boot REST API (/backend)"]
     Security["Spring Security (JWT Filter)"]
-    DB[("H2 / MySQL Database")]
+    DB[("MySQL 8.x Database")]
 
     Client --> API
     API -->|HTTP / JSON + Bearer Token| Security

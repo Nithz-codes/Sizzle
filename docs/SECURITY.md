@@ -104,7 +104,6 @@ Route access rules configured in [SecurityConfig.java](file:///d:/Sizzle/Sizzle/
 .authorizeHttpRequests(auth -> auth
     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
     .requestMatchers("/api/auth/**").permitAll()
-    .requestMatchers("/h2-console/**").permitAll()
     .requestMatchers(HttpMethod.GET, "/api/menu/**").permitAll()
     .requestMatchers("/error").permitAll()
     .anyRequest().authenticated()
@@ -127,7 +126,7 @@ CORS is explicitly configured to prevent unauthorized origins while permitting d
 
 > [!IMPORTANT]
 > - **Production JWT Secret**: Ensure `app.jwt.secret` is overridden with a strong 256-bit environment key in production.
-> - **H2 Console in Production**: Disable `/h2-console/**` access when migrating to production relational databases (MySQL / PostgreSQL).
+> - **Production Database Security**: Ensure `SPRING_DATASOURCE_PASSWORD` is configured via secure environment variables in production.
 > - **HTTPS Enforcement**: Deploy TLS/SSL certificates in production to encrypt tokens in transit.
 
 ---

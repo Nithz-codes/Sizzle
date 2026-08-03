@@ -58,50 +58,24 @@ mvn spring-boot:run
 ```
 
 - **Backend API Base**: `http://localhost:8080/api`
-- **H2 Database Console**: `http://localhost:8080/h2-console`
-  - **JDBC URL**: `jdbc:h2:mem:sizzledb`
-  - **Username**: `sa`
-  - **Password**: *(leave blank)*
+- **Database Engine**: MySQL 8.x running on `localhost:3306`
 
 ---
 
 ## 🗄️ Database Configuration & Migration
 
-### Default: Embedded H2 Database
-The application defaults to H2 in-memory storage (`src/main/resources/application-h2.properties`):
+### MySQL 8.x Database Configuration
+The application uses MySQL exclusively (`src/main/resources/application.properties`):
 ```properties
-spring.datasource.url=jdbc:h2:mem:sizzledb
-spring.datasource.driverClassName=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=
+spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/sizzle?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME:root}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:root}
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
 spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
 ```
-
----
-
-### Switching to MySQL / PostgreSQL
-
-To transition from H2 to MySQL:
-
-1. Update `backend/pom.xml` to include MySQL connector driver:
-   ```xml
-   <dependency>
-       <groupId>com.mysql</groupId>
-       <artifactId>mysql-connector-j</artifactId>
-       <scope>runtime</scope>
-   </dependency>
-   ```
-
-2. Modify `backend/src/main/resources/application.properties`:
-   ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/sizzle_db?createDatabaseIfNotExist=true&useSSL=false
-   spring.datasource.username=root
-   spring.datasource.password=your_password
-   spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-
-   spring.jpa.hibernate.ddl-auto=update
-   spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
-   ```
 
 ---
 

@@ -18,7 +18,7 @@ graph TD
     UserCtrl["UserController (/api/users/*)"]
     AuthService["AuthService"]
     Repo["UserRepository (Spring Data JPA)"]
-    DB[("H2 In-Memory Database")]
+    DB[("MySQL 8.x Database")]
 
     Client -->|HTTP / JSON| API
     API -->|Bearer Token Header| Filter
@@ -109,7 +109,7 @@ sequenceDiagram
 
 ## 🗄️ Database Layer
 
-- **Database Engine**: H2 In-Memory Database (configured via `application-h2.properties`).
+- **Database Engine**: MySQL 8.x Database (configured via `application.properties`).
 - **ORM & Data Mapping**: Spring Data JPA with Hibernate.
 - **Schema Auto-Generation**: Tables are automatically generated on backend startup (`spring.jpa.hibernate.ddl-auto=update`).
 
@@ -125,7 +125,7 @@ sequenceDiagram
     participant Service as API Service (api.ts)
     participant Auth as AuthController
     participant UserSvc as AuthService
-    participant DB as H2 Database
+    participant DB as MySQL Database
 
     Customer->>UI: Fills Registration Form
     UI->>Service: authApi.register(payload)

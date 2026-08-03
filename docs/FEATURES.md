@@ -41,7 +41,7 @@ This document provides a comprehensive list of all implemented and planned featu
 | **REST API Controller Architecture** | `[Completed]` | Layered controller architecture exposing structured `/api/auth` and `/api/users` endpoints. |
 | **Spring Security Integration** | `[Completed]` | Security filter chain enforcing JWT authentication on protected routes while leaving public routes open. |
 | **JPA Data Persistence** | `[Completed]` | Spring Data JPA ORM integration mapping Java domain models to relational tables. |
-| **H2 In-Memory Database** | `[Completed]` | Zero-config local embedded database for rapid development and testing. |
+| **MySQL 8.x Relational Database** | `[Completed]` | Production-grade relational database persistence managed via Spring Data JPA. |
 | **Standardized API Response Wrapper** | `[Completed]` | Universal JSON response structure containing `success`, `message`, `data`, and ISO `timestamp`. |
 
 ---
