@@ -30,6 +30,10 @@ export const AuthModal: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (authTab === 'customer-register' && password.length < 6) {
+      // Immediate client-side validation feedback
+      return;
+    }
     try {
       if (authTab === 'customer-register') {
         await register({ name, email, password, phone, role: 'CUSTOMER' });
@@ -184,12 +188,18 @@ export const AuthModal: React.FC = () => {
 
           {/* Password Field */}
           <div className="space-y-1.5">
-            <label className="block font-semibold text-[#1E1E1E]">Password</label>
+            <div className="flex items-center justify-between">
+              <label className="block font-semibold text-[#1E1E1E]">Password</label>
+              {authTab === 'customer-register' && (
+                <span className="text-[10px] text-[#6B7280]">Min. 6 characters</span>
+              )}
+            </div>
             <div className="relative">
               <Lock className="absolute left-3.5 top-3 w-4 h-4 text-[#6B7280]" />
               <input
                 type="password"
                 required
+                minLength={6}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -202,7 +212,10 @@ export const AuthModal: React.FC = () => {
           <div className="bg-[#FFFDF8] border border-[#E85D04]/20 rounded-xl p-3 text-[11px] text-[#6B7280] space-y-1">
             <p className="font-semibold text-[#E85D04]">Quick Demo Accounts:</p>
             {authTab === 'admin-login' ? (
-              <p>Admin: <code className="text-[#1E1E1E] bg-[#ECECEC]/50 px-1 py-0.5 rounded">admin@sizzle.com</code> / <code className="text-[#1E1E1E] bg-[#ECECEC]/50 px-1 py-0.5 rounded">Admin@123</code></p>
+              <div className="space-y-0.5">
+                <p>Primary: <code className="text-[#1E1E1E] bg-[#ECECEC]/50 px-1 py-0.5 rounded">admin@sizzle.com</code> / <code className="text-[#1E1E1E] bg-[#ECECEC]/50 px-1 py-0.5 rounded">Admin@123</code></p>
+                <p>Secondary: <code className="text-[#1E1E1E] bg-[#ECECEC]/50 px-1 py-0.5 rounded">098@gmail.com</code> / <code className="text-[#1E1E1E] bg-[#ECECEC]/50 px-1 py-0.5 rounded">098765</code></p>
+              </div>
             ) : (
               <p>Customer: <code className="text-[#1E1E1E] bg-[#ECECEC]/50 px-1 py-0.5 rounded">customer@sizzle.com</code> / <code className="text-[#1E1E1E] bg-[#ECECEC]/50 px-1 py-0.5 rounded">Customer@123</code></p>
             )}

@@ -39,6 +39,20 @@ public class DataInitializer implements CommandLineRunner {
             log.info("Initialized default ADMIN account: admin@sizzle.com");
         }
 
+        // Seed secondary Admin user (098@gmail.com) if none exists
+        if (!userRepository.existsByEmail("098@gmail.com")) {
+            User secondAdmin = User.builder()
+                    .name("Secondary Admin")
+                    .email("098@gmail.com")
+                    .password(passwordEncoder.encode("098765"))
+                    .phone("+1 555-0987")
+                    .role(Role.ADMIN)
+                    .accountStatus(AccountStatus.ACTIVE)
+                    .build();
+            userRepository.save(secondAdmin);
+            log.info("Initialized secondary ADMIN account: 098@gmail.com");
+        }
+
         // Seed default Customer user if none exists
         if (!userRepository.existsByEmail("customer@sizzle.com")) {
             User customer = User.builder()

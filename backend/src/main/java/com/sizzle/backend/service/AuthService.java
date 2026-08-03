@@ -1,6 +1,7 @@
 package com.sizzle.backend.service;
 
 import com.sizzle.backend.dto.*;
+import com.sizzle.backend.model.AccountStatus;
 
 public interface AuthService {
 
@@ -13,4 +14,9 @@ public interface AuthService {
     UserProfileResponse updateUserProfile(String email, UpdateProfileRequest request);
 
     void changePassword(String email, ChangePasswordRequest request);
+
+    java.util.List<AdminUserResponse> getAllUsers();
+
+    AdminUserResponse updateUserStatus(Long userId, AccountStatus status);
 }
+

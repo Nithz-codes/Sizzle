@@ -78,6 +78,12 @@ export const authApi = {
 
     const data = await response.json();
     if (!response.ok) {
+      if (data.data && typeof data.data === 'object') {
+        const fieldErrors = Object.values(data.data).join('; ');
+        if (fieldErrors) {
+          throw new Error(fieldErrors);
+        }
+      }
       throw new Error(data.message || 'Registration failed');
     }
     return data;
@@ -92,6 +98,12 @@ export const authApi = {
 
     const data = await response.json();
     if (!response.ok) {
+      if (data.data && typeof data.data === 'object') {
+        const fieldErrors = Object.values(data.data).join('; ');
+        if (fieldErrors) {
+          throw new Error(fieldErrors);
+        }
+      }
       throw new Error(data.message || 'Invalid email or password');
     }
     return data;
@@ -138,3 +150,46 @@ export const authApi = {
     return data;
   },
 };
+
+export const adminApi = {
+  getAllUsers: async (): Promise<ApiResponse<User[]>> => {
+    const response = await fetch(`${API_BASE_URL}/admin/users`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch customer users');
+    }
+    return data;
+  },
+
+  updateUserStatus: async (userId: number, status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED'): Promise<ApiResponse<User>> => {
+    const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/status`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ status }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to update user account status');
+    }
+    return data;
+  },
+
+  getAdminStats: async (): Promise<ApiResponse<Record<string, any>>> => {
+    const response = await fetch(`${API_BASE_URL}/admin/stats`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch admin stats');
+    }
+    return data;
+  },
+};
+

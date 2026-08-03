@@ -42,13 +42,65 @@ export interface ReceiptData {
   customer: Customer;
   items: CartItem[];
   bill: BillSummary;
+  orderStatus?: 'PENDING' | 'PREPARING' | 'READY' | 'DELIVERED' | 'CANCELLED';
+  tableNumber?: string;
+  orderNotes?: string;
+  updatedAt?: string;
 }
 
 export interface CategoryOption {
   id: number;
-  name: string; // Internal name matching Java menu.getCategoryName()
+  name: string;
   displayName: string;
   icon: string;
   description: string;
   itemCount: number;
+}
+
+export interface Reservation {
+  id: string;
+  guestName: string;
+  email: string;
+  phone: string;
+  date: string;
+  time: string;
+  guestCount: number;
+  assignedTable: string;
+  status: 'CONFIRMED' | 'SEATED' | 'COMPLETED' | 'CANCELLED';
+  occasion?: string;
+  specialRequest?: string;
+  createdAt: string;
+}
+
+export interface CustomerRecord {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  address?: string;
+  avatarUrl?: string;
+  totalOrders: number;
+  totalReservations: number;
+  totalSpent: number;
+  accountStatus: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+  createdAt: string;
+}
+
+export interface RestaurantSettings {
+  restaurantName: string;
+  contactNumber: string;
+  email: string;
+  address: string;
+  openingHours: string;
+  currencySymbol: string;
+  gstPercentage: number;
+}
+
+export interface AdminNotification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'order' | 'reservation' | 'status' | 'food' | 'info';
+  timestamp: string;
+  read: boolean;
 }

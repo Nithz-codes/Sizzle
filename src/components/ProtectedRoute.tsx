@@ -8,7 +8,16 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin = false }) => {
-  const { isAuthenticated, isAdmin, openAuthModal } = useAuth();
+  const { isAuthenticated, isAdmin, isInitializing, openAuthModal } = useAuth();
+
+  if (isInitializing) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center">
+        <div className="w-10 h-10 border-4 border-orange-500/30 border-t-orange-500 rounded-full animate-spin mb-4" />
+        <p className="text-sm font-medium text-zinc-400">Verifying authentication session...</p>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (

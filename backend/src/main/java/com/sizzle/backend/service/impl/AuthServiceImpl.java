@@ -163,4 +163,47 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<AdminUserResponse> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(user -> AdminUserResponse.builder()
+                        .id(user.getId())
+                        .name(user.getName())
+                        .email(user.getEmail())
+                        .phone(user.getPhone())
+                        .address(user.getAddress())
+                        .avatarUrl(user.getAvatarUrl())
+                        .role(user.getRole())
+                        .accountStatus(user.getAccountStatus())
+                        .createdAt(user.getCreatedAt())
+                        .updatedAt(user.getUpdatedAt())
+                        .build())
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public AdminUserResponse updateUserStatus(Long userId, AccountStatus status) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        user.setAccountStatus(status);
+        User updatedUser = userRepository.save(user);
+
+        return AdminUserResponse.builder()
+                .id(updatedUser.getId())
+                .name(updatedUser.getName())
+                .email(updatedUser.getEmail())
+                .phone(updatedUser.getPhone())
+                .address(updatedUser.getAddress())
+                .avatarUrl(updatedUser.getAvatarUrl())
+                .role(updatedUser.getRole())
+                .accountStatus(updatedUser.getAccountStatus())
+                .createdAt(updatedUser.getCreatedAt())
+                .updatedAt(updatedUser.getUpdatedAt())
+                .build();
+    }
 }
+
