@@ -1,6 +1,7 @@
 package com.sizzle.backend.controller;
 
 import com.sizzle.backend.dto.ApiResponse;
+import com.sizzle.backend.dto.ChangePasswordRequest;
 import com.sizzle.backend.dto.UpdateProfileRequest;
 import com.sizzle.backend.dto.UserProfileResponse;
 import com.sizzle.backend.service.AuthService;
@@ -32,5 +33,13 @@ public class UserController {
             @Valid @RequestBody UpdateProfileRequest request) {
         UserProfileResponse response = authService.updateUserProfile(userDetails.getUsername(), request);
         return ResponseEntity.ok(ApiResponse.success("User profile updated successfully", response));
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody ChangePasswordRequest request) {
+        authService.changePassword(userDetails.getUsername(), request);
+        return ResponseEntity.ok(ApiResponse.success("Password changed successfully", null));
     }
 }

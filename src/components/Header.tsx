@@ -20,6 +20,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenHistory }) => {
     isAuthenticated,
     isAdmin,
     openAuthModal,
+    openProfileModal,
     logout,
   } = useAuth();
 
@@ -96,18 +97,32 @@ export const Header: React.FC<HeaderProps> = ({ onOpenHistory }) => {
           {/* User Auth Control */}
           {isAuthenticated && user ? (
             <div className="flex items-center gap-2 bg-[#FFFFFF] border border-[#ECECEC] p-1.5 pr-3 rounded-xl shadow-xs">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold ${isAdmin ? 'bg-[#1E1E1E]' : 'bg-[#E85D04]'}`}>
-                {isAdmin ? <ShieldCheck className="w-4 h-4" /> : user.name.charAt(0).toUpperCase()}
-              </div>
-              <div className="hidden md:flex flex-col items-start leading-none pr-1">
-                <span className="text-xs font-bold text-[#1E1E1E] max-w-[100px] truncate">{user.name}</span>
-                <span className={`text-[10px] font-bold uppercase tracking-wider ${isAdmin ? 'text-[#1E1E1E]' : 'text-[#E85D04]'}`}>
-                  {user.role}
-                </span>
-              </div>
+              <button
+                onClick={openProfileModal}
+                className="flex items-center gap-2 text-left hover:opacity-85 transition-opacity cursor-pointer"
+                title="View & Edit Profile"
+              >
+                {user.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.name}
+                    className="w-8 h-8 rounded-lg object-cover border border-[#E85D04]/30"
+                  />
+                ) : (
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold ${isAdmin ? 'bg-[#1E1E1E]' : 'bg-[#E85D04]'}`}>
+                    {isAdmin ? <ShieldCheck className="w-4 h-4" /> : user.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="hidden md:flex flex-col items-start leading-none pr-1">
+                  <span className="text-xs font-bold text-[#1E1E1E] max-w-[100px] truncate">{user.name}</span>
+                  <span className={`text-[10px] font-bold uppercase tracking-wider ${isAdmin ? 'text-[#1E1E1E]' : 'text-[#E85D04]'}`}>
+                    {user.role}
+                  </span>
+                </div>
+              </button>
               <button
                 onClick={logout}
-                className="text-[#6B7280] hover:text-[#D32F2F] p-1.5 hover:bg-[#D32F2F]/10 rounded-lg transition-colors cursor-pointer"
+                className="text-[#6B7280] hover:text-[#D32F2F] p-1.5 hover:bg-[#D32F2F]/10 rounded-lg transition-colors cursor-pointer ml-1"
                 title="Logout"
               >
                 <LogOut className="w-4 h-4" />

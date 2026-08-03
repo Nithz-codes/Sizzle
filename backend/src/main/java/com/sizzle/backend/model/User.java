@@ -31,6 +31,12 @@ public class User {
     @Column(nullable = false, length = 20)
     private AccountStatus accountStatus;
 
+    @Column(length = 255)
+    private String address;
+
+    @Column(length = 500)
+    private String avatarUrl;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -39,12 +45,14 @@ public class User {
 
     public User() {}
 
-    public User(Long id, String name, String email, String password, String phone, Role role, AccountStatus accountStatus, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public User(Long id, String name, String email, String password, String phone, String address, String avatarUrl, Role role, AccountStatus accountStatus, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.phone = phone;
+        this.address = address;
+        this.avatarUrl = avatarUrl;
         this.role = role;
         this.accountStatus = accountStatus;
         this.createdAt = createdAt;
@@ -83,6 +91,12 @@ public class User {
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
 
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public String getAvatarUrl() { return avatarUrl; }
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
 
@@ -105,6 +119,8 @@ public class User {
         private String email;
         private String password;
         private String phone;
+        private String address;
+        private String avatarUrl;
         private Role role;
         private AccountStatus accountStatus;
         private LocalDateTime createdAt;
@@ -115,13 +131,15 @@ public class User {
         public UserBuilder email(String email) { this.email = email; return this; }
         public UserBuilder password(String password) { this.password = password; return this; }
         public UserBuilder phone(String phone) { this.phone = phone; return this; }
+        public UserBuilder address(String address) { this.address = address; return this; }
+        public UserBuilder avatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; return this; }
         public UserBuilder role(Role role) { this.role = role; return this; }
         public UserBuilder accountStatus(AccountStatus accountStatus) { this.accountStatus = accountStatus; return this; }
         public UserBuilder createdAt(LocalDateTime createdAt) { this.createdAt = createdAt; return this; }
         public UserBuilder updatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; return this; }
 
         public User build() {
-            return new User(id, name, email, password, phone, role, accountStatus, createdAt, updatedAt);
+            return new User(id, name, email, password, phone, address, avatarUrl, role, accountStatus, createdAt, updatedAt);
         }
     }
 }

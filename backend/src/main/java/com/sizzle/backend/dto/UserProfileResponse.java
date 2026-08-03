@@ -11,6 +11,8 @@ public class UserProfileResponse {
     private String name;
     private String email;
     private String phone;
+    private String address;
+    private String avatarUrl;
     private Role role;
     private AccountStatus accountStatus;
     private LocalDateTime createdAt;
@@ -18,11 +20,13 @@ public class UserProfileResponse {
 
     public UserProfileResponse() {}
 
-    public UserProfileResponse(Long id, String name, String email, String phone, Role role, AccountStatus accountStatus, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public UserProfileResponse(Long id, String name, String email, String phone, String address, String avatarUrl, Role role, AccountStatus accountStatus, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phone = phone;
+        this.address = address;
+        this.avatarUrl = avatarUrl;
         this.role = role;
         this.accountStatus = accountStatus;
         this.createdAt = createdAt;
@@ -40,6 +44,12 @@ public class UserProfileResponse {
 
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public String getAvatarUrl() { return avatarUrl; }
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
@@ -62,6 +72,8 @@ public class UserProfileResponse {
         private String name;
         private String email;
         private String phone;
+        private String address;
+        private String avatarUrl;
         private Role role;
         private AccountStatus accountStatus;
         private LocalDateTime createdAt;
@@ -71,13 +83,15 @@ public class UserProfileResponse {
         public UserProfileResponseBuilder name(String name) { this.name = name; return this; }
         public UserProfileResponseBuilder email(String email) { this.email = email; return this; }
         public UserProfileResponseBuilder phone(String phone) { this.phone = phone; return this; }
+        public UserProfileResponseBuilder address(String address) { this.address = address; return this; }
+        public UserProfileResponseBuilder avatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; return this; }
         public UserProfileResponseBuilder role(Role role) { this.role = role; return this; }
         public UserProfileResponseBuilder accountStatus(AccountStatus accountStatus) { this.accountStatus = accountStatus; return this; }
         public UserProfileResponseBuilder createdAt(LocalDateTime createdAt) { this.createdAt = createdAt; return this; }
         public UserProfileResponseBuilder updatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; return this; }
 
         public UserProfileResponse build() {
-            return new UserProfileResponse(id, name, email, phone, role, accountStatus, createdAt, updatedAt);
+            return new UserProfileResponse(id, name, email, phone, address, avatarUrl, role, accountStatus, createdAt, updatedAt);
         }
     }
 }

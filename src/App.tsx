@@ -10,8 +10,10 @@ import { CheckoutModal } from './components/CheckoutModal';
 import { ReceiptModal } from './components/ReceiptModal';
 import { OrderHistoryModal } from './components/OrderHistoryModal';
 import { AuthModal } from './components/AuthModal';
+import { ProfileModal } from './components/ProfileModal';
 import { StickyCartBar } from './components/StickyCartBar';
 import { Toast } from './components/Toast';
+import { useAuth } from './context/AuthContext';
 import { MENU_ITEMS, CATEGORIES } from './data/menuData';
 import { Flame, Utensils, Search, Sparkles, FilterX, Filter, Tag, X, RotateCcw } from 'lucide-react';
 
@@ -30,6 +32,7 @@ const MainAppContent: React.FC = () => {
     resetFilters,
   } = useCart();
 
+  const { isProfileModalOpen, closeProfileModal } = useAuth();
   const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false);
 
   // Attach global items reference for search components
@@ -282,6 +285,7 @@ const MainAppContent: React.FC = () => {
       <ReceiptModal />
       <OrderHistoryModal isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} />
       <AuthModal />
+      <ProfileModal isOpen={isProfileModalOpen} onClose={closeProfileModal} />
       <Toast />
 
       {/* Footer */}

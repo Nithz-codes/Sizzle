@@ -10,17 +10,21 @@ public class AuthResponse {
     private String name;
     private String email;
     private String phone;
+    private String address;
+    private String avatarUrl;
     private Role role;
 
     public AuthResponse() {}
 
-    public AuthResponse(String token, String tokenType, Long id, String name, String email, String phone, Role role) {
+    public AuthResponse(String token, String tokenType, Long id, String name, String email, String phone, String address, String avatarUrl, Role role) {
         this.token = token;
         this.tokenType = tokenType;
         this.id = id;
         this.name = name;
         this.email = email;
         this.phone = phone;
+        this.address = address;
+        this.avatarUrl = avatarUrl;
         this.role = role;
     }
 
@@ -42,6 +46,12 @@ public class AuthResponse {
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
 
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public String getAvatarUrl() { return avatarUrl; }
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
 
@@ -56,6 +66,8 @@ public class AuthResponse {
         private String name;
         private String email;
         private String phone;
+        private String address;
+        private String avatarUrl;
         private Role role;
 
         public AuthResponseBuilder token(String token) { this.token = token; return this; }
@@ -64,10 +76,12 @@ public class AuthResponse {
         public AuthResponseBuilder name(String name) { this.name = name; return this; }
         public AuthResponseBuilder email(String email) { this.email = email; return this; }
         public AuthResponseBuilder phone(String phone) { this.phone = phone; return this; }
+        public AuthResponseBuilder address(String address) { this.address = address; return this; }
+        public AuthResponseBuilder avatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; return this; }
         public AuthResponseBuilder role(Role role) { this.role = role; return this; }
 
         public AuthResponse build() {
-            return new AuthResponse(token, tokenType, id, name, email, phone, role);
+            return new AuthResponse(token, tokenType, id, name, email, phone, address, avatarUrl, role);
         }
     }
 }

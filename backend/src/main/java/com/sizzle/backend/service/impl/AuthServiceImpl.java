@@ -64,6 +64,8 @@ public class AuthServiceImpl implements AuthService {
                 .name(savedUser.getName())
                 .email(savedUser.getEmail())
                 .phone(savedUser.getPhone())
+                .address(savedUser.getAddress())
+                .avatarUrl(savedUser.getAvatarUrl())
                 .role(savedUser.getRole())
                 .build();
     }
@@ -90,6 +92,8 @@ public class AuthServiceImpl implements AuthService {
                 .name(user.getName())
                 .email(user.getEmail())
                 .phone(user.getPhone())
+                .address(user.getAddress())
+                .avatarUrl(user.getAvatarUrl())
                 .role(user.getRole())
                 .build();
     }
@@ -104,6 +108,8 @@ public class AuthServiceImpl implements AuthService {
                 .name(user.getName())
                 .email(user.getEmail())
                 .phone(user.getPhone())
+                .address(user.getAddress())
+                .avatarUrl(user.getAvatarUrl())
                 .role(user.getRole())
                 .accountStatus(user.getAccountStatus())
                 .createdAt(user.getCreatedAt())
@@ -121,6 +127,12 @@ public class AuthServiceImpl implements AuthService {
         if (request.getPhone() != null) {
             user.setPhone(request.getPhone().trim());
         }
+        if (request.getAddress() != null) {
+            user.setAddress(request.getAddress().trim());
+        }
+        if (request.getAvatarUrl() != null) {
+            user.setAvatarUrl(request.getAvatarUrl().trim());
+        }
 
         User updatedUser = userRepository.save(user);
 
@@ -129,10 +141,26 @@ public class AuthServiceImpl implements AuthService {
                 .name(updatedUser.getName())
                 .email(updatedUser.getEmail())
                 .phone(updatedUser.getPhone())
+                .address(updatedUser.getAddress())
+                .avatarUrl(updatedUser.getAvatarUrl())
                 .role(updatedUser.getRole())
                 .accountStatus(updatedUser.getAccountStatus())
                 .createdAt(updatedUser.getCreatedAt())
                 .updatedAt(updatedUser.getUpdatedAt())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(String email, ChangePasswordRequest request) {
+        User user = userRepository.findByEmail(email.toLowerCase().trim())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 }

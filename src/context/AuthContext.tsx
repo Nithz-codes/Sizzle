@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, authApi, LoginPayload, RegisterPayload } from '../services/api';
+import { User, authApi, LoginPayload, RegisterPayload, UpdateProfilePayload, ChangePasswordPayload } from '../services/api';
 
 export type AuthTab = 'customer-login' | 'customer-register' | 'admin-login';
 
@@ -9,14 +9,19 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
   isAuthModalOpen: boolean;
+  isProfileModalOpen: boolean;
   authTab: AuthTab;
   isLoading: boolean;
   error: string | null;
   openAuthModal: (tab?: AuthTab) => void;
   closeAuthModal: () => void;
+  openProfileModal: () => void;
+  closeProfileModal: () => void;
   setAuthTab: (tab: AuthTab) => void;
   login: (payload: LoginPayload) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
+  updateProfile: (payload: UpdateProfilePayload) => Promise<User>;
+  changePassword: (payload: ChangePasswordPayload) => Promise<void>;
   logout: () => void;
   clearError: () => void;
 }
@@ -34,13 +39,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
   const [authTab, setAuthTab] = useState<AuthTab>('customer-login');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   // Validate token on mount if present
   useEffect(() => {
-    if (token && !user) {
+    if (token) {
       authApi.getProfile()
         .then((res) => {
           if (res.success && res.data) {
@@ -53,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           logout();
         });
     }
-  }, [token, user]);
+  }, [token]);
 
   const openAuthModal = (tab: AuthTab = 'customer-login') => {
     setAuthTab(tab);
@@ -64,6 +70,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const closeAuthModal = () => {
     setIsAuthModalOpen(false);
     setError(null);
+  };
+
+  const openProfileModal = () => {
+    setIsProfileModalOpen(true);
+  };
+
+  const closeProfileModal = () => {
+    setIsProfileModalOpen(false);
   };
 
   const clearError = () => {
@@ -112,9 +126,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateProfile = async (payload: UpdateProfilePayload): Promise<User> => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await authApi.updateProfile(payload);
+      if (res.success && res.data) {
+        setUser(res.data);
+        localStorage.setItem('sizzle_user', JSON.stringify(res.data));
+        return res.data;
+      } else {
+        throw new Error(res.message || 'Failed to update profile');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Profile update failed.');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const changePassword = async (payload: ChangePasswordPayload): Promise<void> => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await authApi.changePassword(payload);
+      if (!res.success) {
+        throw new Error(res.message || 'Failed to change password');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Password change failed.');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = () => {
     setToken(null);
     setUser(null);
+    setIsProfileModalOpen(false);
     localStorage.removeItem('sizzle_auth_token');
     localStorage.removeItem('sizzle_user');
   };
@@ -130,14 +181,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthenticated,
         isAdmin,
         isAuthModalOpen,
+        isProfileModalOpen,
         authTab,
         isLoading,
         error,
         openAuthModal,
         closeAuthModal,
+        openProfileModal,
+        closeProfileModal,
         setAuthTab,
         login,
         register,
+        updateProfile,
+        changePassword,
         logout,
         clearError,
       }}

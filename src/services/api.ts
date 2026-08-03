@@ -5,6 +5,8 @@ export interface User {
   name: string;
   email: string;
   phone?: string;
+  address?: string;
+  avatarUrl?: string;
   role: 'CUSTOMER' | 'ADMIN' | 'CHEF' | 'MANAGER' | 'CASHIER' | 'WAITER';
   accountStatus?: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
 }
@@ -16,6 +18,8 @@ export interface AuthResponseData {
   name: string;
   email: string;
   phone?: string;
+  address?: string;
+  avatarUrl?: string;
   role: 'CUSTOMER' | 'ADMIN' | 'CHEF' | 'MANAGER' | 'CASHIER' | 'WAITER';
 }
 
@@ -37,6 +41,18 @@ export interface RegisterPayload {
 export interface LoginPayload {
   email: string;
   password: string;
+}
+
+export interface UpdateProfilePayload {
+  name: string;
+  phone?: string;
+  address?: string;
+  avatarUrl?: string;
+}
+
+export interface ChangePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
 }
 
 const getAuthHeaders = (): HeadersInit => {
@@ -94,7 +110,7 @@ export const authApi = {
     return data;
   },
 
-  updateProfile: async (payload: { name: string; phone?: string }): Promise<ApiResponse<User>> => {
+  updateProfile: async (payload: UpdateProfilePayload): Promise<ApiResponse<User>> => {
     const response = await fetch(`${API_BASE_URL}/users/profile`, {
       method: 'PUT',
       headers: getAuthHeaders(),
@@ -104,6 +120,20 @@ export const authApi = {
     const data = await response.json();
     if (!response.ok) {
       throw new Error(data.message || 'Failed to update profile');
+    }
+    return data;
+  },
+
+  changePassword: async (payload: ChangePasswordPayload): Promise<ApiResponse<void>> => {
+    const response = await fetch(`${API_BASE_URL}/users/change-password`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to change password');
     }
     return data;
   },
