@@ -1,11 +1,10 @@
-
 <p align="center">
   <img src="assets/banner.png" alt="Sizzle Banner" width="100%">
 </p>
 
 <br>
 
-# 🍽️ Sizzle
+# 🍽️ Sizzle — Restaurant Management & Ordering System
 
 ```
    _____ _ __________     __    ______
@@ -13,24 +12,17 @@
   \__ \/ / / /_/ /_/ / _ / / -_/ _/ /
  /____/_/ /___|__/____/_/\__/___/_/
 
-  From a Console App to a Modern Web App 🍔
+  From a Java Console App to an Enterprise Full-Stack Web Application 🍔
 ```
 
 <div align="center">
 
-### 🍽️ Sizzle — A Restaurant Ordering App That Evolved Over Time
-
-
-
-![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
-![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
-
-![Repo Size](https://img.shields.io/github/repo-size/Nithz-codes/sizzle?style=flat-square)
-![Last Commit](https://img.shields.io/github/last-commit/Nithz-codes/sizzle?style=flat-square)
-![Stars](https://img.shields.io/github/stars/Nithz-codes/sizzle?style=flat-square)
+![Java](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.4-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![React](https://img.shields.io/badge/React-19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-6.2-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)
 
 </div>
 
@@ -38,245 +30,176 @@
 
 ## 📖 Project Overview
 
-**Sizzle** is a restaurant ordering application built to demonstrate real software growth — not just a finished product, but the entire journey of getting there.
+**Sizzle** is a modern restaurant ordering and management platform built to demonstrate real software engineering evolution. The repository captures a complete journey of technical growth: starting as a **Java Console Application** (`v1`), evolving into an **Enhanced Console System** (`version2`), transitioning into a **React + TypeScript SPA** (`v3.0`), and currently scaling into an **Enterprise Spring Boot REST Backend with JWT Authentication**.
 
-It began as a simple **Java console application** to practice core programming and OOP concepts, was then refined into a more capable **enhanced console version**, and finally rebuilt as a **modern React + TypeScript web application**.
-
-Rather than scattering this progress across separate repositories, the entire evolution — every version, every improvement — lives inside **one repository**, preserved using Git tags and releases. This README documents that journey from start to finish.
+Rather than scattering progress across multiple repositories, every evolution step is preserved in a single repository using Git tags and releases.
 
 ---
 
-## 💡 Why This Project Was Built
+## 🎯 Problem Statement & Solution
 
-Most portfolios only show a finished product. Sizzle was built to show something more valuable: **how a developer grows**.
-
-Each version of Sizzle represents a real stage of learning — starting with fundamentals in Java, iterating on logic and structure, and eventually stepping into modern frontend engineering with React and TypeScript. The goal was to create a single source of truth that captures progress honestly, the way real projects evolve in the real world.
+- **The Problem**: Traditional restaurant ordering systems often suffer from coupled monolithic logic, poor user experience, lack of real-time inventory tracking, and complex deployment setups.
+- **The Solution**: Sizzle delivers a modular, decoupled solution combining a lightning-fast single-page web app (**React 19 + TypeScript + Vite**) with a secure, stateless REST API (**Spring Boot 3 + Spring Security + JWT**).
 
 ---
 
-## 🕰️ Project Evolution Timeline
+## ✨ Implemented Features Summary
 
-| Stage | Version | Technology | Focus |
-|-------|---------|-----------|-------|
-| 🟤 **Stage 1** | `v1` | Java | Console-based ordering system, core OOP fundamentals |
-| 🟠 **Stage 2** | `version2` | Java | Refined logic, improved UX, cleaner code structure |
-| 🟢 **Stage 3** | `v3.0` | React + TypeScript + Vite | Full web application with modern UI/UX |
+- 🔑 **Stateless JWT Authentication**: Secure user registration, BCrypt password hashing, and token-based login.
+- 👤 **User Profile APIs**: Authenticated profile viewing and updating via Spring Boot REST backend.
+- 🎨 **Interactive Food Menu**: Category filtering, instant live search, and detailed dish views.
+- 🛒 **Global Cart Management**: React Context state driven cart with item adjustment, tax calculation, and badge indicators.
+- 💳 **Checkout & Digital Receipts**: Modal checkout workflow with instant itemized digital receipts.
+- 📜 **Historical Order View**: Customer order tracking and receipt viewing.
 
-```
-Java Console Application
-        │
-        ▼
-Enhanced Java Console Application
-        │
-        ▼
-React + TypeScript Web Application
-```
-
-Each stage builds on the lessons of the one before it — logic first, structure second, experience last.
+*(For a complete breakdown of features, view [docs/FEATURES.md](file:///d:/Sizzle/Sizzle/docs/FEATURES.md)).*
 
 ---
 
 ## 🛠️ Technology Stack
 
-<table>
-<tr>
-<th>Version</th>
-<th>Technologies</th>
-</tr>
-<tr>
-<td><strong>v1</strong></td>
-<td>Java</td>
-</tr>
-<tr>
-<td><strong>version2</strong></td>
-<td>Java</td>
-</tr>
-<tr>
-<td><strong>v3.0</strong></td>
-<td>React · TypeScript · Vite · Context API</td>
-</tr>
-</table>
+| Tier | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Frontend** | React 19, TypeScript 5.8, Vite 6, Tailwind CSS | Web Presentation & State Management |
+| **Backend** | Java 21, Spring Boot 3.4, Spring Data JPA | REST API & Core Business Logic |
+| **Security** | Spring Security 6, JJWT, BCrypt | Stateless Authentication & Authorization |
+| **Database** | H2 (Development) / MySQL Ready | Relational Persistence |
+| **Build Tools** | Maven, npm, esbuild | Package Management & Compilation |
 
 ---
 
-## ✨ Features
+## 🏗️ Architecture Overview
 
-### 🔹 Version 1 — Java Console App
-- Console-based restaurant ordering application
-- Restaurant menu with food categories
-- Add items to cart
-- Quantity selection
-- Billing system
-- Receipt generation
-- Customer details capture
-- Object-oriented design
+```mermaid
+graph TD
+    Client["React 19 Web App (TypeScript)"]
+    API["API Client (src/services/api.ts)"]
+    Backend["Spring Boot REST API (/backend)"]
+    Security["Spring Security (JWT Filter)"]
+    DB[("H2 / MySQL Database")]
 
-### 🔹 Version 2 — Enhanced Java Console App
-- Additional menu categories
-- Improved billing logic
-- Enhanced checkout flow
-- Cleaner, more readable console UI
-- Better code organization
-- Bug fixes and stability improvements
-- Overall improved user experience
+    Client --> API
+    API -->|HTTP / JSON + Bearer Token| Security
+    Security --> Backend
+    Backend --> DB
+```
 
-### 🔹 Version 3 — React + TypeScript Web App
-- Modern, fully responsive UI
-- Hero section
-- Category sidebar navigation
-- Interactive food cards
-- Sticky cart for quick access
-- Checkout modal
-- Receipt modal
-- Order history
-- Live search
-- Toast notifications
-- Component-based architecture
-- Global cart management via Context API
+*(For detailed sequence diagrams and component layouts, see [docs/ARCHITECTURE.md](file:///d:/Sizzle/Sizzle/docs/ARCHITECTURE.md)).*
 
 ---
 
+## 🚀 Quick Start Guide
 
-## 📸 Screenshots
+### Prerequisites
+- Node.js `v18+` & npm `v9+`
+- Java JDK `17+` (JDK 21 Recommended)
+- Maven `3.8+`
 
-## 📸 Version 1 — Initial Java Console Application
-
-| Console Application |
-| :-----------------: |
-| <img src="screenshots/v1/console-homev1.png" width="500"> |
-
-The first iteration of **Sizzle**, featuring a console-based restaurant ordering system built using Java.
-
----
-
-## 📸 Version 2 — Enhanced Console Application
-
-| Menu | Receipt |
-|------|---------|
-| <img src="screenshots/v2/console-homev2.png" width="400"> | <img src="screenshots/v2/billing-receipt.png" width="400"> |
-
----
-
-
-## 📸 Version 3 — Modern React Web Application
-
-### 🏠 Discover & Browse
-
-| Home | Menu |
-| :--: | :--: |
-| <img src="screenshots/v3/home.png" width="450"> | <img src="screenshots/v3/menu.png" width="450"> |
-
-The application begins with a modern landing page where users can browse the restaurant menu and explore available dishes.
-
-### 🛒 Review & Checkout
-
-| Cart | Checkout |
-| :--: | :------: |
-| <img src="screenshots/v3/cart.png" width="450"> | <img src="screenshots/v3/checkout.png" width="450"> |
-
-Users can review their selected items, update quantities, and complete the checkout process with a clean and intuitive interface.
-
-### 📜 Confirmation & History
-
-| Receipt | Order History |
-| :------: | :-----------: |
-| <img src="screenshots/v3/receipt.png" width="450"> | <img src="screenshots/v3/order-history.png" width="450"> |
-
-After placing an order, users receive a detailed receipt and can review all previous orders through the built-in order history feature.
-
----
-
-## 🚀 Getting Started
-
-The current version (`v3.0`) is the active version on the `main` branch. Follow these steps to run it locally:
+### 1. Frontend Setup
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/sizzle.git
-
-# Move into the project directory
+git clone https://github.com/Nithz-codes/sizzle.git
 cd sizzle
 
-**Prerequisites:**  Node.js
-
-# Install dependencies
+# Install frontend dependencies
 npm install
 
-# Start the development server
+# Start Vite dev server (http://localhost:3000)
 npm run dev
-
-View your app in AI Studio: https://ai.studio/apps/35663547-6ee0-4469-959a-75c50f09f0de
 ```
 
-The application will start locally, and you can view it in your browser at the URL shown in your terminal (typically `http://localhost:5173`).
+### 2. Backend Setup
+
+```bash
+# Open a new terminal in the backend directory
+cd backend
+
+# Run Spring Boot application (http://localhost:8080/api)
+mvn spring-boot:run
+```
+
+*(For database configurations and production deployment details, see [docs/DEPLOYMENT.md](file:///d:/Sizzle/Sizzle/docs/DEPLOYMENT.md)).*
 
 ---
 
-## 🕹️ Viewing Previous Versions
+## 📸 Screenshots Overview
 
-This repository preserves the full history of Sizzle using **Git tags**, so you can explore earlier versions without losing the current codebase.
+| Web App Menu | Checkout & Receipt |
+| :---: | :---: |
+| <img src="screenshots/v3/menu.png" width="450"> | <img src="screenshots/v3/receipt.png" width="450"> |
+
+*(View the complete screenshot gallery across all version tags in [docs/SCREENSHOTS.md](file:///d:/Sizzle/Sizzle/docs/SCREENSHOTS.md)).*
+
+---
+
+## 📂 Project Directory Structure
+
+```
+Sizzle/
+├── backend/            # Spring Boot REST Server (Java 21)
+├── docs/               # Technical Documentation Suite
+├── screenshots/        # Application Screenshots Gallery
+├── src/                # React + TypeScript Frontend
+│   ├── components/     # UI Components
+│   ├── context/        # React Context Providers
+│   └── services/       # Centralized API Service (api.ts)
+├── PROJECT_PROGRESS.md # Live Module & Progress Tracker
+├── ROADMAP.md          # Multi-Phase Strategic Roadmap
+├── CHANGELOG.md        # Release & Changes Log
+└── CONTRIBUTING.md     # Open Source Guidelines
+```
+
+---
+
+## 📚 Technical Documentation Index
+
+| Document | Description |
+| :--- | :--- |
+| 📊 **[PROJECT_PROGRESS.md](file:///d:/Sizzle/Sizzle/PROJECT_PROGRESS.md)** | Live progress tracker, completion metrics, and active module checklist. |
+| 🗺️ **[ROADMAP.md](file:///d:/Sizzle/Sizzle/ROADMAP.md)** | Multi-phase strategic roadmap (Phases 1 through 9). |
+| 📝 **[CHANGELOG.md](file:///d:/Sizzle/Sizzle/CHANGELOG.md)** | Semantic release notes and version history. |
+| 🤝 **[CONTRIBUTING.md](file:///d:/Sizzle/Sizzle/CONTRIBUTING.md)** | Branching rules, coding standards, and PR guidelines. |
+| 🏗️ **[docs/ARCHITECTURE.md](file:///d:/Sizzle/Sizzle/docs/ARCHITECTURE.md)** | In-depth frontend/backend system architecture and sequence diagrams. |
+| 🚀 **[docs/FEATURES.md](file:///d:/Sizzle/Sizzle/docs/FEATURES.md)** | Implemented and planned feature matrix. |
+| 📡 **[docs/API_DOCUMENTATION.md](file:///d:/Sizzle/Sizzle/docs/API_DOCUMENTATION.md)** | Complete REST API endpoint reference and JSON schemas. |
+| 🗄️ **[docs/DATABASE_SCHEMA.md](file:///d:/Sizzle/Sizzle/docs/DATABASE_SCHEMA.md)** | JPA entities, database tables, and Mermaid ERD. |
+| 🔒 **[docs/SECURITY.md](file:///d:/Sizzle/Sizzle/docs/SECURITY.md)** | JWT authentication flow, BCrypt encryption, and RBAC rules. |
+| 🚀 **[docs/DEPLOYMENT.md](file:///d:/Sizzle/Sizzle/docs/DEPLOYMENT.md)** | Local environment setup, H2 to MySQL migration, and build commands. |
+| 🖼️ **[docs/SCREENSHOTS.md](file:///d:/Sizzle/Sizzle/docs/SCREENSHOTS.md)** | Structured visual gallery for past and present versions. |
+
+---
+
+## 🕹️ Viewing Historical Versions
+
+This repository preserves legacy console versions via **Git Tags**:
 
 ```bash
-# View the original Java console app (v1)
+# View initial Java console app (v1)
 git switch --detach v1
 
-# View the enhanced Java console app (version2)
+# View enhanced Java console app (version2)
 git switch --detach version2
 
-# Return to the latest version
+# Return to active main branch
 git switch main
 ```
 
-`git switch --detach` lets you check out a tagged version in a detached HEAD state — perfect for browsing older code safely without affecting your current branch. Running `git switch main` brings you back to the latest, actively developed version.
+---
+
+## 🔮 Roadmap Summary
+
+- 🟢 **Phase 1**: Authentication & User Profile REST APIs `[Completed]`
+- 🟡 **Phase 2**: Dynamic Menu & Category Management `[In-Progress]`
+- 🔵 **Phase 3/4**: Order Management & Database Persistence `[Planned]`
+- 🟣 **Phase 5/6**: Kitchen Display System & Inventory Management `[Planned]`
+- 🟠 **Phase 7/8**: Payment Processing & Admin Analytics `[Planned]`
+- 🤖 **Phase 9**: AI Dietary & Order Recommendations `[Planned]`
 
 ---
 
-## 📚 Learning Outcomes
+## 👤 Author & License
 
-Building Sizzle across multiple versions helped strengthen skills in:
+**Nithish V** — [@Nithz-codes](https://github.com/Nithz-codes)
 
-- Java Programming
-- Object-Oriented Programming (OOP)
-- Git & GitHub Version Control
-- React
-- TypeScript
-- Component-Based Architecture
-- Context API for State Management
-- Frontend UI/UX Design
-- Code Versioning Strategies
-- Managing Project Evolution Over Time
-
----
-
-## 🔮 Future Improvements
-
-Planned enhancements for future versions of Sizzle:
-
-- 🔧 Backend integration with **Spring Boot**
-- 🔐 User authentication
-- 🗄️ Database integration
-- 💳 Payment gateway support
-- 📊 Admin dashboard
-- 👤 User accounts and profiles
-- 📦 Order tracking
-- 🌐 REST API development
-
----
-
-## 👤 Author
-
-**[Nithish V]**
-
-- GitHub: [@Nithz-codes](https://github.com/Nithz-codes)
-- LinkedIn: [LinkedIn](https://www.linkedin.com/in/nithish-v43/)
-- Portfolio: [Portfolio.com](https://your-portfolio.com)
-
----
-
-<div align="center">
-
-### ⭐ If you found this project interesting, consider giving it a star!
-
-*Sizzle isn't just an app — it's a record of growth, one version at a time.*
-
-</div>
+Distributed under the **MIT License**. See `LICENSE` for details.
