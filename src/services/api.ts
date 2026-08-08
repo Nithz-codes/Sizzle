@@ -193,3 +193,128 @@ export const adminApi = {
   },
 };
 
+export interface CategoryResponseData {
+  id: number;
+  name: string;
+  displayName: string;
+  icon: string;
+  description: string;
+  itemCount: number;
+}
+
+export interface MenuItemResponseData {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  isVeg: boolean;
+  spicyLevel: number;
+  prepTime: string;
+  rating: number;
+  isAvailable: boolean;
+  categoryId: number;
+  categoryName: string;
+}
+
+export interface CreateMenuItemPayload {
+  name: string;
+  description?: string;
+  price: number;
+  image?: string;
+  isVeg?: boolean;
+  spicyLevel?: number;
+  prepTime?: string;
+  rating?: number;
+  isAvailable?: boolean;
+  categoryId: number;
+}
+
+export const menuApi = {
+  getCategories: async (): Promise<ApiResponse<CategoryResponseData[]>> => {
+    const response = await fetch(`${API_BASE_URL}/categories`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch categories');
+    }
+    return data;
+  },
+
+  getMenuItems: async (categoryId?: number, search?: string): Promise<ApiResponse<MenuItemResponseData[]>> => {
+    const params = new URLSearchParams();
+    if (categoryId) params.append('categoryId', categoryId.toString());
+    if (search) params.append('search', search);
+
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    const response = await fetch(`${API_BASE_URL}/menu${queryString}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch menu items');
+    }
+    return data;
+  },
+
+  getMenuItemById: async (id: number): Promise<ApiResponse<MenuItemResponseData>> => {
+    const response = await fetch(`${API_BASE_URL}/menu/${id}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch menu item');
+    }
+    return data;
+  },
+
+  createMenuItem: async (payload: CreateMenuItemPayload): Promise<ApiResponse<MenuItemResponseData>> => {
+    const response = await fetch(`${API_BASE_URL}/menu`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to create menu item');
+    }
+    return data;
+  },
+
+  updateMenuItem: async (id: number, payload: Partial<CreateMenuItemPayload>): Promise<ApiResponse<MenuItemResponseData>> => {
+    const response = await fetch(`${API_BASE_URL}/menu/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to update menu item');
+    }
+    return data;
+  },
+
+  deleteMenuItem: async (id: number): Promise<ApiResponse<void>> => {
+    const response = await fetch(`${API_BASE_URL}/menu/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to delete menu item');
+    }
+    return data;
+  },
+};
+
+

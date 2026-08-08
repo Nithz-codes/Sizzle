@@ -55,7 +55,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
         String method = request.getMethod();
         return "OPTIONS".equalsIgnoreCase(method) ||
-               path.startsWith("/api/auth/");
+               path.startsWith("/api/auth/") ||
+               path.startsWith("/h2-console") ||
+               ("GET".equalsIgnoreCase(method) && (path.startsWith("/api/categories") || path.startsWith("/api/menu")));
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {

@@ -25,9 +25,15 @@ import { AdminSettings } from './components/admin/AdminSettings';
 import { AdminNotificationToast } from './components/admin/AdminNotificationToast';
 
 import { MENU_ITEMS, CATEGORIES } from './data/menuData';
+import { menuApi } from './services/api';
+import { FoodItem, CategoryOption } from './types';
 import { Flame, Utensils, Search, Sparkles, FilterX, Filter, Tag, X, RotateCcw } from 'lucide-react';
 
 const MainAppContent: React.FC = () => {
+  const [itemsList, setItemsList] = useState<FoodItem[]>(MENU_ITEMS);
+  const [categoriesList, setCategoriesList] = useState<CategoryOption[]>(CATEGORIES);
+  const [isMenuLoading, setIsMenuLoading] = useState<boolean>(false);
+
   const {
     activeCategory,
     setActiveCategory,
@@ -58,9 +64,50 @@ const MainAppContent: React.FC = () => {
 
   const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false);
 
-  // Attach global items reference for search components
+  // Fetch dynamic categories and menu items from Spring Boot REST API
   useEffect(() => {
-    (window as any).sizzleMenuItems = MENU_ITEMS;
+    setIsMenuLoading(true);
+
+    Promise.all([menuApi.getCategories(), menuApi.getMenuItems()])
+      .then(([catRes, menuRes]) => {
+        if (catRes.success && catRes.data && catRes.data.length > 0) {
+          const mappedCats: CategoryOption[] = catRes.data.map((c) => ({
+            id: c.id,
+            name: c.name,
+            displayName: c.displayName,
+            icon: c.icon || 'Utensils',
+            description: c.description || '',
+            itemCount: c.itemCount,
+          }));
+          setCategoriesList(mappedCats);
+        }
+
+        if (menuRes.success && menuRes.data && menuRes.data.length > 0) {
+          const mappedItems: FoodItem[] = menuRes.data.map((m) => ({
+            id: m.id,
+            name: m.name,
+            category: m.categoryName || 'Burger',
+            price: Number(m.price),
+            description: m.description || '',
+            image: m.image || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800',
+            isVeg: Boolean(m.isVeg),
+            spicyLevel: m.spicyLevel ?? 0,
+            prepTime: m.prepTime || '15 mins',
+            rating: m.rating ?? 4.5,
+          }));
+          setItemsList(mappedItems);
+          (window as any).sizzleMenuItems = mappedItems;
+        } else {
+          (window as any).sizzleMenuItems = MENU_ITEMS;
+        }
+      })
+      .catch((err) => {
+        console.warn('Backend menu API unavailable, falling back to local dataset:', err.message);
+        (window as any).sizzleMenuItems = MENU_ITEMS;
+      })
+      .finally(() => {
+        setIsMenuLoading(false);
+      });
   }, []);
 
   // Handle direct URL path access (e.g., http://localhost:3000/profile)
@@ -100,7 +147,7 @@ const MainAppContent: React.FC = () => {
   const filteredMenuItems = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
-    return MENU_ITEMS.filter((item) => {
+    return itemsList.filter((item) => {
       // Group 1: Category Filter
       if (categoryFilter !== 'All') {
         if ((categoryFilter === 'Burgers' || categoryFilter === 'Burger') && item.category !== 'Burger' && !item.name.toLowerCase().includes('burger')) return false;
@@ -153,10 +200,10 @@ const MainAppContent: React.FC = () => {
 
       return true;
     });
-  }, [activeCategory, searchQuery, dietaryFilter, categoryFilter, priceFilter]);
+  }, [itemsList, activeCategory, searchQuery, dietaryFilter, categoryFilter, priceFilter]);
 
   // Find category metadata description
-  const activeCategoryMeta = CATEGORIES.find((c) => c.name === activeCategory);
+  const activeCategoryMeta = categoriesList.find((c) => c.name === activeCategory);
 
   return (
     <div className={isAdmin ? "min-h-screen bg-[#111827] text-[#F9FAFB] flex flex-col justify-between font-['Plus_Jakarta_Sans'] transition-colors duration-500" : "min-h-screen bg-[#FFFDF8] text-[#1E1E1E] flex flex-col justify-between font-['Plus_Jakarta_Sans'] transition-colors duration-500"}>
