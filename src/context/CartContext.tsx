@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useMemo } from 'react';
 import { FoodItem, CartItem, Customer, BillSummary, ReceiptData } from '../types';
 import { MENU_ITEMS } from '../data/menuData';
+import { orderApi } from '../services/api';
 
 export interface ToastNotification {
   foodItemId: number;
@@ -315,6 +316,24 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       items: [...cartItems],
       bill: { ...billSummary },
     };
+
+    // Fire backend database order persistence
+    const backendPaymentMethod: 'CASH' | 'CARD' | 'UPI' = 
+      custDetails.paymentMethod === 'Card' ? 'CARD' : 
+      custDetails.paymentMethod === 'UPI' ? 'UPI' : 'CASH';
+
+    orderApi.createOrder({
+      customerName: custDetails.customerName,
+      phoneNumber: custDetails.phoneNumber,
+      paymentMethod: backendPaymentMethod,
+      orderType: 'DINE_IN',
+      items: cartItems.map(i => ({
+        menuItemId: i.foodItem.id,
+        quantity: i.quantity,
+      })),
+    }).catch(err => {
+      console.warn('Backend order persistence skipped/failed:', err.message);
+    });
 
     setCustomer(custDetails);
     setNextBillNumber((prev) => prev + 1);
