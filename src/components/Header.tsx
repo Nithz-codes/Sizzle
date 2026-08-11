@@ -9,6 +9,7 @@ import {
   LogOut,
   ShieldCheck,
   LayoutDashboard,
+  ChefHat,
   Calendar,
   Users,
   FileSpreadsheet,
@@ -286,6 +287,12 @@ export const Header: React.FC<HeaderProps> = ({ onOpenHistory }) => {
           <div className="max-w-7xl mx-auto flex items-center gap-2 text-xs font-semibold font-['Poppins']">
             {[
               { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+              {
+                id: 'kitchen',
+                label: 'Kitchen KDS',
+                icon: ChefHat,
+                badge: adminCtx.orders.filter((o: any) => (o.orderStatus || 'PENDING') === 'PENDING' || o.orderStatus === 'PREPARING').length,
+              },
               {
                 id: 'orders',
                 label: 'Orders',

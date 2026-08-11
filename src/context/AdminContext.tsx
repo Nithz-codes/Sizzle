@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { ReceiptData, Reservation, CustomerRecord, RestaurantSettings, AdminNotification } from '../types';
-import { adminApi } from '../services/api';
+import { adminApi, orderApi } from '../services/api';
 import { useAuth } from './AuthContext';
 
-export type AdminTab = 'dashboard' | 'orders' | 'reservations' | 'customers' | 'reports' | 'settings' | 'menu';
+export type AdminTab = 'dashboard' | 'kitchen' | 'orders' | 'reservations' | 'customers' | 'reports' | 'settings' | 'menu';
 
 interface AdminContextType {
   activeTab: AdminTab;
@@ -492,14 +492,25 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     billNumber: number,
     status: 'PENDING' | 'PREPARING' | 'READY' | 'DELIVERED' | 'CANCELLED'
   ) => {
+    // Find target order id if exists
+    const targetOrder = orders.find(o => o.billNumber === billNumber);
+
+    // Optimistic UI update
     setOrders((prev) =>
       prev.map((o) => (o.billNumber === billNumber ? { ...o, orderStatus: status, updatedAt: new Date().toLocaleTimeString() } : o))
     );
+
     addNotification(
       'Order Status Updated',
       `Order #${billNumber} moved to ${status}`,
       'order'
     );
+
+    // Fire backend update if target order has numeric backend id or bill number
+    const orderIdToUpdate = targetOrder && (targetOrder as any).id ? (targetOrder as any).id : billNumber;
+    orderApi.updateOrderStatus(orderIdToUpdate, status).catch((err) => {
+      console.warn(`Backend order status update for #${billNumber} skipped/failed:`, err.message);
+    });
   };
 
   const addOrder = (order: ReceiptData) => {

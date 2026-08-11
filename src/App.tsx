@@ -17,6 +17,7 @@ import { Toast } from './components/Toast';
 
 // Admin Components
 import { AdminDashboard } from './components/admin/AdminDashboard';
+import { KitchenDisplaySystem } from './components/admin/KitchenDisplaySystem';
 import { CustomerManagement } from './components/admin/CustomerManagement';
 import { OrderManagement } from './components/admin/OrderManagement';
 import { ReservationManagement } from './components/admin/ReservationManagement';
@@ -243,6 +244,7 @@ const MainAppContent: React.FC = () => {
       {isAdmin && activeTab !== 'menu' ? (
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1">
           {activeTab === 'dashboard' && <AdminDashboard />}
+          {activeTab === 'kitchen' && <KitchenDisplaySystem />}
           {activeTab === 'orders' && <OrderManagement />}
           {activeTab === 'reservations' && <ReservationManagement />}
           {activeTab === 'customers' && <CustomerManagement />}

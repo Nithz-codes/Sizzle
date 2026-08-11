@@ -25,15 +25,18 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final MenuItemRepository menuItemRepository;
+    private final com.sizzle.backend.repository.OrderRepository orderRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(UserRepository userRepository,
                            CategoryRepository categoryRepository,
                            MenuItemRepository menuItemRepository,
+                           com.sizzle.backend.repository.OrderRepository orderRepository,
                            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.menuItemRepository = menuItemRepository;
+        this.orderRepository = orderRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -41,6 +44,7 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) {
         seedUsers();
         seedCategoriesAndMenuItems();
+        seedSampleOrders();
     }
 
     private void seedUsers() {
@@ -122,5 +126,114 @@ public class DataInitializer implements CommandLineRunner {
 
         menuItemRepository.saveAll(items);
         log.info("Successfully seeded {} initial categories and {} menu items into database.", categoryRepository.count(), menuItemRepository.count());
+    }
+
+    private void seedSampleOrders() {
+        if (orderRepository.count() > 0) {
+            return;
+        }
+
+        List<MenuItem> allItems = menuItemRepository.findAll();
+        if (allItems.isEmpty()) {
+            return;
+        }
+
+        log.info("Seeding initial kitchen orders into database...");
+
+        MenuItem item1 = allItems.get(0); // Classic Smash Cheeseburger
+        MenuItem item2 = allItems.size() > 3 ? allItems.get(3) : item1; // Margherita Pizza
+        MenuItem item3 = allItems.size() > 5 ? allItems.get(5) : item1; // Truffle Pasta
+
+        // Order 1: PENDING
+        com.sizzle.backend.model.Order order1 = com.sizzle.backend.model.Order.builder()
+                .orderNumber("SZ-1001")
+                .customerName("Sarah Connor")
+                .customerPhone("+1 555-0144")
+                .tableNumber("Table 4")
+                .orderType(com.sizzle.backend.model.OrderType.DINE_IN)
+                .paymentMethod(com.sizzle.backend.model.PaymentMethod.UPI)
+                .orderStatus(com.sizzle.backend.model.OrderStatus.PENDING)
+                .subtotal(new BigDecimal("698.00"))
+                .taxAmount(new BigDecimal("34.90"))
+                .discountAmount(BigDecimal.ZERO)
+                .grandTotal(new BigDecimal("732.90"))
+                .orderNotes("Extra spicy salsa on the side please")
+                .build();
+
+        com.sizzle.backend.model.OrderItem order1Item1 = com.sizzle.backend.model.OrderItem.builder()
+                .menuItem(item1)
+                .itemName(item1.getName())
+                .price(item1.getPrice())
+                .quantity(2)
+                .subtotal(item1.getPrice().multiply(new BigDecimal("2")))
+                .build();
+
+        order1.addItem(order1Item1);
+        orderRepository.save(order1);
+
+        // Order 2: PREPARING
+        com.sizzle.backend.model.Order order2 = com.sizzle.backend.model.Order.builder()
+                .orderNumber("SZ-1002")
+                .customerName("Michael Scott")
+                .customerPhone("+1 555-0188")
+                .tableNumber("Table 2")
+                .orderType(com.sizzle.backend.model.OrderType.DINE_IN)
+                .paymentMethod(com.sizzle.backend.model.PaymentMethod.CARD)
+                .orderStatus(com.sizzle.backend.model.OrderStatus.PREPARING)
+                .subtotal(new BigDecimal("948.00"))
+                .taxAmount(new BigDecimal("47.40"))
+                .discountAmount(BigDecimal.ZERO)
+                .grandTotal(new BigDecimal("995.40"))
+                .orderNotes("No onions in pizza")
+                .build();
+
+        com.sizzle.backend.model.OrderItem order2Item1 = com.sizzle.backend.model.OrderItem.builder()
+                .menuItem(item2)
+                .itemName(item2.getName())
+                .price(item2.getPrice())
+                .quantity(1)
+                .subtotal(item2.getPrice())
+                .build();
+
+        com.sizzle.backend.model.OrderItem order2Item2 = com.sizzle.backend.model.OrderItem.builder()
+                .menuItem(item3)
+                .itemName(item3.getName())
+                .price(item3.getPrice())
+                .quantity(1)
+                .subtotal(item3.getPrice())
+                .build();
+
+        order2.addItem(order2Item1);
+        order2.addItem(order2Item2);
+        orderRepository.save(order2);
+
+        // Order 3: READY
+        com.sizzle.backend.model.Order order3 = com.sizzle.backend.model.Order.builder()
+                .orderNumber("SZ-1003")
+                .customerName("David Miller")
+                .customerPhone("+1 555-0192")
+                .tableNumber("Takeaway #1")
+                .orderType(com.sizzle.backend.model.OrderType.TAKEAWAY)
+                .paymentMethod(com.sizzle.backend.model.PaymentMethod.CASH)
+                .orderStatus(com.sizzle.backend.model.OrderStatus.READY)
+                .subtotal(new BigDecimal("349.00"))
+                .taxAmount(new BigDecimal("17.45"))
+                .discountAmount(BigDecimal.ZERO)
+                .grandTotal(new BigDecimal("366.45"))
+                .orderNotes("Pack extra cutlery")
+                .build();
+
+        com.sizzle.backend.model.OrderItem order3Item1 = com.sizzle.backend.model.OrderItem.builder()
+                .menuItem(item1)
+                .itemName(item1.getName())
+                .price(item1.getPrice())
+                .quantity(1)
+                .subtotal(item1.getPrice())
+                .build();
+
+        order3.addItem(order3Item1);
+        orderRepository.save(order3);
+
+        log.info("Successfully seeded 3 initial kitchen orders into database.");
     }
 }
