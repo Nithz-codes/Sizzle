@@ -72,8 +72,14 @@ export const CategorySidebar: React.FC = () => {
   };
 
   const getCategoryCount = (catName: string) => {
-    if (catName === 'All') return MENU_ITEMS.length;
-    return MENU_ITEMS.filter((item) => item.category === catName).length;
+    const currentList = (window as any).sizzleMenuItems || MENU_ITEMS;
+    if (catName === 'All') return currentList.length;
+    return currentList.filter((item: any) => {
+      if (catName === 'Burger' || catName === 'Burgers') return item.category === 'Burger' || item.category === 'Burgers' || item.name.toLowerCase().includes('burger');
+      if (catName === 'Grill' || catName === 'Grills & Tandoor') return item.category === 'Grill' || item.category === 'Grills & Tandoor';
+      if (catName === 'Indian Curry') return item.category === 'Indian Curry' || item.category === 'Curry';
+      return item.category === catName;
+    }).length;
   };
 
   return (

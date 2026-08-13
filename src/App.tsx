@@ -62,7 +62,8 @@ const MainAppContent: React.FC = () => {
     logout,
   } = useAuth();
 
-  const { activeTab, settings } = useAdmin();
+  const { activeTab, settings, orders, setActiveTab } = useAdmin();
+  const pendingOrdersCount = useMemo(() => orders.filter(o => o.orderStatus === 'PENDING' || !o.orderStatus).length, [orders]);
 
   const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false);
 
@@ -145,63 +146,90 @@ const MainAppContent: React.FC = () => {
     }
   }, [isInitializing, isAuthenticated, isAdmin]);
 
-  // Filter food items dynamically using Dual Filter System
+  // Filter food items dynamically using Dual Filter System & sort by Category order
   const filteredMenuItems = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
-    return itemsList.filter((item) => {
-      // Group 1: Category Filter
-      if (categoryFilter !== 'All') {
-        if ((categoryFilter === 'Burgers' || categoryFilter === 'Burger') && item.category !== 'Burger' && !item.name.toLowerCase().includes('burger')) return false;
-        if (categoryFilter === 'Pizza' && item.category !== 'Pizza' && !item.name.toLowerCase().includes('pizza')) return false;
-        if (categoryFilter === 'Pasta' && item.category !== 'Pasta' && !item.name.toLowerCase().includes('pasta')) return false;
-        if (categoryFilter === 'Biryani' && item.category !== 'Biryani' && !item.name.toLowerCase().includes('biryani')) return false;
-        if (categoryFilter === 'Indian Curry' && item.category !== 'Indian Curry' && !item.name.toLowerCase().includes('curry')) return false;
-        if (categoryFilter === 'Grills & Tandoor' || categoryFilter === 'Grill') {
-          if (item.category !== 'Grill') return false;
+    const categoryOrder: Record<string, number> = {
+      'Burger': 1,
+      'Burgers': 1,
+      'Burgers & Sandwiches': 1,
+      'Pizza': 2,
+      'Pasta': 3,
+      'Chinese': 4,
+      'Biryani': 5,
+      'Indian Curry': 6,
+      'Curry': 6,
+      'Breads': 7,
+      'Grill': 8,
+      'Grills & Tandoor': 8,
+      'Starters': 9,
+      'Dessert': 10,
+      'Desserts': 10,
+      'Beverage': 11,
+      'Beverages': 11,
+    };
+
+    return itemsList
+      .filter((item) => {
+        // Group 1: Category Filter
+        if (categoryFilter !== 'All') {
+          if ((categoryFilter === 'Burgers' || categoryFilter === 'Burger') && item.category !== 'Burger' && !item.name.toLowerCase().includes('burger')) return false;
+          if (categoryFilter === 'Pizza' && item.category !== 'Pizza' && !item.name.toLowerCase().includes('pizza')) return false;
+          if (categoryFilter === 'Pasta' && item.category !== 'Pasta' && !item.name.toLowerCase().includes('pasta')) return false;
+          if (categoryFilter === 'Biryani' && item.category !== 'Biryani' && !item.name.toLowerCase().includes('biryani')) return false;
+          if (categoryFilter === 'Indian Curry' && item.category !== 'Indian Curry' && !item.name.toLowerCase().includes('curry')) return false;
+          if (categoryFilter === 'Grills & Tandoor' || categoryFilter === 'Grill') {
+            if (item.category !== 'Grill') return false;
+          }
+          if (categoryFilter === 'Veg' && !item.isVeg) return false;
+          if (categoryFilter === 'Non-Veg' && item.isVeg) return false;
         }
-        if (categoryFilter === 'Veg' && !item.isVeg) return false;
-        if (categoryFilter === 'Non-Veg' && item.isVeg) return false;
-      }
 
-      // Group 2: Price Range Filter
-      if (priceFilter !== 'All Prices' && priceFilter !== 'All') {
-        if (priceFilter === 'Under ₹200' && item.price >= 200) return false;
-        if (priceFilter === '₹200–₹300' && (item.price < 200 || item.price > 300)) return false;
-        if (priceFilter === '₹300–₹500' && (item.price < 300 || item.price > 500)) return false;
-        if (priceFilter === 'Above ₹500' && item.price <= 500) return false;
-      }
-
-      // Search query filter
-      if (query !== '') {
-        const matchesName = item.name.toLowerCase().includes(query);
-        const matchesCat = item.category.toLowerCase().includes(query);
-        const matchesDesc = item.description.toLowerCase().includes(query);
-        const matchesId = item.id.toString() === query;
-        const matchesTags = item.tags?.some((tag) => tag.toLowerCase().includes(query));
-
-        if (!matchesName && !matchesCat && !matchesDesc && !matchesId && !matchesTags) {
-          return false;
+        // Group 2: Price Range Filter
+        if (priceFilter !== 'All Prices' && priceFilter !== 'All') {
+          if (priceFilter === 'Under ₹200' && item.price >= 200) return false;
+          if (priceFilter === '₹200–₹300' && (item.price < 200 || item.price > 300)) return false;
+          if (priceFilter === '₹300–₹500' && (item.price < 300 || item.price > 500)) return false;
+          if (priceFilter === 'Above ₹500' && item.price <= 500) return false;
         }
-      } else {
-        // Category Sidebar filter (ignoring pseudo-categories Veg, Non-Veg)
-        if (
-          activeCategory !== 'All' &&
-          activeCategory !== 'Veg' &&
-          activeCategory !== 'Non-Veg'
-        ) {
-          if (item.category !== activeCategory && !(activeCategory === 'Burgers' && item.category === 'Burger')) {
+
+        // Search query filter
+        if (query !== '') {
+          const matchesName = item.name.toLowerCase().includes(query);
+          const matchesCat = item.category.toLowerCase().includes(query);
+          const matchesDesc = item.description.toLowerCase().includes(query);
+          const matchesId = item.id.toString() === query;
+          const matchesTags = item.tags?.some((tag) => tag.toLowerCase().includes(query));
+
+          if (!matchesName && !matchesCat && !matchesDesc && !matchesId && !matchesTags) {
             return false;
           }
+        } else {
+          // Category Sidebar filter (ignoring pseudo-categories Veg, Non-Veg)
+          if (
+            activeCategory !== 'All' &&
+            activeCategory !== 'Veg' &&
+            activeCategory !== 'Non-Veg'
+          ) {
+            if (item.category !== activeCategory && !(activeCategory === 'Burgers' && item.category === 'Burger')) {
+              return false;
+            }
+          }
         }
-      }
 
-      // Dietary filter from sidebar
-      if (dietaryFilter === 'Veg' && !item.isVeg) return false;
-      if (dietaryFilter === 'Non-Veg' && item.isVeg) return false;
+        // Dietary filter from sidebar
+        if (dietaryFilter === 'Veg' && !item.isVeg) return false;
+        if (dietaryFilter === 'Non-Veg' && item.isVeg) return false;
 
-      return true;
-    });
+        return true;
+      })
+      .sort((a, b) => {
+        const orderA = categoryOrder[a.category] || 99;
+        const orderB = categoryOrder[b.category] || 99;
+        if (orderA !== orderB) return orderA - orderB;
+        return a.id - b.id;
+      });
   }, [itemsList, activeCategory, searchQuery, dietaryFilter, categoryFilter, priceFilter]);
 
   // Find category metadata description
@@ -224,6 +252,15 @@ const MainAppContent: React.FC = () => {
               <span className="text-[#D1D5DB] hidden sm:inline">Logged in: <strong className="text-white">{user?.name}</strong> ({user?.email})</span>
             </div>
             <div className="flex items-center gap-3">
+              {pendingOrdersCount > 0 && (
+                <button
+                  onClick={() => setActiveTab('kitchen')}
+                  className="bg-[#F97316] hover:bg-[#EA580C] text-white px-3 py-1 rounded-lg text-[11px] font-extrabold flex items-center gap-1.5 shadow-md animate-pulse cursor-pointer transition-all"
+                >
+                  <Flame className="w-3.5 h-3.5" />
+                  <span>{pendingOrdersCount} New Order{pendingOrdersCount > 1 ? 's' : ''} &rarr; KDS</span>
+                </button>
+              )}
               <span className="hidden sm:inline-block bg-[#F97316]/10 text-[#F97316] border border-[#F97316]/30 px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wide">
                 MySQL 8.0 Connected
               </span>
