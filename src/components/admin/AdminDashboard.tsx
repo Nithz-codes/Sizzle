@@ -94,6 +94,38 @@ export const AdminDashboard: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-fadeIn">
+      {/* New Orders Placed Alert Card */}
+      {metrics.pendingCount > 0 && (
+        <div className="bg-gradient-to-r from-[#F97316]/25 via-[#EA580C]/20 to-[#1F2937] border-2 border-[#F97316] rounded-2xl p-6 shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 animate-pulse">
+          <div className="flex items-center gap-4">
+            <div className="p-3.5 bg-[#F97316] text-white rounded-2xl shadow-xl shrink-0">
+              <ChefHat className="w-8 h-8" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="bg-[#F97316] text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  Action Required
+                </span>
+                <span className="text-xs text-[#F97316] font-semibold">Kitchen Order Queue</span>
+              </div>
+              <h2 className="text-xl font-extrabold text-[#F9FAFB] font-['Poppins']">
+                {metrics.pendingCount} New Order{metrics.pendingCount > 1 ? 's' : ''} Placed!
+              </h2>
+              <p className="text-xs text-[#D1D5DB]">
+                New customer orders have been received and are waiting for preparation in the kitchen.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setActiveTab('kitchen')}
+            className="bg-[#F97316] hover:bg-[#EA580C] text-white font-extrabold text-xs px-6 py-3.5 rounded-xl shadow-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer hover:scale-105"
+          >
+            <UtensilsCrossed className="w-4 h-4" />
+            <span>Open Kitchen KDS Screen &rarr;</span>
+          </button>
+        </div>
+      )}
+
       {/* Executive Command Banner */}
       <div className="bg-[#1F2937] border border-[#374151] rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
         <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 bg-[#F97316]/10 rounded-full blur-3xl pointer-events-none" />

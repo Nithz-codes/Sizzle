@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { ReceiptData, Reservation, CustomerRecord, RestaurantSettings, AdminNotification } from '../types';
 import { adminApi, orderApi } from '../services/api';
 import { useAuth } from './AuthContext';
@@ -317,6 +317,95 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     localStorage.setItem('sizzle_admin_orders', JSON.stringify(orders));
   }, [orders]);
+
+  // Listen for real-time order placement events from CartContext
+  useEffect(() => {
+    const handleOrderPlaced = (e: any) => {
+      if (e.detail) {
+        const newReceipt: ReceiptData = {
+          ...e.detail,
+          orderStatus: e.detail.orderStatus || 'PENDING',
+        };
+        setOrders((prev) => {
+          const exists = prev.some((o) => o.billNumber === newReceipt.billNumber);
+          return exists ? prev : [newReceipt, ...prev];
+        });
+        addNotification(
+          'New Order Placed!',
+          `Order #${newReceipt.billNumber} received for ₹${newReceipt.bill.grandTotal.toFixed(2)} (${newReceipt.customer.customerName})`,
+          'order'
+        );
+      }
+    };
+
+    window.addEventListener('sizzle_order_placed', handleOrderPlaced);
+    return () => {
+      window.removeEventListener('sizzle_order_placed', handleOrderPlaced);
+    };
+  }, []);
+
+  // Refresh live orders from Spring Boot backend API
+  const refreshOrders = useCallback(async () => {
+    try {
+      const res = await orderApi.getAllOrders();
+      if (res.success && Array.isArray(res.data)) {
+        const fetchedReceipts: ReceiptData[] = res.data.map((ord: any) => ({
+          id: ord.id,
+          billNumber: parseInt((ord.orderNumber || '').replace(/\D/g, '')) || ord.id,
+          dateTime: ord.createdAt ? new Date(ord.createdAt).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) : new Date().toLocaleString(),
+          customer: {
+            customerName: ord.customerName || 'Guest Customer',
+            phoneNumber: ord.customerPhone || '',
+            paymentMethod: (ord.paymentMethod === 'CARD' ? 'Card' : ord.paymentMethod === 'UPI' ? 'UPI' : 'Cash') as 'UPI' | 'Card' | 'Cash',
+          },
+          items: (ord.items || []).map((item: any) => ({
+            foodItem: {
+              id: item.menuItemId || 1,
+              name: item.itemName || 'Menu Dish',
+              category: 'Main',
+              price: item.price || 0,
+              description: item.itemName || '',
+              image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500',
+              isVeg: true,
+            },
+            quantity: item.quantity || 1,
+            totalPrice: item.subtotal || (item.price || 0) * (item.quantity || 1),
+          })),
+          bill: {
+            subtotal: ord.subtotal || 0,
+            gst: ord.taxAmount || 0,
+            discount: ord.discountAmount || 0,
+            grandTotal: ord.grandTotal || 0,
+          },
+          orderStatus: ord.orderStatus || 'PENDING',
+          tableNumber: ord.tableNumber || 'Table 1',
+          orderNotes: ord.orderNotes,
+        }));
+
+        setOrders((prev) => {
+          const map = new Map<number, ReceiptData>();
+          // First put fetched receipts from backend DB
+          fetchedReceipts.forEach((r) => map.set(r.billNumber, r));
+          // Preserve any local state items if not present
+          prev.forEach((o) => {
+            if (!map.has(o.billNumber)) {
+              map.set(o.billNumber, o);
+            }
+          });
+          return Array.from(map.values()).sort((a, b) => b.billNumber - a.billNumber);
+        });
+      }
+    } catch (err: any) {
+      console.warn('Admin order sync skipped/failed:', err.message);
+    }
+  }, []);
+
+  // Trigger sync on mount, when admin logs in, when tab changes, or on 4s background interval
+  useEffect(() => {
+    refreshOrders();
+    const interval = setInterval(refreshOrders, 4000);
+    return () => clearInterval(interval);
+  }, [isAdmin, activeTab, refreshOrders]);
 
   // Reservations State
   const [reservations, setReservations] = useState<Reservation[]>(() => {

@@ -358,6 +358,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setActiveReceipt(receipt);
     setPastReceipts((prev) => [receipt, ...prev]);
     
+    // Broadcast order to AdminContext & KDS in real-time
+    window.dispatchEvent(new CustomEvent('sizzle_order_placed', { detail: receipt }));
+
     // Clear cart as in receipt.java line cart.clearCart()
     clearCart();
     setIsCheckoutOpen(false);
