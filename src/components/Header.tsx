@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   LayoutDashboard,
   ChefHat,
+  Package,
   Calendar,
   Users,
   FileSpreadsheet,
@@ -293,6 +294,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenHistory }) => {
                 icon: ChefHat,
                 badge: adminCtx.orders.filter((o: any) => (o.orderStatus || 'PENDING') === 'PENDING' || o.orderStatus === 'PREPARING').length,
               },
+              { id: 'inventory', label: 'Inventory Stock', icon: Package },
               {
                 id: 'orders',
                 label: 'Orders',

@@ -3,7 +3,7 @@ import { ReceiptData, Reservation, CustomerRecord, RestaurantSettings, AdminNoti
 import { adminApi, orderApi } from '../services/api';
 import { useAuth } from './AuthContext';
 
-export type AdminTab = 'dashboard' | 'kitchen' | 'orders' | 'reservations' | 'customers' | 'reports' | 'settings' | 'menu';
+export type AdminTab = 'dashboard' | 'kitchen' | 'inventory' | 'orders' | 'reservations' | 'customers' | 'reports' | 'settings' | 'menu';
 
 interface AdminContextType {
   activeTab: AdminTab;

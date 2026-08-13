@@ -26,17 +26,20 @@ public class DataInitializer implements CommandLineRunner {
     private final CategoryRepository categoryRepository;
     private final MenuItemRepository menuItemRepository;
     private final com.sizzle.backend.repository.OrderRepository orderRepository;
+    private final com.sizzle.backend.repository.InventoryRepository inventoryRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(UserRepository userRepository,
                            CategoryRepository categoryRepository,
                            MenuItemRepository menuItemRepository,
                            com.sizzle.backend.repository.OrderRepository orderRepository,
+                           com.sizzle.backend.repository.InventoryRepository inventoryRepository,
                            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.menuItemRepository = menuItemRepository;
         this.orderRepository = orderRepository;
+        this.inventoryRepository = inventoryRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -45,6 +48,7 @@ public class DataInitializer implements CommandLineRunner {
         seedUsers();
         seedCategoriesAndMenuItems();
         seedSampleOrders();
+        seedSampleInventory();
     }
 
     private void seedUsers() {
@@ -235,5 +239,29 @@ public class DataInitializer implements CommandLineRunner {
         orderRepository.save(order3);
 
         log.info("Successfully seeded 3 initial kitchen orders into database.");
+    }
+
+    private void seedSampleInventory() {
+        if (inventoryRepository.count() > 0) {
+            return;
+        }
+
+        log.info("Seeding initial inventory items into database...");
+
+        List<com.sizzle.backend.model.InventoryItem> inventoryList = List.of(
+            com.sizzle.backend.model.InventoryItem.builder().name("Angus Beef Patties").category("Meat & Poultry").quantity(45.0).unit("kg").minThreshold(10.0).costPerUnit(new BigDecimal("450.00")).supplier("Prime Meats Co.").build(),
+            com.sizzle.backend.model.InventoryItem.builder().name("Fresh Buffalo Mozzarella").category("Dairy").quantity(18.5).unit("kg").minThreshold(5.0).costPerUnit(new BigDecimal("320.00")).supplier("Dairy Fresh Ltd.").build(),
+            com.sizzle.backend.model.InventoryItem.builder().name("Premium Basmati Rice").category("Grains & Rice").quantity(8.0).unit("kg").minThreshold(15.0).costPerUnit(new BigDecimal("120.00")).supplier("Royal Grains").build(),
+            com.sizzle.backend.model.InventoryItem.builder().name("Artisanal Burger Buns").category("Bakery").quantity(120.0).unit("pcs").minThreshold(30.0).costPerUnit(new BigDecimal("15.00")).supplier("Bakehouse Inc.").build(),
+            com.sizzle.backend.model.InventoryItem.builder().name("White Truffle Oil").category("Condiments").quantity(2.5).unit("liters").minThreshold(1.0).costPerUnit(new BigDecimal("1200.00")).supplier("Gourmet Imports").build(),
+            com.sizzle.backend.model.InventoryItem.builder().name("Fresh San Marzano Tomatoes").category("Produce").quantity(35.0).unit("kg").minThreshold(10.0).costPerUnit(new BigDecimal("80.00")).supplier("Farm Direct").build(),
+            com.sizzle.backend.model.InventoryItem.builder().name("San Pellegrino Sparkling Water").category("Beverages").quantity(0.0).unit("pcs").minThreshold(20.0).costPerUnit(new BigDecimal("95.00")).supplier("Beverage Supply Co.").build(),
+            com.sizzle.backend.model.InventoryItem.builder().name("Fresh Mint Leaves").category("Produce").quantity(3.0).unit("kg").minThreshold(1.5).costPerUnit(new BigDecimal("150.00")).supplier("Organic Farms").build(),
+            com.sizzle.backend.model.InventoryItem.builder().name("Aged Cheddar Cheese Slices").category("Dairy").quantity(12.0).unit("packs").minThreshold(5.0).costPerUnit(new BigDecimal("220.00")).supplier("Dairy Fresh Ltd.").build(),
+            com.sizzle.backend.model.InventoryItem.builder().name("Dark Chocolate Compound").category("Baking").quantity(15.0).unit("kg").minThreshold(4.0).costPerUnit(new BigDecimal("380.00")).supplier("Sweet Craft").build()
+        );
+
+        inventoryRepository.saveAll(inventoryList);
+        log.info("Successfully seeded 10 initial inventory items into database.");
     }
 }

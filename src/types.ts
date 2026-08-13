@@ -104,3 +104,19 @@ export interface AdminNotification {
   timestamp: string;
   read: boolean;
 }
+
+export interface InventoryItem {
+  id: number;
+  name: string;
+  category: string;
+  quantity: number;
+  unit: string;
+  minThreshold: number;
+  costPerUnit: number;
+  totalValue: number;
+  supplier?: string;
+  status: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
+  lastRestockedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}

@@ -431,5 +431,104 @@ export const orderApi = {
   },
 };
 
+export interface CreateInventoryPayload {
+  name: string;
+  category: string;
+  quantity: number;
+  unit: string;
+  minThreshold: number;
+  costPerUnit: number;
+  supplier?: string;
+}
+
+export const inventoryApi = {
+  getAllItems: async (category?: string, status?: string, search?: string): Promise<ApiResponse<any[]>> => {
+    const params = new URLSearchParams();
+    if (category && category !== 'ALL') params.append('category', category);
+    if (status && status !== 'ALL') params.append('status', status);
+    if (search) params.append('search', search);
+
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    const response = await fetch(`${API_BASE_URL}/inventory${queryString}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch inventory items');
+    }
+    return data;
+  },
+
+  getItemById: async (id: number): Promise<ApiResponse<any>> => {
+    const response = await fetch(`${API_BASE_URL}/inventory/${id}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch inventory item');
+    }
+    return data;
+  },
+
+  createItem: async (payload: CreateInventoryPayload): Promise<ApiResponse<any>> => {
+    const response = await fetch(`${API_BASE_URL}/inventory`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to create inventory item');
+    }
+    return data;
+  },
+
+  updateItem: async (id: number, payload: CreateInventoryPayload): Promise<ApiResponse<any>> => {
+    const response = await fetch(`${API_BASE_URL}/inventory/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to update inventory item');
+    }
+    return data;
+  },
+
+  restockItem: async (id: number, addQuantity: number): Promise<ApiResponse<any>> => {
+    const response = await fetch(`${API_BASE_URL}/inventory/${id}/restock`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ addQuantity }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to restock inventory item');
+    }
+    return data;
+  },
+
+  deleteItem: async (id: number): Promise<ApiResponse<void>> => {
+    const response = await fetch(`${API_BASE_URL}/inventory/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to delete inventory item');
+    }
+    return data;
+  },
+};
+
 
 
