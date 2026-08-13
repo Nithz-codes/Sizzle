@@ -573,61 +573,34 @@ export const CheckoutModal: React.FC = () => {
               </div>
             )}
 
-            {/* 3. UPI PAYMENT FLOW (BUG #5) */}
+            {/* 3. UPI PAYMENT FLOW */}
             {paymentMethod === 'UPI' && (
               <div className="bg-[#FFFFFF] border border-[#ECECEC] rounded-2xl p-4 text-center space-y-3 animate-in fade-in duration-150">
                 <div className="flex items-center justify-between pb-1 border-b border-[#ECECEC]">
                   <span className="text-xs font-bold text-[#1E1E1E]">Instant Scan & Pay</span>
-                  <span className="text-[10px] text-[#2E7D32] bg-[#2E7D32]/10 font-bold px-2 py-0.5 rounded-full">
-                    Zero Extra Fee
+                  <span className="text-[10px] text-[#2E7D32] bg-[#2E7D32]/10 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#2E7D32] animate-ping" />
+                    Live Working QR
                   </span>
                 </div>
 
-                {/* QR Code Container */}
-                <div className="bg-[#FFFDF8] border border-[#ECECEC] p-3 rounded-2xl inline-block shadow-2xs">
-                  <svg className="w-36 h-36 mx-auto" viewBox="0 0 100 100">
-                    <rect width="100" height="100" fill="#FFFFFF" rx="8" />
-                    {/* Top-Left Finder */}
-                    <rect x="8" y="8" width="28" height="28" fill="#1E1E1E" rx="4" />
-                    <rect x="12" y="12" width="20" height="20" fill="#FFFFFF" rx="2" />
-                    <rect x="16" y="16" width="12" height="12" fill="#E85D04" rx="1" />
-
-                    {/* Top-Right Finder */}
-                    <rect x="64" y="8" width="28" height="28" fill="#1E1E1E" rx="4" />
-                    <rect x="68" y="12" width="20" height="20" fill="#FFFFFF" rx="2" />
-                    <rect x="72" y="16" width="12" height="12" fill="#E85D04" rx="1" />
-
-                    {/* Bottom-Left Finder */}
-                    <rect x="8" y="64" width="28" height="28" fill="#1E1E1E" rx="4" />
-                    <rect x="12" y="68" width="20" height="20" fill="#FFFFFF" rx="2" />
-                    <rect x="16" y="72" width="12" height="12" fill="#E85D04" rx="1" />
-
-                    {/* Dummy Data Matrix Dots */}
-                    <rect x="42" y="10" width="6" height="6" fill="#1E1E1E" />
-                    <rect x="52" y="10" width="6" height="6" fill="#1E1E1E" />
-                    <rect x="42" y="20" width="6" height="6" fill="#1E1E1E" />
-                    <rect x="50" y="28" width="8" height="8" fill="#1E1E1E" />
-
-                    <rect x="10" y="42" width="6" height="6" fill="#1E1E1E" />
-                    <rect x="22" y="42" width="6" height="6" fill="#1E1E1E" />
-                    <rect x="30" y="42" width="10" height="10" fill="#E85D04" />
-
-                    <rect x="44" y="44" width="12" height="12" fill="#1E1E1E" rx="2" />
-                    <rect x="60" y="42" width="8" height="8" fill="#1E1E1E" />
-                    <rect x="74" y="42" width="6" height="6" fill="#1E1E1E" />
-                    <rect x="86" y="42" width="6" height="6" fill="#1E1E1E" />
-
-                    <rect x="42" y="62" width="8" height="8" fill="#1E1E1E" />
-                    <rect x="54" y="62" width="6" height="6" fill="#1E1E1E" />
-                    <rect x="64" y="64" width="8" height="8" fill="#1E1E1E" />
-
-                    <rect x="42" y="76" width="12" height="12" fill="#E85D04" rx="2" />
-                    <rect x="60" y="76" width="8" height="8" fill="#1E1E1E" />
-                    <rect x="74" y="76" width="12" height="12" fill="#1E1E1E" />
-                  </svg>
-                  <p className="text-[10px] font-bold text-[#E85D04] mt-1 font-['Poppins']">
-                    SIZZLE PAY
-                  </p>
+                {/* Real Working UPI QR Code Container */}
+                <div className="bg-[#FFFFFF] border-2 border-[#E85D04]/30 p-3 rounded-2xl inline-block shadow-md relative group">
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+                      `upi://pay?pa=payments@sizzle&pn=Sizzle%20Gourmet%20Bistro&am=${grandTotal.toFixed(
+                        2
+                      )}&cu=INR&tn=Order%20Payment`
+                    )}`}
+                    alt="Scan UPI QR Code to Pay"
+                    className="w-40 h-40 mx-auto rounded-lg"
+                  />
+                  <div className="mt-2 flex items-center justify-center gap-1 text-[11px] font-extrabold text-[#E85D04]">
+                    <span>Scan with GPay / PhonePe / Paytm / BHIM</span>
+                  </div>
+                  <div className="text-[10px] font-bold text-[#2E7D32] bg-[#2E7D32]/10 px-2 py-0.5 rounded-full mt-1 inline-block">
+                    Exact Amount: ₹{grandTotal.toFixed(2)}
+                  </div>
                 </div>
 
                 {/* UPI ID Info */}
