@@ -530,5 +530,76 @@ export const inventoryApi = {
   },
 };
 
+export interface InitiatePaymentPayload {
+  orderId: number;
+  paymentMethod: 'CASH' | 'CARD' | 'UPI';
+  gatewayProvider?: 'RAZORPAY' | 'STRIPE' | 'UPI_DIRECT' | 'CASH_ON_DELIVERY';
+  cardLastFour?: string;
+  upiId?: string;
+}
+
+export interface VerifyPaymentPayload {
+  transactionId: string;
+  gatewayPaymentId?: string;
+  gatewaySignature?: string;
+}
+
+export const paymentApi = {
+  initiatePayment: async (payload: InitiatePaymentPayload): Promise<ApiResponse<any>> => {
+    const response = await fetch(`${API_BASE_URL}/payments/initiate`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to initiate payment');
+    }
+    return data;
+  },
+
+  verifyPayment: async (payload: VerifyPaymentPayload): Promise<ApiResponse<any>> => {
+    const response = await fetch(`${API_BASE_URL}/payments/verify`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to verify payment');
+    }
+    return data;
+  },
+
+  getPaymentsByOrder: async (orderId: number): Promise<ApiResponse<any[]>> => {
+    const response = await fetch(`${API_BASE_URL}/payments/order/${orderId}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch order payment history');
+    }
+    return data;
+  },
+
+  getAllPayments: async (status?: string): Promise<ApiResponse<any[]>> => {
+    const queryString = status ? `?status=${status}` : '';
+    const response = await fetch(`${API_BASE_URL}/payments${queryString}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch payment audit logs');
+    }
+    return data;
+  },
+};
+
 
 

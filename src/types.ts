@@ -43,8 +43,27 @@ export interface ReceiptData {
   items: CartItem[];
   bill: BillSummary;
   orderStatus?: 'PENDING' | 'PREPARING' | 'READY' | 'DELIVERED' | 'CANCELLED';
+  paymentStatus?: 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED';
+  transactionId?: string;
   tableNumber?: string;
   orderNotes?: string;
+  updatedAt?: string;
+}
+
+export interface PaymentTransaction {
+  id: number;
+  transactionId: string;
+  gatewayOrderId?: string;
+  orderId: number;
+  orderNumber?: string;
+  amount: number;
+  currency: string;
+  paymentMethod: 'CASH' | 'CARD' | 'UPI';
+  gatewayProvider: 'RAZORPAY' | 'STRIPE' | 'UPI_DIRECT' | 'CASH_ON_DELIVERY';
+  paymentStatus: 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED';
+  cardLastFour?: string;
+  upiId?: string;
+  createdAt?: string;
   updatedAt?: string;
 }
 

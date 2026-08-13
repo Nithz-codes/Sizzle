@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useMemo } from 'react';
 import { FoodItem, CartItem, Customer, BillSummary, ReceiptData } from '../types';
 import { MENU_ITEMS } from '../data/menuData';
-import { orderApi } from '../services/api';
+import { orderApi, paymentApi } from '../services/api';
 
 export interface ToastNotification {
   foodItemId: number;
@@ -317,7 +317,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       bill: { ...billSummary },
     };
 
-    // Fire backend database order persistence
+    // Fire backend database order persistence and payment processing
     const backendPaymentMethod: 'CASH' | 'CARD' | 'UPI' = 
       custDetails.paymentMethod === 'Card' ? 'CARD' : 
       custDetails.paymentMethod === 'UPI' ? 'UPI' : 'CASH';
@@ -331,8 +331,26 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         menuItemId: i.foodItem.id,
         quantity: i.quantity,
       })),
+    }).then(async (createdOrderRes) => {
+      if (createdOrderRes.success && createdOrderRes.data) {
+        const orderId = createdOrderRes.data.id;
+        // Initiate Payment
+        const initRes = await paymentApi.initiatePayment({
+          orderId,
+          paymentMethod: backendPaymentMethod,
+          cardLastFour: custDetails.cardLastFour,
+          upiId: custDetails.upiId,
+        });
+
+        if (initRes.success && initRes.data) {
+          // Verify Payment & Settle Order
+          await paymentApi.verifyPayment({
+            transactionId: initRes.data.transactionId,
+          });
+        }
+      }
     }).catch(err => {
-      console.warn('Backend order persistence skipped/failed:', err.message);
+      console.warn('Backend order/payment processing skipped/failed:', err.message);
     });
 
     setCustomer(custDetails);

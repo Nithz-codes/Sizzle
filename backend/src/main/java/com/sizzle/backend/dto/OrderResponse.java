@@ -3,6 +3,7 @@ package com.sizzle.backend.dto;
 import com.sizzle.backend.model.OrderStatus;
 import com.sizzle.backend.model.OrderType;
 import com.sizzle.backend.model.PaymentMethod;
+import com.sizzle.backend.model.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ public class OrderResponse {
     private String tableNumber;
     private OrderType orderType;
     private PaymentMethod paymentMethod;
+    private PaymentStatus paymentStatus;
     private OrderStatus orderStatus;
     private BigDecimal subtotal;
     private BigDecimal taxAmount;
@@ -29,7 +31,7 @@ public class OrderResponse {
 
     public OrderResponse() {}
 
-    public OrderResponse(Long id, String orderNumber, Long userId, String customerName, String customerPhone, String tableNumber, OrderType orderType, PaymentMethod paymentMethod, OrderStatus orderStatus, BigDecimal subtotal, BigDecimal taxAmount, BigDecimal discountAmount, BigDecimal grandTotal, String orderNotes, List<OrderItemResponse> items, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public OrderResponse(Long id, String orderNumber, Long userId, String customerName, String customerPhone, String tableNumber, OrderType orderType, PaymentMethod paymentMethod, PaymentStatus paymentStatus, OrderStatus orderStatus, BigDecimal subtotal, BigDecimal taxAmount, BigDecimal discountAmount, BigDecimal grandTotal, String orderNotes, List<OrderItemResponse> items, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.orderNumber = orderNumber;
         this.userId = userId;
@@ -38,6 +40,7 @@ public class OrderResponse {
         this.tableNumber = tableNumber;
         this.orderType = orderType;
         this.paymentMethod = paymentMethod;
+        this.paymentStatus = paymentStatus;
         this.orderStatus = orderStatus;
         this.subtotal = subtotal;
         this.taxAmount = taxAmount;
@@ -48,6 +51,9 @@ public class OrderResponse {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    public PaymentStatus getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(PaymentStatus paymentStatus) { this.paymentStatus = paymentStatus; }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

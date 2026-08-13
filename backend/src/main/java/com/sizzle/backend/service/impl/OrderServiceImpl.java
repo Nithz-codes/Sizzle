@@ -178,6 +178,7 @@ public class OrderServiceImpl implements OrderService {
                 order.getTableNumber(),
                 order.getOrderType(),
                 order.getPaymentMethod(),
+                order.getPaymentStatus(),
                 order.getOrderStatus(),
                 order.getSubtotal(),
                 order.getTaxAmount(),
