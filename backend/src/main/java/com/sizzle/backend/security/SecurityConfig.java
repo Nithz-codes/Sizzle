@@ -80,6 +80,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/payments/verify").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/payments/order/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/payments").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers("/api/analytics/**").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/users/**").authenticated()
