@@ -139,3 +139,41 @@ export interface InventoryItem {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface DailyRevenueData {
+  date: string;
+  revenue: number;
+  orderCount: number;
+}
+
+export interface TopDishData {
+  menuItemId: number;
+  dishName: string;
+  categoryName: string;
+  quantitySold: number;
+  totalRevenue: number;
+  imageUrl?: string;
+}
+
+export interface CategorySalesData {
+  categoryName: string;
+  itemsSold: number;
+  totalRevenue: number;
+  percentageShare: number;
+}
+
+export interface HourlyDemandData {
+  hour: number;
+  orderCount: number;
+  totalRevenue: number;
+}
+
+export interface AnalyticsOverviewData {
+  totalRevenue: number;
+  totalOrders: number;
+  averageOrderValue: number;
+  pendingOrders: number;
+  preparingOrders: number;
+  completedOrders: number;
+  dailyTrends: DailyRevenueData[];
+}

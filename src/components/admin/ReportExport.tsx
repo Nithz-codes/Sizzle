@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAdmin } from '../../context/AdminContext';
+import { analyticsApi, inventoryApi } from '../../services/api';
 import {
   FileSpreadsheet,
   Download,
@@ -8,26 +9,62 @@ import {
   Calendar,
   ShoppingBag,
   DollarSign,
+  TrendingUp,
+  Award,
+  Clock,
+  PieChart,
+  Package,
 } from 'lucide-react';
 
 export const ReportExport: React.FC = () => {
   const { orders, reservations, settings } = useAdmin();
 
-  const [activeReportTab, setActiveReportTab] = useState<'orders' | 'reservations' | 'revenue'>('orders');
+  const [activeReportTab, setActiveReportTab] = useState<'orders' | 'reservations' | 'revenue' | 'inventory'>('orders');
+  const [analyticsOverview, setAnalyticsOverview] = useState<any>(null);
+  const [topDishes, setTopDishes] = useState<any[]>([]);
+  const [categorySales, setCategorySales] = useState<any[]>([]);
+  const [hourlyDemand, setHourlyDemand] = useState<any[]>([]);
+  const [inventoryList, setInventoryList] = useState<any[]>([]);
+  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState<boolean>(false);
 
-  // CSV Export Utility
-  const exportToCSV = (filename: string, headers: string[], rows: (string | number)[][]) => {
-    const csvContent =
-      'data:text/csv;charset=utf-8,' +
-      [headers.join(','), ...rows.map((e) => e.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(','))].join('\n');
+  useEffect(() => {
+    setIsLoadingAnalytics(true);
+    Promise.all([
+      analyticsApi.getOverview().catch(() => null),
+      analyticsApi.getTopDishes(5).catch(() => null),
+      analyticsApi.getCategorySales().catch(() => null),
+      analyticsApi.getHourlyDemand().catch(() => null),
+      inventoryApi.getAllItems().catch(() => null),
+    ]).then(([ov, td, cat, hr, inv]) => {
+      if (ov?.success && ov?.data) setAnalyticsOverview(ov.data);
+      if (td?.success && Array.isArray(td.data)) setTopDishes(td.data);
+      if (cat?.success && Array.isArray(cat.data)) setCategorySales(cat.data);
+      if (hr?.success && Array.isArray(hr.data)) setHourlyDemand(hr.data);
+      if (inv?.success && Array.isArray(inv.data)) setInventoryList(inv.data);
+      setIsLoadingAnalytics(false);
+    });
+  }, []);
 
-    const encodedUri = encodeURI(csvContent);
+  // CSV Export Utility (Uses UTF-8 Blob & Object URL to prevent URI fragment truncations)
+  const exportToCSV = (filename: string, headers: string[], rows: (string | number | undefined | null)[][]) => {
+    const csvLines = [
+      headers.map((h) => `"${String(h).replace(/"/g, '""')}"`).join(','),
+      ...rows.map((row) =>
+        row.map((val) => `"${String(val ?? '').replace(/"/g, '""')}"`).join(',')
+      ),
+    ];
+    // UTF-8 BOM prefix (\uFEFF) ensures Excel and text editors parse symbols and UTF-8 characters cleanly
+    const csvString = '\uFEFF' + csvLines.join('\r\n');
+
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
+    link.setAttribute('href', url);
     link.setAttribute('download', `${filename}_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   // PDF Export Utility (Invokes HTML document print view)
@@ -76,15 +113,15 @@ export const ReportExport: React.FC = () => {
   const handleExportOrdersCSV = () => {
     const headers = ['Order ID', 'Date & Time', 'Customer Name', 'Phone', 'Payment Method', 'Items Count', 'Subtotal (₹)', 'GST (₹)', 'Grand Total (₹)', 'Status'];
     const rows = orders.map((o) => [
-      `#${o.billNumber}`,
-      o.dateTime,
-      o.customer.customerName,
-      o.customer.phoneNumber,
-      o.customer.paymentMethod,
-      o.items.length,
-      o.bill.subtotal.toFixed(2),
-      o.bill.gst.toFixed(2),
-      o.bill.grandTotal.toFixed(2),
+      o.billNumber ? `ORD-${o.billNumber}` : 'ORD-N/A',
+      o.dateTime || '',
+      o.customer?.customerName || 'Guest Customer',
+      o.customer?.phoneNumber || 'N/A',
+      o.customer?.paymentMethod || 'Cash',
+      o.items ? o.items.length : 0,
+      o.bill?.subtotal ? Number(o.bill.subtotal).toFixed(2) : '0.00',
+      o.bill?.gst ? Number(o.bill.gst).toFixed(2) : '0.00',
+      o.bill?.grandTotal ? Number(o.bill.grandTotal).toFixed(2) : '0.00',
       o.orderStatus || 'PENDING',
     ]);
     exportToCSV('Orders_Report', headers, rows);
@@ -240,6 +277,64 @@ export const ReportExport: React.FC = () => {
     exportToPDF('Revenue Financial Summary Report', bodyHtml);
   };
 
+  // Inventory Export Handlers
+  const handleExportInventoryCSV = () => {
+    const headers = ['Item ID', 'Ingredient Name', 'Category', 'Stock Quantity', 'Unit', 'Min Threshold', 'Unit Cost (₹)', 'Total Valuation (₹)', 'Status'];
+    const rows = inventoryList.map((item) => [
+      item.id,
+      item.name,
+      item.category,
+      item.quantity,
+      item.unit,
+      item.minThreshold,
+      Number(item.costPerUnit || 0).toFixed(2),
+      Number(item.totalValue || (item.costPerUnit * item.quantity) || 0).toFixed(2),
+      item.status,
+    ]);
+    exportToCSV('Inventory_Stock_Report', headers, rows);
+  };
+
+  const handleExportInventoryPDF = () => {
+    const rowsHtml = inventoryList
+      .map(
+        (i) => `
+      <tr>
+        <td>#${i.id}</td>
+        <td>${i.name}</td>
+        <td>${i.category}</td>
+        <td>${i.quantity} ${i.unit}</td>
+        <td>₹${Number(i.costPerUnit || 0).toFixed(2)}</td>
+        <td>₹${Number(i.totalValue || 0).toFixed(2)}</td>
+        <td><strong>${i.status}</strong></td>
+      </tr>
+    `
+      )
+      .join('');
+
+    const bodyHtml = `
+      <div class="summary-box">
+        <p><strong>Total Ingredients Tracked:</strong> ${inventoryList.length}</p>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Item ID</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Quantity</th>
+            <th>Unit Cost</th>
+            <th>Valuation</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+        </tbody>
+      </table>
+    `;
+    exportToPDF('Inventory Stock Audit Report', bodyHtml);
+  };
+
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Header Banner */}
@@ -250,22 +345,71 @@ export const ReportExport: React.FC = () => {
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-[#F9FAFB] font-['Poppins']">
-              Report Export Center
+              Business Intelligence & Report Export Center
             </h1>
             <p className="text-xs text-[#9CA3AF]">
-              Generate, preview, and download official PDF and CSV data reports for management review.
+              Live sales performance analytics, peak hour demand insights, and instant CSV/PDF reporting.
             </p>
           </div>
         </div>
       </div>
 
+      {/* BI Analytics Metrics Overview Grid */}
+      {analyticsOverview && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-[#1E293B] border border-[#374151] p-5 rounded-2xl shadow-md">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-[#9CA3AF] font-bold uppercase tracking-wider">Total Sales Revenue</span>
+              <DollarSign className="w-5 h-5 text-[#22C55E]" />
+            </div>
+            <p className="text-2xl font-extrabold text-[#F9FAFB] font-['Poppins'] mt-2">
+              ₹{Number(analyticsOverview.totalRevenue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+            </p>
+            <span className="text-[11px] text-[#22C55E] font-semibold mt-1 inline-block">Live DB Analytics</span>
+          </div>
+
+          <div className="bg-[#1E293B] border border-[#374151] p-5 rounded-2xl shadow-md">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-[#9CA3AF] font-bold uppercase tracking-wider">Average Order Value</span>
+              <TrendingUp className="w-5 h-5 text-[#F97316]" />
+            </div>
+            <p className="text-2xl font-extrabold text-[#F9FAFB] font-['Poppins'] mt-2">
+              ₹{Number(analyticsOverview.averageOrderValue || 0).toFixed(2)}
+            </p>
+            <span className="text-[11px] text-[#9CA3AF] mt-1 inline-block">Per Customer Checkout</span>
+          </div>
+
+          <div className="bg-[#1E293B] border border-[#374151] p-5 rounded-2xl shadow-md">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-[#9CA3AF] font-bold uppercase tracking-wider">Completed Orders</span>
+              <ShoppingBag className="w-5 h-5 text-[#3B82F6]" />
+            </div>
+            <p className="text-2xl font-extrabold text-[#F9FAFB] font-['Poppins'] mt-2">
+              {analyticsOverview.totalOrders || 0}
+            </p>
+            <span className="text-[11px] text-[#3B82F6] font-semibold mt-1 inline-block">Settled & Delivered</span>
+          </div>
+
+          <div className="bg-[#1E293B] border border-[#374151] p-5 rounded-2xl shadow-md">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-[#9CA3AF] font-bold uppercase tracking-wider">Active Kitchen Queue</span>
+              <Clock className="w-5 h-5 text-[#F59E0B]" />
+            </div>
+            <p className="text-2xl font-extrabold text-[#F9FAFB] font-['Poppins'] mt-2">
+              {(analyticsOverview.pendingOrders || 0) + (analyticsOverview.preparingOrders || 0)}
+            </p>
+            <span className="text-[11px] text-[#F59E0B] font-semibold mt-1 inline-block">Pending Preparation</span>
+          </div>
+        </div>
+      )}
+
       {/* Tabs & Export Triggers Bar */}
       <div className="bg-[#1E293B] border border-[#374151] rounded-2xl p-4 shadow-md flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Report Category Selector */}
-        <div className="flex items-center bg-[#111827] p-1 rounded-xl border border-[#374151] text-xs font-medium w-full md:w-auto">
+        <div className="flex items-center bg-[#111827] p-1 rounded-xl border border-[#374151] text-xs font-medium w-full md:w-auto overflow-x-auto">
           <button
             onClick={() => setActiveReportTab('orders')}
-            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-2 ${
+            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
               activeReportTab === 'orders'
                 ? 'bg-[#F97316] text-white font-bold shadow-md'
                 : 'text-[#9CA3AF] hover:text-[#F9FAFB]'
@@ -277,19 +421,19 @@ export const ReportExport: React.FC = () => {
 
           <button
             onClick={() => setActiveReportTab('reservations')}
-            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-2 ${
+            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
               activeReportTab === 'reservations'
                 ? 'bg-[#F97316] text-white font-bold shadow-md'
                 : 'text-[#9CA3AF] hover:text-[#F9FAFB]'
             }`}
           >
             <Calendar className="w-4 h-4" />
-            <span>Reservations Report</span>
+            <span>Reservations</span>
           </button>
 
           <button
             onClick={() => setActiveReportTab('revenue')}
-            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-2 ${
+            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
               activeReportTab === 'revenue'
                 ? 'bg-[#F97316] text-white font-bold shadow-md'
                 : 'text-[#9CA3AF] hover:text-[#F9FAFB]'
@@ -297,6 +441,18 @@ export const ReportExport: React.FC = () => {
           >
             <DollarSign className="w-4 h-4" />
             <span>Revenue Summary</span>
+          </button>
+
+          <button
+            onClick={() => setActiveReportTab('inventory')}
+            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+              activeReportTab === 'inventory'
+                ? 'bg-[#F97316] text-white font-bold shadow-md'
+                : 'text-[#9CA3AF] hover:text-[#F9FAFB]'
+            }`}
+          >
+            <Package className="w-4 h-4" />
+            <span>Inventory Report</span>
           </button>
         </div>
 
@@ -306,6 +462,7 @@ export const ReportExport: React.FC = () => {
             onClick={() => {
               if (activeReportTab === 'orders') handleExportOrdersCSV();
               else if (activeReportTab === 'reservations') handleExportReservationsCSV();
+              else if (activeReportTab === 'inventory') handleExportInventoryCSV();
               else handleExportRevenueCSV();
             }}
             className="bg-[#374151] hover:bg-[#4B5563] text-[#F9FAFB] font-bold text-xs px-4 py-2.5 rounded-xl border border-[#4B5563] transition-all flex items-center gap-2 cursor-pointer shadow-md"
@@ -318,6 +475,7 @@ export const ReportExport: React.FC = () => {
             onClick={() => {
               if (activeReportTab === 'orders') handleExportOrdersPDF();
               else if (activeReportTab === 'reservations') handleExportReservationsPDF();
+              else if (activeReportTab === 'inventory') handleExportInventoryPDF();
               else handleExportRevenuePDF();
             }}
             className="bg-[#F97316] hover:bg-[#EA580C] text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-[#F97316]/20"
@@ -339,6 +497,8 @@ export const ReportExport: React.FC = () => {
                 ? 'Orders Data'
                 : activeReportTab === 'reservations'
                 ? 'Reservations Data'
+                : activeReportTab === 'inventory'
+                ? 'Inventory Stock Report'
                 : 'Revenue Financial Summary'}
             </span>
           </h2>
@@ -470,6 +630,48 @@ export const ReportExport: React.FC = () => {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Inventory Preview */}
+        {activeReportTab === 'inventory' && (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="bg-[#111827] border-b border-[#374151] text-[#9CA3AF] font-semibold uppercase text-[11px]">
+                  <th className="py-3 px-4">Item ID</th>
+                  <th className="py-3 px-4">Ingredient Name</th>
+                  <th className="py-3 px-4">Category</th>
+                  <th className="py-3 px-4">Stock Quantity</th>
+                  <th className="py-3 px-4 text-right">Unit Cost</th>
+                  <th className="py-3 px-4 text-right">Total Valuation</th>
+                  <th className="py-3 px-4">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#374151]/40 text-[#D1D5DB]">
+                {inventoryList.map((i) => (
+                  <tr key={i.id}>
+                    <td className="py-3 px-4 font-bold text-[#F9FAFB]">#{i.id}</td>
+                    <td className="py-3 px-4 font-medium">{i.name}</td>
+                    <td className="py-3 px-4 text-[#9CA3AF]">{i.category}</td>
+                    <td className="py-3 px-4 font-bold text-[#F97316]">{i.quantity} {i.unit}</td>
+                    <td className="py-3 px-4 text-right">₹{Number(i.costPerUnit || 0).toFixed(2)}</td>
+                    <td className="py-3 px-4 text-right font-bold text-[#22C55E]">
+                      ₹{Number(i.totalValue || (i.costPerUnit * i.quantity) || 0).toFixed(2)}
+                    </td>
+                    <td className="py-3 px-4 font-bold">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] ${
+                        i.status === 'IN_STOCK' ? 'bg-[#22C55E]/10 text-[#22C55E]' :
+                        i.status === 'LOW_STOCK' ? 'bg-[#F59E0B]/10 text-[#F59E0B]' :
+                        'bg-[#EF4444]/10 text-[#EF4444]'
+                      }`}>
+                        {i.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

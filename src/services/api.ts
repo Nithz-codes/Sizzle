@@ -601,5 +601,47 @@ export const paymentApi = {
   },
 };
 
+export const analyticsApi = {
+  getOverview: async (): Promise<ApiResponse<any>> => {
+    const response = await fetch(`${API_BASE_URL}/analytics/overview`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch analytics overview');
+    return data;
+  },
+
+  getTopDishes: async (limit = 5): Promise<ApiResponse<any[]>> => {
+    const response = await fetch(`${API_BASE_URL}/analytics/top-dishes?limit=${limit}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch top dishes');
+    return data;
+  },
+
+  getCategorySales: async (): Promise<ApiResponse<any[]>> => {
+    const response = await fetch(`${API_BASE_URL}/analytics/categories`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch category sales');
+    return data;
+  },
+
+  getHourlyDemand: async (): Promise<ApiResponse<any[]>> => {
+    const response = await fetch(`${API_BASE_URL}/analytics/hourly`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch hourly demand');
+    return data;
+  },
+};
+
 
 
