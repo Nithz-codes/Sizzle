@@ -10,6 +10,10 @@ export interface FoodItem {
   prepTime?: string;
   rating?: number;
   tags?: string[];
+  calories?: number;
+  protein?: number;
+  carbs?: number;
+  fat?: number;
 }
 
 export interface CartItem {
@@ -176,4 +180,25 @@ export interface AnalyticsOverviewData {
   preparingOrders: number;
   completedOrders: number;
   dailyTrends: DailyRevenueData[];
+}
+
+export type FitnessPreset = 'HIGH_PROTEIN' | 'KETO' | 'LOW_CALORIE' | 'BALANCED';
+
+export interface MacroGoalRequest {
+  targetCalories: number;
+  minProtein: number;
+  dietaryFilter: 'All' | 'Veg' | 'Non-Veg';
+  preset?: FitnessPreset;
+}
+
+export interface MacroMealResponse {
+  preset: FitnessPreset;
+  matchScore: number; // 0..100%
+  totalCalories: number;
+  totalProtein: number;
+  totalCarbs: number;
+  totalFat: number;
+  totalPrice: number;
+  items: { foodItem: FoodItem; quantity: number }[];
+  explanation: string;
 }

@@ -91,7 +91,7 @@ export const CATEGORIES: CategoryOption[] = [
   },
 ];
 
-export const MENU_ITEMS: FoodItem[] = [
+const RAW_MENU_ITEMS: FoodItem[] = [
   // ================================
   // Burgers & Sandwiches (1..7)
   // ================================
@@ -774,3 +774,69 @@ export const MENU_ITEMS: FoodItem[] = [
     tags: ['Thick Shake']
   },
 ];
+
+const MACRO_LOOKUP: Record<number, { calories: number; protein: number; carbs: number; fat: number }> = {
+  1: { calories: 420, protein: 14, carbs: 48, fat: 18 },
+  2: { calories: 510, protein: 18, carbs: 46, fat: 26 },
+  3: { calories: 580, protein: 32, carbs: 44, fat: 28 },
+  4: { calories: 720, protein: 48, carbs: 46, fat: 38 },
+  5: { calories: 310, protein: 10, carbs: 42, fat: 12 },
+  6: { calories: 410, protein: 14, carbs: 48, fat: 18 },
+  7: { calories: 490, protein: 28, carbs: 45, fat: 22 },
+  8: { calories: 560, protein: 22, carbs: 68, fat: 22 },
+  9: { calories: 620, protein: 24, carbs: 74, fat: 26 },
+  10: { calories: 680, protein: 28, carbs: 72, fat: 30 },
+  11: { calories: 740, protein: 38, carbs: 66, fat: 34 },
+  12: { calories: 480, protein: 14, carbs: 65, fat: 18 },
+  13: { calories: 560, protein: 18, carbs: 68, fat: 24 },
+  14: { calories: 610, protein: 28, carbs: 62, fat: 26 },
+  15: { calories: 640, protein: 22, carbs: 64, fat: 32 },
+  16: { calories: 440, protein: 12, carbs: 62, fat: 16 },
+  17: { calories: 520, protein: 26, carbs: 60, fat: 20 },
+  18: { calories: 460, protein: 11, carbs: 64, fat: 17 },
+  19: { calories: 540, protein: 25, carbs: 62, fat: 21 },
+  20: { calories: 380, protein: 16, carbs: 24, fat: 18 },
+  21: { calories: 420, protein: 22, carbs: 26, fat: 20 },
+  22: { calories: 580, protein: 22, carbs: 72, fat: 22 },
+  23: { calories: 680, protein: 36, carbs: 70, fat: 26 },
+  24: { calories: 740, protein: 42, carbs: 68, fat: 28 },
+  25: { calories: 520, protein: 18, carbs: 65, fat: 20 },
+  26: { calories: 480, protein: 18, carbs: 18, fat: 32 },
+  27: { calories: 520, protein: 34, carbs: 14, fat: 30 },
+  28: { calories: 440, protein: 16, carbs: 16, fat: 28 },
+  29: { calories: 490, protein: 32, carbs: 15, fat: 28 },
+  30: { calories: 180, protein: 5, carbs: 32, fat: 4 },
+  31: { calories: 230, protein: 6, carbs: 32, fat: 9 },
+  32: { calories: 260, protein: 7, carbs: 32, fat: 12 },
+  33: { calories: 240, protein: 8, carbs: 34, fat: 9 },
+  34: { calories: 290, protein: 9, carbs: 36, fat: 12 },
+  35: { calories: 380, protein: 44, carbs: 6, fat: 18 },
+  36: { calories: 460, protein: 52, carbs: 8, fat: 22 },
+  37: { calories: 360, protein: 22, carbs: 10, fat: 24 },
+  38: { calories: 320, protein: 38, carbs: 5, fat: 16 },
+  39: { calories: 390, protein: 42, carbs: 7, fat: 19 },
+  40: { calories: 480, protein: 46, carbs: 9, fat: 24 },
+  41: { calories: 280, protein: 14, carbs: 22, fat: 16 },
+  42: { calories: 340, protein: 22, carbs: 18, fat: 20 },
+  43: { calories: 310, protein: 12, carbs: 32, fat: 15 },
+  44: { calories: 360, protein: 18, carbs: 28, fat: 20 },
+  45: { calories: 320, protein: 5, carbs: 46, fat: 14 },
+  46: { calories: 380, protein: 6, carbs: 52, fat: 18 },
+  47: { calories: 340, protein: 8, carbs: 42, fat: 16 },
+  48: { calories: 290, protein: 4, carbs: 40, fat: 12 },
+  49: { calories: 120, protein: 1, carbs: 28, fat: 1 },
+  50: { calories: 180, protein: 3, carbs: 24, fat: 8 },
+  51: { calories: 140, protein: 2, carbs: 22, fat: 5 },
+  52: { calories: 90, protein: 1, carbs: 20, fat: 0 },
+};
+
+export const MENU_ITEMS: FoodItem[] = RAW_MENU_ITEMS.map((item) => {
+  const macros = MACRO_LOOKUP[item.id] || { calories: 450, protein: 20, carbs: 45, fat: 18 };
+  return {
+    ...item,
+    calories: item.calories ?? macros.calories,
+    protein: item.protein ?? macros.protein,
+    carbs: item.carbs ?? macros.carbs,
+    fat: item.fat ?? macros.fat,
+  };
+});

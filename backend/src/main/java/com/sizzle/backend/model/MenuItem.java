@@ -36,6 +36,18 @@ public class MenuItem {
     @Column
     private Double rating = 4.5;
 
+    @Column
+    private Integer calories = 450;
+
+    @Column
+    private Integer protein = 20;
+
+    @Column
+    private Integer carbs = 45;
+
+    @Column
+    private Integer fat = 18;
+
     @Column(nullable = false)
     private Boolean isAvailable = true;
 
@@ -108,6 +120,18 @@ public class MenuItem {
 
     public Double getRating() { return rating; }
     public void setRating(Double rating) { this.rating = rating; }
+
+    public Integer getCalories() { return calories; }
+    public void setCalories(Integer calories) { this.calories = calories; }
+
+    public Integer getProtein() { return protein; }
+    public void setProtein(Integer protein) { this.protein = protein; }
+
+    public Integer getCarbs() { return carbs; }
+    public void setCarbs(Integer carbs) { this.carbs = carbs; }
+
+    public Integer getFat() { return fat; }
+    public void setFat(Integer fat) { this.fat = fat; }
 
     public Boolean getIsAvailable() { return isAvailable; }
     public void setIsAvailable(Boolean isAvailable) { this.isAvailable = isAvailable; }
