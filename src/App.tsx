@@ -25,6 +25,7 @@ import { ReservationManagement } from './components/admin/ReservationManagement'
 import { ReportExport } from './components/admin/ReportExport';
 import { AdminSettings } from './components/admin/AdminSettings';
 import { AdminNotificationToast } from './components/admin/AdminNotificationToast';
+import { AiNutritionModal } from './components/AiNutritionModal';
 
 import { MENU_ITEMS, CATEGORIES } from './data/menuData';
 import { menuApi } from './services/api';
@@ -35,6 +36,7 @@ const MainAppContent: React.FC = () => {
   const [itemsList, setItemsList] = useState<FoodItem[]>(MENU_ITEMS);
   const [categoriesList, setCategoriesList] = useState<CategoryOption[]>(CATEGORIES);
   const [isMenuLoading, setIsMenuLoading] = useState<boolean>(false);
+  const [isAiNutritionOpen, setIsAiNutritionOpen] = useState<boolean>(false);
 
   const {
     activeCategory,
@@ -276,7 +278,10 @@ const MainAppContent: React.FC = () => {
       )}
 
       {/* Top Bar Header */}
-      <Header onOpenHistory={() => setIsHistoryOpen(true)} />
+      <Header
+        onOpenHistory={() => setIsHistoryOpen(true)}
+        onOpenAiNutrition={() => setIsAiNutritionOpen(true)}
+      />
 
       {/* ADMIN PORTAL VIEWS */}
       {isAdmin && activeTab !== 'menu' ? (
@@ -293,7 +298,7 @@ const MainAppContent: React.FC = () => {
       ) : (
         <>
           {/* Hero Banner Section */}
-          <Hero />
+          <Hero onOpenAiNutrition={() => setIsAiNutritionOpen(true)} />
 
           {/* Main Content Area: Category Sidebar + Food Grid */}
           <main id="menu-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full flex-1">
@@ -474,6 +479,7 @@ const MainAppContent: React.FC = () => {
       <OrderHistoryModal isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} />
       <AuthModal />
       <ProfileModal isOpen={isProfileModalOpen} onClose={closeProfileModal} />
+      <AiNutritionModal isOpen={isAiNutritionOpen} onClose={() => setIsAiNutritionOpen(false)} />
       <Toast />
       <AdminNotificationToast />
 

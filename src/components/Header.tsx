@@ -22,11 +22,14 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useAdmin, AdminTab } from '../context/AdminContext';
 
+import { Sparkles } from 'lucide-react';
+
 interface HeaderProps {
   onOpenHistory: () => void;
+  onOpenAiNutrition?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenHistory }) => {
+export const Header: React.FC<HeaderProps> = ({ onOpenHistory, onOpenAiNutrition }) => {
   const { cartItems, subtotal, setIsCartOpen, pastReceipts } = useCart();
   const { user, isAuthenticated, isAdmin, openAuthModal, openProfileModal, logout } = useAuth();
 
@@ -101,6 +104,18 @@ export const Header: React.FC<HeaderProps> = ({ onOpenHistory }) => {
 
         {/* Header Action Controls */}
         <div className="flex items-center gap-2 sm:gap-3">
+          
+          {/* AI Nutrition & Macro Builder Button */}
+          {onOpenAiNutrition && (
+            <button
+              onClick={onOpenAiNutrition}
+              className="p-2 sm:px-3 sm:py-2 rounded-xl bg-gradient-to-r from-[#E85D04] to-[#F97316] hover:from-[#C94B00] hover:to-[#EA580C] text-white font-extrabold text-xs transition-all shadow-md flex items-center gap-1.5 cursor-pointer hover:scale-105"
+              title="AI Nutrition & Fitness Meal Builder"
+            >
+              <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
+              <span className="hidden md:inline">AI Nutrition</span>
+            </button>
+          )}
           
           {/* Notification Bell Dropdown (Admin Mode) */}
           {isAdmin && adminCtx && (

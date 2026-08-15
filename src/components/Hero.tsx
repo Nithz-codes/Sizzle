@@ -21,7 +21,11 @@ import { LiveSearchDropdown } from './LiveSearchDropdown';
 import { FoodItem } from '../types';
 import { EditFoodModal } from './admin/EditFoodModal';
 
-export const Hero: React.FC = () => {
+interface HeroProps {
+  onOpenAiNutrition?: () => void;
+}
+
+export const Hero: React.FC<HeroProps> = ({ onOpenAiNutrition }) => {
   const {
     searchQuery,
     setSearchQuery,
@@ -87,9 +91,21 @@ export const Hero: React.FC = () => {
         {/* Top Header / Branding Subtitle */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2">
           <div>
-            <div className={isAdmin ? "inline-flex items-center gap-1.5 bg-[#F97316]/10 text-[#F97316] px-2.5 py-0.5 rounded-full text-xs font-bold border border-[#F97316]/30 mb-1" : "inline-flex items-center gap-1.5 bg-[#E85D04]/10 text-[#E85D04] px-2.5 py-0.5 rounded-full text-xs font-bold border border-[#E85D04]/20 mb-1"}>
-              <Flame className={isAdmin ? "w-3.5 h-3.5 fill-[#F97316]" : "w-3.5 h-3.5 fill-[#E85D04]"} />
-              <span>{isAdmin ? '🛡️ Admin System Management' : 'Gourmet Food Ordering'}</span>
+            <div className="flex flex-wrap items-center gap-2 mb-1">
+              <div className={isAdmin ? "inline-flex items-center gap-1.5 bg-[#F97316]/10 text-[#F97316] px-2.5 py-0.5 rounded-full text-xs font-bold border border-[#F97316]/30" : "inline-flex items-center gap-1.5 bg-[#E85D04]/10 text-[#E85D04] px-2.5 py-0.5 rounded-full text-xs font-bold border border-[#E85D04]/20"}>
+                <Flame className={isAdmin ? "w-3.5 h-3.5 fill-[#F97316]" : "w-3.5 h-3.5 fill-[#E85D04]"} />
+                <span>{isAdmin ? '🛡️ Admin System Management' : 'Gourmet Food Ordering'}</span>
+              </div>
+              {!isAdmin && onOpenAiNutrition && (
+                <button
+                  type="button"
+                  onClick={onOpenAiNutrition}
+                  className="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#E85D04] to-[#F97316] hover:from-[#C94B00] hover:to-[#EA580C] text-white px-3 py-0.5 rounded-full text-xs font-extrabold shadow-sm transition-all hover:scale-105 cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-200 animate-spin" />
+                  <span>✨ Build AI Macro Meal</span>
+                </button>
+              )}
             </div>
             <h1 className={isAdmin ? "text-2xl sm:text-3xl font-black text-[#F9FAFB] font-['Poppins'] tracking-tight" : "text-2xl sm:text-3xl font-black text-[#1E1E1E] font-['Poppins'] tracking-tight"}>
               {isAdmin ? 'System Administration & Food Inventory' : 'What are you craving today?'}
