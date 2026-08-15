@@ -191,6 +191,20 @@ export interface MacroGoalRequest {
   preset?: FitnessPreset;
 }
 
+export interface MacroMealCombo {
+  id: string;
+  title: string;
+  badge: string;
+  matchScore: number;
+  totalCalories: number;
+  totalProtein: number;
+  totalCarbs: number;
+  totalFat: number;
+  totalPrice: number;
+  items: { foodItem: FoodItem; quantity: number }[];
+  explanation: string;
+}
+
 export interface MacroMealResponse {
   preset: FitnessPreset;
   matchScore: number; // 0..100%
@@ -201,4 +215,5 @@ export interface MacroMealResponse {
   totalPrice: number;
   items: { foodItem: FoodItem; quantity: number }[];
   explanation: string;
+  topCombos: MacroMealCombo[];
 }

@@ -181,6 +181,21 @@ public class DataInitializer implements CommandLineRunner {
         );
 
         for (MenuItemSeed seed : seeds) {
+            int cal = 450, prot = 20, carbs = 45, fat = 18;
+            String nameLower = seed.name.toLowerCase();
+            if (nameLower.contains("tandoori chicken")) { cal = 440; prot = 54; carbs = 6; fat = 22; }
+            else if (nameLower.contains("grill chicken")) { cal = 380; prot = 48; carbs = 8; fat = 16; }
+            else if (nameLower.contains("reshmi") || nameLower.contains("malai chicken")) { cal = 420; prot = 45; carbs = 8; fat = 22; }
+            else if (nameLower.contains("kebab")) { cal = 390; prot = 42; carbs = 7; fat = 21; }
+            else if (nameLower.contains("paneer tikka")) { cal = 360; prot = 22; carbs = 10; fat = 24; }
+            else if (nameLower.contains("biryani") && !seed.isVeg) { cal = 680; prot = 38; carbs = 72; fat = 26; }
+            else if (nameLower.contains("biryani") && seed.isVeg) { cal = 580; prot = 24; carbs = 74; fat = 22; }
+            else if (nameLower.contains("double chicken")) { cal = 720; prot = 46; carbs = 46; fat = 36; }
+            else if (nameLower.contains("burger") && !seed.isVeg) { cal = 540; prot = 32; carbs = 42; fat = 26; }
+            else if (nameLower.contains("burger") && seed.isVeg) { cal = 410; prot = 12; carbs = 48; fat = 16; }
+            else if (nameLower.contains("naan")) { cal = 260; prot = 7; carbs = 38; fat = 9; }
+            else if (nameLower.contains("roti")) { cal = 140; prot = 4; carbs = 28; fat = 1; }
+
             Optional<MenuItem> existing = menuItemRepository.findByName(seed.name);
             if (existing.isPresent()) {
                 MenuItem item = existing.get();
@@ -192,6 +207,10 @@ public class DataInitializer implements CommandLineRunner {
                 item.setPrepTime(seed.prepTime);
                 item.setRating(seed.rating);
                 item.setCategory(seed.category);
+                item.setCalories(cal);
+                item.setProtein(prot);
+                item.setCarbs(carbs);
+                item.setFat(fat);
                 menuItemRepository.save(item);
             } else {
                 MenuItem item = MenuItem.builder()
@@ -206,6 +225,10 @@ public class DataInitializer implements CommandLineRunner {
                         .category(seed.category)
                         .isAvailable(true)
                         .build();
+                item.setCalories(cal);
+                item.setProtein(prot);
+                item.setCarbs(carbs);
+                item.setFat(fat);
                 menuItemRepository.save(item);
             }
         }

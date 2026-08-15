@@ -1,0 +1,64 @@
+{
+  "1": { "id": 1, "name": "Classic Burger", "calories": 410, "protein": 12, "carbs": 48, "fat": 16 },
+  "2": { "id": 2, "name": "Cheese Burger", "calories": 510, "protein": 22, "carbs": 44, "fat": 28 },
+  "3": { "id": 3, "name": "Chicken Burger", "calories": 540, "protein": 32, "carbs": 42, "fat": 26 },
+  "4": { "id": 4, "name": "Double Chicken Burger", "calories": 720, "protein": 46, "carbs": 46, "fat": 36 },
+  "5": { "id": 5, "name": "Veg Sandwich", "calories": 290, "protein": 9, "carbs": 42, "fat": 10 },
+  "6": { "id": 6, "name": "Grilled Sandwich", "calories": 380, "protein": 14, "carbs": 46, "fat": 16 },
+  "7": { "id": 7, "name": "Club Sandwich", "calories": 480, "protein": 28, "carbs": 42, "fat": 22 },
+
+  "8": { "id": 8, "name": "Margherita Pizza", "calories": 560, "protein": 22, "carbs": 68, "fat": 22 },
+  "9": { "id": 9, "name": "Farmhouse Pizza", "calories": 620, "protein": 24, "carbs": 74, "fat": 24 },
+  "10": { "id": 10, "name": "Veg Supreme Pizza", "calories": 680, "protein": 26, "carbs": 72, "fat": 28 },
+  "11": { "id": 11, "name": "Pepperoni Feast Pizza", "calories": 760, "protein": 36, "carbs": 68, "fat": 34 },
+
+  "12": { "id": 12, "name": "Penne Arrabbiata", "calories": 460, "protein": 14, "carbs": 66, "fat": 16 },
+  "13": { "id": 13, "name": "Alfredo Pasta", "calories": 580, "protein": 16, "carbs": 64, "fat": 28 },
+  "14": { "id": 14, "name": "Chicken Creamy Pasta", "calories": 640, "protein": 32, "carbs": 62, "fat": 26 },
+  "15": { "id": 15, "name": "Pesto Veg Pasta", "calories": 520, "protein": 15, "carbs": 58, "fat": 24 },
+
+  "16": { "id": 16, "name": "Veg Fried Rice", "calories": 420, "protein": 11, "carbs": 64, "fat": 14 },
+  "17": { "id": 17, "name": "Chicken Schezwan Fried Rice", "calories": 540, "protein": 26, "carbs": 62, "fat": 18 },
+  "18": { "id": 18, "name": "Hakka Noodles", "calories": 440, "protein": 10, "carbs": 66, "fat": 15 },
+  "19": { "id": 19, "name": "Chicken Manchow Noodles", "calories": 520, "protein": 24, "carbs": 60, "fat": 19 },
+
+  "20": { "id": 20, "name": "Veg Dum Biryani", "calories": 480, "protein": 14, "carbs": 78, "fat": 14 },
+  "21": { "id": 21, "name": "Paneer Dum Biryani", "calories": 580, "protein": 24, "carbs": 74, "fat": 22 },
+  "22": { "id": 22, "name": "Egg Biryani", "calories": 620, "protein": 32, "carbs": 70, "fat": 22 },
+  "23": { "id": 23, "name": "Chicken Dum Biryani", "calories": 680, "protein": 38, "carbs": 72, "fat": 26 },
+  "24": { "id": 24, "name": "Mutton Dum Biryani", "calories": 760, "protein": 44, "carbs": 68, "fat": 32 },
+  "25": { "id": 25, "name": "Hyderabadi Special Biryani", "calories": 720, "protein": 40, "carbs": 70, "fat": 28 },
+
+  "26": { "id": 26, "name": "Paneer Butter Masala", "calories": 460, "protein": 18, "carbs": 16, "fat": 34 },
+  "27": { "id": 27, "name": "Kadai Chicken", "calories": 490, "protein": 36, "carbs": 12, "fat": 28 },
+  "28": { "id": 28, "name": "Dal Makhani", "calories": 410, "protein": 15, "carbs": 24, "fat": 22 },
+  "29": { "id": 29, "name": "Chicken Tikka Masala", "calories": 490, "protein": 38, "carbs": 14, "fat": 28 },
+
+  "30": { "id": 30, "name": "Tandoori Roti", "calories": 140, "protein": 4, "carbs": 28, "fat": 1 },
+  "31": { "id": 31, "name": "Butter Naan", "calories": 260, "protein": 7, "carbs": 38, "fat": 9 },
+  "32": { "id": 32, "name": "Garlic Naan", "calories": 270, "protein": 7, "carbs": 39, "fat": 10 },
+  "33": { "id": 33, "name": "Cheese Garlic Naan", "calories": 340, "protein": 12, "carbs": 42, "fat": 14 },
+  "34": { "id": 34, "name": "Lachha Paratha", "calories": 290, "protein": 6, "carbs": 36, "fat": 12 },
+
+  "35": { "id": 35, "name": "Smokey BBQ Grill Chicken", "calories": 380, "protein": 48, "carbs": 8, "fat": 16 },
+  "36": { "id": 36, "name": "Tandoori Chicken", "calories": 440, "protein": 54, "carbs": 6, "fat": 22 },
+  "37": { "id": 37, "name": "Paneer Tikka", "calories": 360, "protein": 22, "carbs": 10, "fat": 24 },
+  "38": { "id": 38, "name": "Malai Chicken Tikka", "calories": 410, "protein": 42, "carbs": 8, "fat": 20 },
+  "39": { "id": 39, "name": "Seekh Kebab", "calories": 390, "protein": 42, "carbs": 7, "fat": 21 },
+  "40": { "id": 40, "name": "Chicken Reshmi Kebab", "calories": 420, "protein": 45, "carbs": 8, "fat": 22 },
+
+  "41": { "id": 41, "name": "French Fries", "calories": 320, "protein": 4, "carbs": 42, "fat": 15 },
+  "42": { "id": 42, "name": "Chicken Wings", "calories": 420, "protein": 28, "carbs": 14, "fat": 26 },
+  "43": { "id": 43, "name": "Spring Rolls", "calories": 280, "protein": 6, "carbs": 32, "fat": 14 },
+  "44": { "id": 44, "name": "Crispy Corn", "calories": 290, "protein": 5, "carbs": 36, "fat": 14 },
+
+  "45": { "id": 45, "name": "Gulab Jamun", "calories": 310, "protein": 5, "carbs": 46, "fat": 12 },
+  "46": { "id": 46, "name": "Chocolate Lava Cake", "calories": 420, "protein": 6, "carbs": 54, "fat": 22 },
+  "47": { "id": 47, "name": "Ice Cream Sundae", "calories": 380, "protein": 8, "carbs": 52, "fat": 16 },
+  "48": { "id": 48, "name": "Rasmalai", "calories": 340, "protein": 7, "carbs": 44, "fat": 15 },
+
+  "49": { "id": 49, "name": "Cold Coffee", "calories": 180, "protein": 4, "carbs": 26, "fat": 6 },
+  "50": { "id": 50, "name": "Fresh Lime Soda", "calories": 90, "protein": 1, "carbs": 22, "fat": 0 },
+  "51": { "id": 51, "name": "Virgin Mojito", "calories": 120, "protein": 0, "carbs": 30, "fat": 0 },
+  "52": { "id": 52, "name": "Chocolate Milkshake", "calories": 310, "protein": 6, "carbs": 48, "fat": 11 }
+}
