@@ -15,7 +15,7 @@
 /* Custom scrollbars for category sidebar and cart drawer */
 ::-webkit-scrollbar {
   width: 6px;
-  height: 6px;
+  height: 0px;
 }
 
 ::-webkit-scrollbar-track {
@@ -23,12 +23,29 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #E5E7EB;
+  background: #374151;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #D1D5DB;
+  background: #4B5563;
+}
+
+/* Custom dark mode modal scrollbar */
+.custom-modal-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 0px;
+}
+.custom-modal-scrollbar::-webkit-scrollbar-track {
+  background: #111827;
+  border-radius: 9999px;
+}
+.custom-modal-scrollbar::-webkit-scrollbar-thumb {
+  background: #E85D04;
+  border-radius: 9999px;
+}
+.custom-modal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #C94B00;
 }
 
 /* Print Styles for Printable Receipt */
