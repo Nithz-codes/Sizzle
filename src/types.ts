@@ -217,3 +217,29 @@ export interface MacroMealResponse {
   explanation: string;
   topCombos: MacroMealCombo[];
 }
+
+export type MoodOccasion =
+  | 'RAINY_DAY'
+  | 'POST_WORKOUT'
+  | 'LATE_NIGHT'
+  | 'ROMANTIC_DATE'
+  | 'BUSY_WORKDAY'
+  | 'FESTIVE_PARTY';
+
+export interface MoodFeastCombo {
+  id: string;
+  title: string;
+  badge: string;
+  vibeTag: string;
+  totalCalories: number;
+  totalProtein: number;
+  totalPrice: number;
+  items: { foodItem: FoodItem; quantity: number }[];
+  chefQuote: string;
+}
+
+export interface MoodFeastResponse {
+  mood: MoodOccasion;
+  headline: string;
+  combos: MoodFeastCombo[];
+}
