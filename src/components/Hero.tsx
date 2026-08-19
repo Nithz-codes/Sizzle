@@ -25,9 +25,10 @@ interface HeroProps {
   onOpenAiNutrition?: () => void;
   onOpenAiMood?: () => void;
   onOpenAiSurprise?: () => void;
+  onOpenAiUsual?: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onOpenAiNutrition, onOpenAiMood, onOpenAiSurprise }) => {
+export const Hero: React.FC<HeroProps> = ({ onOpenAiNutrition, onOpenAiMood, onOpenAiSurprise, onOpenAiUsual }) => {
   const {
     searchQuery,
     setSearchQuery,
@@ -98,6 +99,16 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAiNutrition, onOpenAiMood, onO
                 <Flame className={isAdmin ? "w-3.5 h-3.5 fill-[#F97316]" : "w-3.5 h-3.5 fill-[#E85D04]"} />
                 <span>{isAdmin ? '🛡️ Admin System Management' : 'Gourmet Food Ordering'}</span>
               </div>
+              {!isAdmin && onOpenAiUsual && (
+                <button
+                  type="button"
+                  onClick={onOpenAiUsual}
+                  className="inline-flex items-center gap-1.5 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white px-3 py-0.5 rounded-full text-xs font-extrabold shadow-sm transition-all hover:scale-105 cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-rose-200 animate-bounce" />
+                  <span>⚡ Usual Feast</span>
+                </button>
+              )}
               {!isAdmin && onOpenAiSurprise && (
                 <button
                   type="button"

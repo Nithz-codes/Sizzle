@@ -29,6 +29,7 @@ interface HeaderProps {
   onOpenAiNutrition?: () => void;
   onOpenAiMood?: () => void;
   onOpenAiSurprise?: () => void;
+  onOpenAiUsual?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -36,6 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAiNutrition,
   onOpenAiMood,
   onOpenAiSurprise,
+  onOpenAiUsual,
 }) => {
   const { cartItems, subtotal, setIsCartOpen, pastReceipts } = useCart();
   const { user, isAuthenticated, isAdmin, openAuthModal, openProfileModal, logout } = useAuth();
@@ -112,6 +114,18 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Header Action Controls */}
         <div className="flex items-center gap-2 sm:gap-3">
           
+          {/* AI Usual Feast Button */}
+          {onOpenAiUsual && (
+            <button
+              onClick={onOpenAiUsual}
+              className="p-2 sm:px-3 sm:py-2 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-extrabold text-xs transition-all shadow-md flex items-center gap-1.5 cursor-pointer hover:scale-105"
+              title="AI One-Tap Usual Feast Reordering"
+            >
+              <Sparkles className="w-4 h-4 text-rose-200 animate-bounce" />
+              <span className="hidden md:inline">Usual Feast ⚡</span>
+            </button>
+          )}
+
           {/* AI Surprise Me Button */}
           {onOpenAiSurprise && (
             <button

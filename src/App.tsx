@@ -28,6 +28,7 @@ import { AdminNotificationToast } from './components/admin/AdminNotificationToas
 import { AiNutritionModal } from './components/AiNutritionModal';
 import { AiMoodCuratorModal } from './components/AiMoodCuratorModal';
 import { AiSurpriseBoxModal } from './components/AiSurpriseBoxModal';
+import { AiUsualFeastModal } from './components/AiUsualFeastModal';
 
 import { MENU_ITEMS, CATEGORIES } from './data/menuData';
 import { menuApi } from './services/api';
@@ -41,6 +42,7 @@ const MainAppContent: React.FC = () => {
   const [isAiNutritionOpen, setIsAiNutritionOpen] = useState<boolean>(false);
   const [isAiMoodOpen, setIsAiMoodOpen] = useState<boolean>(false);
   const [isAiSurpriseOpen, setIsAiSurpriseOpen] = useState<boolean>(false);
+  const [isAiUsualOpen, setIsAiUsualOpen] = useState<boolean>(false);
 
   const {
     activeCategory,
@@ -287,6 +289,7 @@ const MainAppContent: React.FC = () => {
         onOpenAiNutrition={() => setIsAiNutritionOpen(true)}
         onOpenAiMood={() => setIsAiMoodOpen(true)}
         onOpenAiSurprise={() => setIsAiSurpriseOpen(true)}
+        onOpenAiUsual={() => setIsAiUsualOpen(true)}
       />
 
       {/* ADMIN PORTAL VIEWS */}
@@ -308,6 +311,7 @@ const MainAppContent: React.FC = () => {
             onOpenAiNutrition={() => setIsAiNutritionOpen(true)}
             onOpenAiMood={() => setIsAiMoodOpen(true)}
             onOpenAiSurprise={() => setIsAiSurpriseOpen(true)}
+            onOpenAiUsual={() => setIsAiUsualOpen(true)}
           />
 
           {/* Main Content Area: Category Sidebar + Food Grid */}
@@ -492,6 +496,7 @@ const MainAppContent: React.FC = () => {
       <AiNutritionModal isOpen={isAiNutritionOpen} onClose={() => setIsAiNutritionOpen(false)} />
       <AiMoodCuratorModal isOpen={isAiMoodOpen} onClose={() => setIsAiMoodOpen(false)} />
       <AiSurpriseBoxModal isOpen={isAiSurpriseOpen} onClose={() => setIsAiSurpriseOpen(false)} />
+      <AiUsualFeastModal isOpen={isAiUsualOpen} onClose={() => setIsAiUsualOpen(false)} />
       <Toast />
       <AdminNotificationToast />
 

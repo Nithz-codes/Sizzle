@@ -107,11 +107,30 @@ We built two major AI Customer Features:
 * **How Sizzle AI Solves It**:
   1. The customer taps a Mood Card or types a custom prompt (e.g. *"Stressed after work, want hot cheesy pasta"*).
   2. The **Sensory Vector Engine** (`moodAiCurator.ts`) evaluates Sizzle's 52 dishes across 5 sensory vectors (*spiciness, temperature, comfort score, protein density, vibe*).
-  3. It generates **3 Curated Occasion Feasts** complete with Chef Mario comfort quotes!
+   3. It generates **3 Curated Occasion Feasts** complete with Chef Mario comfort quotes!
      * 🌧️ **Rainy Day**: *Hot Chicken Dum Biryani + Kadai Chicken + Garlic Naan*.
      * 🏋️ **Post-Workout**: *Tandoori Chicken + Seekh Kebab + Cold Coffee*.
      * 🎬 **Late Night**: *Double Chicken Burger + Hot Wings + Chocolate Shake*.
      * 🕯️ **Romantic Date**: *Pink Sauce Pasta + Farmhouse Pizza + Lava Cake*.
+
+---
+
+### 3️⃣ Feature 9: AI "Surprise Me & Taste Discovery" Box
+* **The Problem**: You don't know what to order or want to try something new without breaking your budget.
+* **How Sizzle AI Solves It**:
+  1. The customer selects a budget (*Under ₹250, ₹250–₹500, or ₹500+ Premium*) and flavor vibe (*Fast-Food, Royal Indian, Italian Gourmet, or Wild Surprise*).
+  2. Tap **"Unbox AI Mystery Feast 🎁"** to trigger an unboxing animation revealing a 2–3 item mystery bundle with a **10% Surprise Discount**!
+  3. Includes a **"Swap Dish 🎲"** button so you can reroll any individual dish before checkout.
+
+---
+
+### 4️⃣ Feature 10: AI "One-Tap Usual Feast" & Smart Reordering
+* **The Problem**: Returning customers want to reorder their exact favorite meal in 1 tap without searching through 52 dishes again.
+* **How Sizzle AI Solves It**:
+  1. AI analyzes past order receipts to calculate dish order frequencies and time context (*☀️ Lunchtime Usual*, *🌙 Dinner Feast*, *🎬 Midnight Snack*).
+  2. Presents your itemized **"Usual Feast"** with order history counts (*"Ordered 3x"*).
+  3. Tap **"Reorder My Usual Feast ⚡"** for 1-click cart loading and instant checkout!
+  4. For new diners, it automatically curates Sizzle's #1 Bestseller Community Feast!
 
 ---
 
@@ -132,6 +151,7 @@ We saved our project progress in clean Git release tags:
 * `version2` $\rightarrow$ Authentication & Shopping Cart.
 * `version3` $\rightarrow$ BI Analytics & Multi-Channel CSV/PDF Reporting.
 * `version4` $\rightarrow$ AI Nutrition & Fitness Macro Builder + Verified 52-Dish Database + Glassmorphism UI.
+* `version5` $\rightarrow$ All 4 Customer AI Features Complete (Features 4, 7, 9 & 10) + Smart Reorder & Taste Discovery Engines.
 
 ---
 
@@ -141,3 +161,4 @@ We saved our project progress in clean Git release tags:
 2. **Mathematically Accurate**: Exact 52-dish nutritional database eliminates generic estimates.
 3. **Multi-Combo Diversity**: Always generates 3 distinct options across different culinary categories.
 4. **Stunning Aesthetics**: Translucent glassmorphism UI that wows the user at first glance.
+5. **Smart Personalization**: AI-driven Mood Curator, Mystery Unboxing, and 1-Tap Usual Feast reordering!
