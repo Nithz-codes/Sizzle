@@ -267,3 +267,23 @@ export interface MysteryBoxResponse {
   items: MysteryBoxItem[];
   mysteryDescription: string;
 }
+
+export interface UsualFeastItem {
+  foodItem: FoodItem;
+  quantity: number;
+  timesOrdered: number;
+}
+
+export interface UsualFeastResponse {
+  isNewUser: boolean;
+  timeBadge: string;
+  feastTitle: string;
+  totalOrdersCount: number;
+  totalPrice: number;
+  totalCalories: number;
+  totalProtein: number;
+  items: UsualFeastItem[];
+  chefGreeting: string;
+}
+
+export type OrderReceipt = ReceiptData;
