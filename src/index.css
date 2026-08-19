@@ -100,3 +100,37 @@
     color: #000000 !important;
   }
 }
+
+/* 3D Realistic Mystery Box Unboxing Keyframes */
+@keyframes boxShake {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  15% { transform: rotate(-8deg) scale(1.05); }
+  30% { transform: rotate(8deg) scale(1.08); }
+  45% { transform: rotate(-10deg) scale(1.1); }
+  60% { transform: rotate(10deg) scale(1.12); }
+  75% { transform: rotate(-5deg) scale(1.15); }
+}
+
+@keyframes lidFlyUp {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  50% { transform: translateY(-70px) rotate(-25deg) scale(1.1); opacity: 0.9; }
+  100% { transform: translateY(-140px) rotate(-45deg) scale(0.6); opacity: 0; }
+}
+
+@keyframes lightBurstBeam {
+  0% { opacity: 0; transform: scaleY(0); }
+  40% { opacity: 1; transform: scaleY(1.2); }
+  100% { opacity: 0; transform: scaleY(1.5); }
+}
+
+.animate-box-shake {
+  animation: boxShake 0.75s ease-in-out infinite;
+}
+
+.animate-lid-fly {
+  animation: lidFlyUp 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.animate-light-beam {
+  animation: lightBurstBeam 0.85s ease-out forwards;
+}

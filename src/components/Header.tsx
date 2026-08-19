@@ -28,9 +28,15 @@ interface HeaderProps {
   onOpenHistory: () => void;
   onOpenAiNutrition?: () => void;
   onOpenAiMood?: () => void;
+  onOpenAiSurprise?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenHistory, onOpenAiNutrition, onOpenAiMood }) => {
+export const Header: React.FC<HeaderProps> = ({
+  onOpenHistory,
+  onOpenAiNutrition,
+  onOpenAiMood,
+  onOpenAiSurprise,
+}) => {
   const { cartItems, subtotal, setIsCartOpen, pastReceipts } = useCart();
   const { user, isAuthenticated, isAdmin, openAuthModal, openProfileModal, logout } = useAuth();
 
@@ -106,6 +112,18 @@ export const Header: React.FC<HeaderProps> = ({ onOpenHistory, onOpenAiNutrition
         {/* Header Action Controls */}
         <div className="flex items-center gap-2 sm:gap-3">
           
+          {/* AI Surprise Me Button */}
+          {onOpenAiSurprise && (
+            <button
+              onClick={onOpenAiSurprise}
+              className="p-2 sm:px-3 sm:py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-xs transition-all shadow-md flex items-center gap-1.5 cursor-pointer hover:scale-105"
+              title="AI Surprise Me & Taste Discovery Box"
+            >
+              <Sparkles className="w-4 h-4 text-emerald-200 animate-spin" />
+              <span className="hidden md:inline">Surprise Me 🎁</span>
+            </button>
+          )}
+
           {/* AI Mood Curator Button */}
           {onOpenAiMood && (
             <button

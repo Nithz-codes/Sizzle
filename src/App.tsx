@@ -27,6 +27,7 @@ import { AdminSettings } from './components/admin/AdminSettings';
 import { AdminNotificationToast } from './components/admin/AdminNotificationToast';
 import { AiNutritionModal } from './components/AiNutritionModal';
 import { AiMoodCuratorModal } from './components/AiMoodCuratorModal';
+import { AiSurpriseBoxModal } from './components/AiSurpriseBoxModal';
 
 import { MENU_ITEMS, CATEGORIES } from './data/menuData';
 import { menuApi } from './services/api';
@@ -39,6 +40,7 @@ const MainAppContent: React.FC = () => {
   const [isMenuLoading, setIsMenuLoading] = useState<boolean>(false);
   const [isAiNutritionOpen, setIsAiNutritionOpen] = useState<boolean>(false);
   const [isAiMoodOpen, setIsAiMoodOpen] = useState<boolean>(false);
+  const [isAiSurpriseOpen, setIsAiSurpriseOpen] = useState<boolean>(false);
 
   const {
     activeCategory,
@@ -284,6 +286,7 @@ const MainAppContent: React.FC = () => {
         onOpenHistory={() => setIsHistoryOpen(true)}
         onOpenAiNutrition={() => setIsAiNutritionOpen(true)}
         onOpenAiMood={() => setIsAiMoodOpen(true)}
+        onOpenAiSurprise={() => setIsAiSurpriseOpen(true)}
       />
 
       {/* ADMIN PORTAL VIEWS */}
@@ -304,6 +307,7 @@ const MainAppContent: React.FC = () => {
           <Hero
             onOpenAiNutrition={() => setIsAiNutritionOpen(true)}
             onOpenAiMood={() => setIsAiMoodOpen(true)}
+            onOpenAiSurprise={() => setIsAiSurpriseOpen(true)}
           />
 
           {/* Main Content Area: Category Sidebar + Food Grid */}
@@ -487,6 +491,7 @@ const MainAppContent: React.FC = () => {
       <ProfileModal isOpen={isProfileModalOpen} onClose={closeProfileModal} />
       <AiNutritionModal isOpen={isAiNutritionOpen} onClose={() => setIsAiNutritionOpen(false)} />
       <AiMoodCuratorModal isOpen={isAiMoodOpen} onClose={() => setIsAiMoodOpen(false)} />
+      <AiSurpriseBoxModal isOpen={isAiSurpriseOpen} onClose={() => setIsAiSurpriseOpen(false)} />
       <Toast />
       <AdminNotificationToast />
 

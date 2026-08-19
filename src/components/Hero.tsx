@@ -24,9 +24,10 @@ import { EditFoodModal } from './admin/EditFoodModal';
 interface HeroProps {
   onOpenAiNutrition?: () => void;
   onOpenAiMood?: () => void;
+  onOpenAiSurprise?: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onOpenAiNutrition, onOpenAiMood }) => {
+export const Hero: React.FC<HeroProps> = ({ onOpenAiNutrition, onOpenAiMood, onOpenAiSurprise }) => {
   const {
     searchQuery,
     setSearchQuery,
@@ -97,6 +98,16 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAiNutrition, onOpenAiMood }) =
                 <Flame className={isAdmin ? "w-3.5 h-3.5 fill-[#F97316]" : "w-3.5 h-3.5 fill-[#E85D04]"} />
                 <span>{isAdmin ? '🛡️ Admin System Management' : 'Gourmet Food Ordering'}</span>
               </div>
+              {!isAdmin && onOpenAiSurprise && (
+                <button
+                  type="button"
+                  onClick={onOpenAiSurprise}
+                  className="inline-flex items-center gap-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-3 py-0.5 rounded-full text-xs font-extrabold shadow-sm transition-all hover:scale-105 cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-200 animate-spin" />
+                  <span>🎁 Surprise Me</span>
+                </button>
+              )}
               {!isAdmin && onOpenAiMood && (
                 <button
                   type="button"
