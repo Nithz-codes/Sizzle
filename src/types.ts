@@ -243,3 +243,27 @@ export interface MoodFeastResponse {
   headline: string;
   combos: MoodFeastCombo[];
 }
+
+export type TasteBudget = 'UNDER_250' | 'MID_RANGE' | 'PREMIUM';
+export type TasteVibe = 'WILD_SURPRISE' | 'FAST_FOOD' | 'ROYAL_INDIAN' | 'ITALIAN_GOURMET';
+
+export interface MysteryBoxItem {
+  foodItem: FoodItem;
+  quantity: number;
+}
+
+export interface MysteryBoxResponse {
+  boxId: string;
+  boxTitle: string;
+  boxBadge: string;
+  budgetPreset: TasteBudget;
+  vibePreset: TasteVibe;
+  matchScore: number;
+  originalPrice: number;
+  discountedPrice: number;
+  discountPercentage: number;
+  totalCalories: number;
+  totalProtein: number;
+  items: MysteryBoxItem[];
+  mysteryDescription: string;
+}
