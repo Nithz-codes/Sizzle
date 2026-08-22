@@ -1,8 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { curateMoodFeast } from '../services/moodAiCurator';
-import { MoodOccasion } from '../types';
+import { generateGeminiMoodFeast, getStoredApiKey, saveStoredApiKey } from '../services/geminiAiService';
+import { MoodOccasion, MoodFeastResponse } from '../types';
 import { MODAL_THEMES } from './AiNutritionModal';
+import { AiEngineToggle, AiEngineMode } from './AiEngineToggle';
 import {
   X,
   Sparkles,
@@ -33,10 +35,27 @@ export const AiMoodCuratorModal: React.FC<AiMoodCuratorModalProps> = ({ isOpen, 
   const [activeComboIndex, setActiveComboIndex] = useState<number>(0);
   const [addedToCart, setAddedToCart] = useState<boolean>(false);
 
+  // Dual-Engine AI Mode State
+  const [engineMode, setEngineMode] = useState<AiEngineMode>('LOCAL');
+  const [apiKey, setApiKey] = useState<string>(getStoredApiKey());
+  const [geminiMoodState, setGeminiMoodState] = useState<MoodFeastResponse | null>(null);
+
   // Compute live AI mood solution
-  const moodResult = useMemo(() => {
+  const localMoodResult = useMemo(() => {
     return curateMoodFeast(selectedMood, activeCustomPrompt);
   }, [selectedMood, activeCustomPrompt]);
+
+  useEffect(() => {
+    if (engineMode === 'GEMINI') {
+      generateGeminiMoodFeast(selectedMood, activeCustomPrompt)
+        .then((res) => setGeminiMoodState(res))
+        .catch(() => setGeminiMoodState(null));
+    } else {
+      setGeminiMoodState(null);
+    }
+  }, [engineMode, selectedMood, activeCustomPrompt]);
+
+  const moodResult = engineMode === 'GEMINI' && geminiMoodState ? geminiMoodState : localMoodResult;
 
   const currentCombo = useMemo(() => {
     if (moodResult.combos && moodResult.combos[activeComboIndex]) {
@@ -116,6 +135,20 @@ export const AiMoodCuratorModal: React.FC<AiMoodCuratorModalProps> = ({ isOpen, 
             >
               <X className="w-5 h-5 text-[#F97316]" />
             </button>
+          </div>
+
+          {/* Dual-Engine Mode Switcher Toggle */}
+          <div className="relative z-10">
+            <AiEngineToggle
+              mode={engineMode}
+              onModeChange={(m) => setEngineMode(m)}
+              apiKey={apiKey}
+              onSaveApiKey={(k) => {
+                setApiKey(k);
+                saveStoredApiKey(k);
+                showToast('Gemini API Key Saved!');
+              }}
+            />
           </div>
 
           {/* 1. Mood Cards Selector */}

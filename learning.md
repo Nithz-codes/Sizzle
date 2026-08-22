@@ -134,6 +134,17 @@ We built two major AI Customer Features:
 
 ---
 
+### 5️⃣ Google Gemini 1.5 API Dual-Engine Integration
+* **The Concept**: Customers can choose between **⚡ Local Solver Mode** (0ms latency, 100% offline) and **✨ Gemini 1.5 AI Mode** (Generative Large Language Model inference)!
+* **How It Works (Explained Simply)**:
+  1. **Dual-Engine Mode Switcher (`AiEngineToggle.tsx`)**: A sleek toggle button at the top of every AI modal.
+  2. **System Menu Injection**: When switched to Gemini Mode, Sizzle sends our full 52-dish menu context to Google Gemini 1.5 Flash API (`@google/genai`).
+  3. **Conversational Chef Responses**: Gemini acts as **Chef Mario AI**, returning real-time generative chef quotes, custom free-text mood analysis, and personalized dining advice.
+  4. **Automatic Fallback Engine**: If no API key is set or the device is offline, Sizzle automatically falls back to our ultra-fast Local Solver Engine so the app never fails!
+  5. **In-App Key Config**: Diners can click `🔑 Set Gemini API Key` to paste their custom AI Studio key directly in the UI, stored safely in `localStorage`.
+
+---
+
 ## 🎨 5. The Glassmorphism Design System
 
 We created a custom translucent **Glassmorphism Theme** (`SIZZLE_WARM`):
@@ -152,6 +163,7 @@ We saved our project progress in clean Git release tags:
 * `version3` $\rightarrow$ BI Analytics & Multi-Channel CSV/PDF Reporting.
 * `version4` $\rightarrow$ AI Nutrition & Fitness Macro Builder + Verified 52-Dish Database + Glassmorphism UI.
 * `version5` $\rightarrow$ All 4 Customer AI Features Complete (Features 4, 7, 9 & 10) + Smart Reorder & Taste Discovery Engines.
+* `version6` $\rightarrow$ Google Gemini 1.5 API Dual-Engine Integration + Automatic Fallback Engine + In-App Key Configuration.
 
 ---
 
@@ -160,5 +172,6 @@ We saved our project progress in clean Git release tags:
 1. **Fast & Reliable**: 0ms local AI solver latency with zero downtime.
 2. **Mathematically Accurate**: Exact 52-dish nutritional database eliminates generic estimates.
 3. **Multi-Combo Diversity**: Always generates 3 distinct options across different culinary categories.
-4. **Stunning Aesthetics**: Translucent glassmorphism UI that wows the user at first glance.
-5. **Smart Personalization**: AI-driven Mood Curator, Mystery Unboxing, and 1-Tap Usual Feast reordering!
+4. **Dual-Engine AI**: Switch between instant local algorithms and Google Gemini 1.5 LLM!
+5. **Stunning Aesthetics**: Translucent glassmorphism UI that wows the user at first glance.
+6. **Smart Personalization**: AI-driven Mood Curator, Mystery Unboxing, and 1-Tap Usual Feast reordering!

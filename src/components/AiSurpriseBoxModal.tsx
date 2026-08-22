@@ -1,8 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { generateMysteryBox, rerollDish } from '../services/tasteDiscoveryEngine';
+import { generateGeminiTasteDiscovery, getStoredApiKey, saveStoredApiKey } from '../services/geminiAiService';
 import { TasteBudget, TasteVibe, MysteryBoxResponse } from '../types';
 import { MODAL_THEMES } from './AiNutritionModal';
+import { AiEngineToggle, AiEngineMode } from './AiEngineToggle';
 import {
   X,
   Gift,
@@ -34,10 +36,27 @@ export const AiSurpriseBoxModal: React.FC<AiSurpriseBoxModalProps> = ({ isOpen, 
   const [addedToCart, setAddedToCart] = useState<boolean>(false);
   const [customBoxState, setCustomBoxState] = useState<MysteryBoxResponse | null>(null);
 
+  // Dual-Engine AI Mode State
+  const [engineMode, setEngineMode] = useState<AiEngineMode>('LOCAL');
+  const [apiKey, setApiKey] = useState<string>(getStoredApiKey());
+  const [geminiBoxState, setGeminiBoxState] = useState<MysteryBoxResponse | null>(null);
+
   // Generate initial box solution
-  const generatedBox = useMemo(() => {
+  const localBox = useMemo(() => {
     return generateMysteryBox(budgetPreset, dietaryFilter, vibePreset);
   }, [budgetPreset, dietaryFilter, vibePreset]);
+
+  useEffect(() => {
+    if (engineMode === 'GEMINI') {
+      generateGeminiTasteDiscovery(budgetPreset, dietaryFilter, vibePreset)
+        .then((res) => setGeminiBoxState(res))
+        .catch(() => setGeminiBoxState(null));
+    } else {
+      setGeminiBoxState(null);
+    }
+  }, [engineMode, budgetPreset, dietaryFilter, vibePreset]);
+
+  const generatedBox = engineMode === 'GEMINI' && geminiBoxState ? geminiBoxState : localBox;
 
   // Current active box (either customized or generated)
   const activeBox = customBoxState || generatedBox;
@@ -114,6 +133,20 @@ export const AiSurpriseBoxModal: React.FC<AiSurpriseBoxModalProps> = ({ isOpen, 
             >
               <X className="w-5 h-5 text-[#F97316]" />
             </button>
+          </div>
+
+          {/* Dual-Engine Mode Switcher Toggle */}
+          <div className="relative z-10">
+            <AiEngineToggle
+              mode={engineMode}
+              onModeChange={(m) => setEngineMode(m)}
+              apiKey={apiKey}
+              onSaveApiKey={(k) => {
+                setApiKey(k);
+                saveStoredApiKey(k);
+                showToast('Gemini API Key Saved!');
+              }}
+            />
           </div>
 
           {/* 1. Discovery Preference Selectors */}

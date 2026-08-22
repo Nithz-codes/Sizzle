@@ -1,8 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { buildMacroMeal, getItemMacros } from '../services/macroAiBuilder';
-import { FitnessPreset, FoodItem } from '../types';
+import { generateGeminiMacroMeal, getStoredApiKey, saveStoredApiKey } from '../services/geminiAiService';
+import { FitnessPreset, FoodItem, MacroMealResponse } from '../types';
 import { MENU_ITEMS } from '../data/menuData';
+import { AiEngineToggle, AiEngineMode } from './AiEngineToggle';
 import {
   X,
   Sparkles,
@@ -63,8 +65,8 @@ export const MODAL_THEMES = {
     comboTabActive: 'bg-[#E85D04] border-[#E85D04] text-white shadow-lg font-bold ring-2 ring-[#E85D04]/50',
     selectedCardBg: 'bg-gradient-to-br from-[#111827] to-[#1F2937] border-2 border-[#E85D04]/50 shadow-xl',
     quoteBg: 'bg-[#1E293B]/60 border-[#374151] text-[#D1D5DB]',
-    statBoxBg: 'bg-[#1E293B] border-[#374151]',
-    dishCardBg: 'bg-[#1E293B] border-[#374151]',
+    statBoxBg: 'bg-[#111827] border-[#374151]',
+    dishCardBg: 'bg-[#111827] border-[#374151]',
     dishTitle: 'text-white',
     dishMutedText: 'text-[#9CA3AF]',
     actionCloseBtn: 'bg-[#111827] hover:bg-[#374151] text-[#D1D5DB] hover:text-white border-[#374151]',
@@ -87,12 +89,18 @@ export const AiNutritionModal: React.FC<AiNutritionModalProps> = ({ isOpen, onCl
   const [activeComboIndex, setActiveComboIndex] = useState<number>(0);
   const [addedToCart, setAddedToCart] = useState<boolean>(false);
 
+  // Dual-Engine AI Mode State
+  const [engineMode, setEngineMode] = useState<AiEngineMode>('LOCAL');
+  const [apiKey, setApiKey] = useState<string>(getStoredApiKey());
+  const [geminiMealState, setGeminiMealState] = useState<MacroMealResponse | null>(null);
+  const [isGeminiLoading, setIsGeminiLoading] = useState<boolean>(false);
+
   const currentMenuItemsList: FoodItem[] = useMemo(() => {
     const windowList = (window as any).sizzleMenuItems || [];
     return windowList.length >= 20 ? windowList : MENU_ITEMS;
   }, [isOpen]);
 
-  const generatedMeal = useMemo(() => {
+  const localMeal = useMemo(() => {
     return buildMacroMeal(
       {
         targetCalories,
@@ -103,6 +111,25 @@ export const AiNutritionModal: React.FC<AiNutritionModalProps> = ({ isOpen, onCl
       currentMenuItemsList
     );
   }, [targetCalories, minProtein, dietaryFilter, preset, currentMenuItemsList]);
+
+  // Effect to trigger Gemini API when engineMode === 'GEMINI'
+  useEffect(() => {
+    if (engineMode === 'GEMINI') {
+      setIsGeminiLoading(true);
+      generateGeminiMacroMeal({ targetCalories, minProtein, dietaryFilter, preset })
+        .then((res) => {
+          setGeminiMealState(res);
+          setIsGeminiLoading(false);
+        })
+        .catch(() => {
+          setIsGeminiLoading(false);
+        });
+    } else {
+      setGeminiMealState(null);
+    }
+  }, [engineMode, targetCalories, minProtein, dietaryFilter, preset]);
+
+  const generatedMeal = engineMode === 'GEMINI' && geminiMealState ? geminiMealState : localMeal;
 
   const currentCombo = useMemo(() => {
     if (generatedMeal.topCombos && generatedMeal.topCombos[activeComboIndex]) {
@@ -193,6 +220,20 @@ export const AiNutritionModal: React.FC<AiNutritionModalProps> = ({ isOpen, onCl
           >
             <X className="w-5 h-5 text-[#F97316]" />
           </button>
+        </div>
+
+        {/* Dual-Engine Mode Switcher Toggle */}
+        <div className="relative z-10">
+          <AiEngineToggle
+            mode={engineMode}
+            onModeChange={(m) => setEngineMode(m)}
+            apiKey={apiKey}
+            onSaveApiKey={(k) => {
+              setApiKey(k);
+              saveStoredApiKey(k);
+              showToast('Gemini API Key Saved!');
+            }}
+          />
         </div>
 
         <div className="space-y-3 relative z-10">
