@@ -160,6 +160,16 @@ We built two major AI Customer Features:
 
 ---
 
+### 6️⃣ Unified "Sizzle AI Studio" Selection Hub (`AiHubModal.tsx`)
+* **The Problem**: Displaying 4 separate AI buttons in both Header and Hero crowded the UI and created visual clutter.
+* **How We Fixed It**:
+  1. **Single Master Button**: Consolidated all 4 AI buttons into one elegant header button: **`✨ Sizzle AI Studio`**.
+  2. **Clean 2x2 Selection Grid (`AiHubModal.tsx`)**: Clicking the button opens a glassmorphism master modal presenting all 4 AI tools (*Usual Feast, Surprise Me, Mood Curator, Macro Builder*) in a clean 2x2 grid.
+  3. **Seamless 2-Way Navigation**: Added a **`← Back to AI Studio`** button in the header of all 4 AI feature modals (`AiNutritionModal`, `AiMoodCuratorModal`, `AiSurpriseBoxModal`, `AiUsualFeastModal`). Users can now jump back to the 4-card selection grid instantly without closing the modal!
+  4. **Result**: 0 UI clutter, clean navigation, and instant switching across the entire Sizzle AI Suite!
+
+---
+
 ## 🎨 5. The Glassmorphism Design System
 
 We created a custom translucent **Glassmorphism Theme** (`SIZZLE_WARM`):
@@ -179,6 +189,23 @@ We saved our project progress in clean Git release tags:
 * `version4` $\rightarrow$ AI Nutrition & Fitness Macro Builder + Verified 52-Dish Database + Glassmorphism UI.
 * `version5` $\rightarrow$ All 4 Customer AI Features Complete (Features 4, 7, 9 & 10) + Smart Reorder & Taste Discovery Engines.
 * `version6` $\rightarrow$ Google Gemini 1.5 API Dual-Engine Integration + Automatic Fallback Engine + In-App Key Configuration.
+
+---
+
+## 💻 7. Essential Project Verification Commands
+
+Here are the key verification commands used throughout the development of Sizzle:
+
+### 1️⃣ `npx.cmd tsc --noEmit` (TypeScript Quality Inspector)
+* **What it does**: Scans all 50+ TypeScript frontend files (`.ts` / `.tsx`) in 2 seconds to detect typos, syntax bugs, broken imports, or mismatched prop types.
+* **Command Breakdown**:
+  * **`tsc`**: TypeScript Compiler (Microsoft's official type checker).
+  * **`--noEmit`**: Tells the compiler: *"Check all files for errors, but **DO NOT output or save any JavaScript files** on disk."*
+  * **`npx.cmd`**: Runs the exact TypeScript version installed inside `node_modules` on Windows.
+* **Why it's essential**: Guarantees zero runtime crashes before releasing or committing code to GitHub!
+
+### 2️⃣ `mvn test-compile` (Backend Java Compiler Check)
+* **What it does**: Compiles all Spring Boot Java backend controllers, services, and repositories to ensure 100% clean Java compilation.
 
 ---
 
