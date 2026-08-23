@@ -26,6 +26,7 @@ import { Sparkles } from 'lucide-react';
 
 interface HeaderProps {
   onOpenHistory: () => void;
+  onOpenAiHub?: () => void;
   onOpenAiNutrition?: () => void;
   onOpenAiMood?: () => void;
   onOpenAiSurprise?: () => void;
@@ -34,6 +35,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenHistory,
+  onOpenAiHub,
   onOpenAiNutrition,
   onOpenAiMood,
   onOpenAiSurprise,
@@ -63,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
       }
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-        
+
         {/* Brand Logo & Title */}
         <div
           className="flex items-center gap-3 cursor-pointer"
@@ -113,55 +115,21 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Header Action Controls */}
         <div className="flex items-center gap-2 sm:gap-3">
-          
-          {/* AI Usual Feast Button */}
-          {onOpenAiUsual && (
+
+          {/* Single Master Sizzle AI Studio Button */}
+          {!isAdmin && onOpenAiHub && (
             <button
-              onClick={onOpenAiUsual}
-              className="p-2 sm:px-3 sm:py-2 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-extrabold text-xs transition-all shadow-md flex items-center gap-1.5 cursor-pointer hover:scale-105"
-              title="AI One-Tap Usual Feast Reordering"
+              onClick={onOpenAiHub}
+              className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-[#059669] hover:bg-[#047857] text-white font-black text-xs transition-all shadow-[0_0_22px_0_#a7f3d0] hover:shadow-[0_0_32px_0_#a7f3d0] border-2 border-white/40 hover:border-white/70 flex items-center gap-2 cursor-pointer hover:scale-105"
+              title="Open Sizzle AI Studio"
             >
-              <Sparkles className="w-4 h-4 text-rose-200 animate-bounce" />
-              <span className="hidden md:inline">Usual Feast ⚡</span>
+              <div className="p-1 rounded-full bg-[#FEB157]/25 text-[#FEB157] animate-pulse transition-transform duration-500 hover:scale-125">
+                <Sparkles className="w-3.5 h-3.5 text-[#FEB157] fill-[#FEB157]" />
+              </div>
+              <span className="tracking-wide">Sizzle AI Studio</span>
             </button>
           )}
 
-          {/* AI Surprise Me Button */}
-          {onOpenAiSurprise && (
-            <button
-              onClick={onOpenAiSurprise}
-              className="p-2 sm:px-3 sm:py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-xs transition-all shadow-md flex items-center gap-1.5 cursor-pointer hover:scale-105"
-              title="AI Surprise Me & Taste Discovery Box"
-            >
-              <Sparkles className="w-4 h-4 text-emerald-200 animate-spin" />
-              <span className="hidden md:inline">Surprise Me 🎁</span>
-            </button>
-          )}
-
-          {/* AI Mood Curator Button */}
-          {onOpenAiMood && (
-            <button
-              onClick={onOpenAiMood}
-              className="p-2 sm:px-3 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-extrabold text-xs transition-all shadow-md flex items-center gap-1.5 cursor-pointer hover:scale-105"
-              title="AI Mood & Occasion Menu Curator"
-            >
-              <Sparkles className="w-4 h-4 text-amber-100 animate-bounce" />
-              <span className="hidden md:inline">Mood AI</span>
-            </button>
-          )}
-
-          {/* AI Nutrition & Macro Builder Button */}
-          {onOpenAiNutrition && (
-            <button
-              onClick={onOpenAiNutrition}
-              className="p-2 sm:px-3 sm:py-2 rounded-xl bg-gradient-to-r from-[#E85D04] to-[#F97316] hover:from-[#C94B00] hover:to-[#EA580C] text-white font-extrabold text-xs transition-all shadow-md flex items-center gap-1.5 cursor-pointer hover:scale-105"
-              title="AI Nutrition & Fitness Meal Builder"
-            >
-              <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
-              <span className="hidden md:inline">AI Nutrition</span>
-            </button>
-          )}
-          
           {/* Notification Bell Dropdown (Admin Mode) */}
           {isAdmin && adminCtx && (
             <div className="relative">
@@ -289,11 +257,10 @@ export const Header: React.FC<HeaderProps> = ({
                   />
                 ) : (
                   <div
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${
-                      isAdmin
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${isAdmin
                         ? 'bg-gradient-to-br from-[#F97316] to-[#EA580C] text-white'
                         : 'bg-[#E85D04] text-white'
-                    }`}
+                      }`}
                   >
                     {isAdmin ? <ShieldCheck className="w-4 h-4" /> : user.name.charAt(0).toUpperCase()}
                   </div>
@@ -309,9 +276,8 @@ export const Header: React.FC<HeaderProps> = ({
                     {user.name}
                   </span>
                   <span
-                    className={`text-[10px] font-bold uppercase tracking-wider ${
-                      isAdmin ? 'text-[#F97316]' : 'text-[#E85D04]'
-                    }`}
+                    className={`text-[10px] font-bold uppercase tracking-wider ${isAdmin ? 'text-[#F97316]' : 'text-[#E85D04]'
+                      }`}
                   >
                     {user.role}
                   </span>
@@ -373,21 +339,19 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   key={tab.id}
                   onClick={() => adminCtx.setActiveTab(tab.id as AdminTab)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
-                    isActive
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${isActive
                       ? 'bg-[#F97316] text-white shadow-md shadow-[#F97316]/20 font-bold'
                       : 'text-[#9CA3AF] hover:text-[#F9FAFB] hover:bg-[#374151]/60'
-                  }`}
+                    }`}
                 >
                   <Icon className="w-4 h-4 shrink-0" />
                   <span>{tab.label}</span>
                   {tab.badge !== undefined && tab.badge > 0 && (
                     <span
-                      className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
-                        isActive
+                      className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${isActive
                           ? 'bg-white text-[#F97316]'
                           : 'bg-[#F97316]/10 text-[#F97316] border border-[#F97316]/30'
-                      }`}
+                        }`}
                     >
                       {tab.badge}
                     </span>

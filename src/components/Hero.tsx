@@ -22,13 +22,14 @@ import { FoodItem } from '../types';
 import { EditFoodModal } from './admin/EditFoodModal';
 
 interface HeroProps {
+  onOpenAiHub?: () => void;
   onOpenAiNutrition?: () => void;
   onOpenAiMood?: () => void;
   onOpenAiSurprise?: () => void;
   onOpenAiUsual?: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onOpenAiNutrition, onOpenAiMood, onOpenAiSurprise, onOpenAiUsual }) => {
+export const Hero: React.FC<HeroProps> = ({ onOpenAiHub, onOpenAiNutrition, onOpenAiMood, onOpenAiSurprise, onOpenAiUsual }) => {
   const {
     searchQuery,
     setSearchQuery,
@@ -99,46 +100,6 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAiNutrition, onOpenAiMood, onO
                 <Flame className={isAdmin ? "w-3.5 h-3.5 fill-[#F97316]" : "w-3.5 h-3.5 fill-[#E85D04]"} />
                 <span>{isAdmin ? '🛡️ Admin System Management' : 'Gourmet Food Ordering'}</span>
               </div>
-              {!isAdmin && onOpenAiUsual && (
-                <button
-                  type="button"
-                  onClick={onOpenAiUsual}
-                  className="inline-flex items-center gap-1.5 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white px-3 py-0.5 rounded-full text-xs font-extrabold shadow-sm transition-all hover:scale-105 cursor-pointer"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-rose-200 animate-bounce" />
-                  <span>⚡ Usual Feast</span>
-                </button>
-              )}
-              {!isAdmin && onOpenAiSurprise && (
-                <button
-                  type="button"
-                  onClick={onOpenAiSurprise}
-                  className="inline-flex items-center gap-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-3 py-0.5 rounded-full text-xs font-extrabold shadow-sm transition-all hover:scale-105 cursor-pointer"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-200 animate-spin" />
-                  <span>🎁 Surprise Me</span>
-                </button>
-              )}
-              {!isAdmin && onOpenAiMood && (
-                <button
-                  type="button"
-                  onClick={onOpenAiMood}
-                  className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-3 py-0.5 rounded-full text-xs font-extrabold shadow-sm transition-all hover:scale-105 cursor-pointer"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-100 animate-bounce" />
-                  <span>🎭 Mood Curator</span>
-                </button>
-              )}
-              {!isAdmin && onOpenAiNutrition && (
-                <button
-                  type="button"
-                  onClick={onOpenAiNutrition}
-                  className="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#E85D04] to-[#F97316] hover:from-[#C94B00] hover:to-[#EA580C] text-white px-3 py-0.5 rounded-full text-xs font-extrabold shadow-sm transition-all hover:scale-105 cursor-pointer"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-200 animate-spin" />
-                  <span>✨ Build AI Macro Meal</span>
-                </button>
-              )}
             </div>
             <h1 className={isAdmin ? "text-2xl sm:text-3xl font-black text-[#F9FAFB] font-['Poppins'] tracking-tight" : "text-2xl sm:text-3xl font-black text-[#1E1E1E] font-['Poppins'] tracking-tight"}>
               {isAdmin ? 'System Administration & Food Inventory' : 'What are you craving today?'}
