@@ -15,6 +15,7 @@ import {
   ShoppingBag,
   CheckCircle2,
   Zap,
+  ArrowLeft,
 } from 'lucide-react';
 
 // Theme presets for Sizzle Macro Engine (Easily switch between 'SIZZLE_WARM' and 'DARK' or revert!)
@@ -76,9 +77,10 @@ export const MODAL_THEMES = {
 interface AiNutritionModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onBackToHub?: () => void;
 }
 
-export const AiNutritionModal: React.FC<AiNutritionModalProps> = ({ isOpen, onClose }) => {
+export const AiNutritionModal: React.FC<AiNutritionModalProps> = ({ isOpen, onClose, onBackToHub }) => {
   const { addItem, showToast } = useCart();
   const theme = MODAL_THEMES[MODAL_THEMES.active];
 
@@ -195,32 +197,49 @@ export const AiNutritionModal: React.FC<AiNutritionModalProps> = ({ isOpen, onCl
         <div className="max-h-[85vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 space-y-5 custom-modal-scrollbar">
           <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-[#E85D04]/15 rounded-full blur-3xl pointer-events-none" />
 
-        <div className={`flex items-start justify-between pb-4 border-b ${theme.headerBorder} relative z-10`}>
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-[#E85D04] text-white rounded-2xl shadow-lg animate-bounce">
-              <Sparkles className="w-5 h-5" />
+          {/* Modal Header */}
+          <div className={`pb-4 border-b ${theme.headerBorder} relative z-10 space-y-3`}>
+            {/* Row 1: Back Button (Left) & Close Button (Right) on the same line */}
+            <div className="flex items-center justify-between w-full">
+              {onBackToHub ? (
+                <button
+                  type="button"
+                  onClick={onBackToHub}
+                  className="p-2 sm:px-3 sm:py-2 rounded-xl bg-white text-[#1E1E1E] hover:text-[#E85D04] border border-gray-200 hover:border-[#E85D04]/40 font-extrabold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-md hover:scale-105"
+                  title="Back to AI Studio Cards"
+                >
+                  <ArrowLeft className="w-4 h-4 text-[#E85D04]" />
+                  <span>Back to AI Studio</span>
+                </button>
+              ) : (
+                <div />
+              )}
+              <button
+                type="button"
+                onClick={onClose}
+                className={`p-2 rounded-xl border transition-all cursor-pointer shadow-md shrink-0 ${theme.closeBtn}`}
+                title="Close Modal"
+              >
+                <X className="w-5 h-5 text-[#F97316]" />
+              </button>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
+
+            {/* Row 2: Below Action Bar - Centered Heading & Badges */}
+            <div className="flex flex-col items-center text-center justify-center space-y-1.5 px-2">
+              <div className="flex items-center justify-center gap-2 flex-wrap">
+                <div className="p-1.5 bg-[#E85D04] text-white rounded-xl shadow-md shrink-0">
+                  <Sparkles className="w-4 h-4" />
+                </div>
                 <span className="bg-[#E85D04]/20 text-[#E85D04] border border-[#E85D04]/40 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                   AI Smart Dining
                 </span>
                 <span className={`text-xs ${theme.subtitleText}`}>Sizzle Macro Engine</span>
               </div>
-              <h2 className={`text-lg sm:text-xl font-extrabold font-['Poppins'] mt-1 ${theme.titleText}`}>
+              <h2 className={`text-xl sm:text-2xl font-extrabold font-['Poppins'] ${theme.titleText}`}>
                 AI Nutrition &amp; Fitness Meal Builder
               </h2>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className={`p-2 rounded-xl border transition-all cursor-pointer shadow-md shrink-0 ${theme.closeBtn}`}
-            title="Close Modal"
-          >
-            <X className="w-5 h-5 text-[#F97316]" />
-          </button>
-        </div>
 
         {/* Dual-Engine Mode Switcher Toggle */}
         <div className="relative z-10">

@@ -29,6 +29,7 @@ import { AiNutritionModal } from './components/AiNutritionModal';
 import { AiMoodCuratorModal } from './components/AiMoodCuratorModal';
 import { AiSurpriseBoxModal } from './components/AiSurpriseBoxModal';
 import { AiUsualFeastModal } from './components/AiUsualFeastModal';
+import { AiHubModal } from './components/AiHubModal';
 
 import { MENU_ITEMS, CATEGORIES } from './data/menuData';
 import { menuApi } from './services/api';
@@ -39,6 +40,7 @@ const MainAppContent: React.FC = () => {
   const [itemsList, setItemsList] = useState<FoodItem[]>(MENU_ITEMS);
   const [categoriesList, setCategoriesList] = useState<CategoryOption[]>(CATEGORIES);
   const [isMenuLoading, setIsMenuLoading] = useState<boolean>(false);
+  const [isAiHubOpen, setIsAiHubOpen] = useState<boolean>(false);
   const [isAiNutritionOpen, setIsAiNutritionOpen] = useState<boolean>(false);
   const [isAiMoodOpen, setIsAiMoodOpen] = useState<boolean>(false);
   const [isAiSurpriseOpen, setIsAiSurpriseOpen] = useState<boolean>(false);
@@ -286,6 +288,7 @@ const MainAppContent: React.FC = () => {
       {/* Top Bar Header */}
       <Header
         onOpenHistory={() => setIsHistoryOpen(true)}
+        onOpenAiHub={() => setIsAiHubOpen(true)}
         onOpenAiNutrition={() => setIsAiNutritionOpen(true)}
         onOpenAiMood={() => setIsAiMoodOpen(true)}
         onOpenAiSurprise={() => setIsAiSurpriseOpen(true)}
@@ -308,6 +311,7 @@ const MainAppContent: React.FC = () => {
         <>
           {/* Hero Banner Section */}
           <Hero
+            onOpenAiHub={() => setIsAiHubOpen(true)}
             onOpenAiNutrition={() => setIsAiNutritionOpen(true)}
             onOpenAiMood={() => setIsAiMoodOpen(true)}
             onOpenAiSurprise={() => setIsAiSurpriseOpen(true)}
@@ -493,10 +497,46 @@ const MainAppContent: React.FC = () => {
       <OrderHistoryModal isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} />
       <AuthModal />
       <ProfileModal isOpen={isProfileModalOpen} onClose={closeProfileModal} />
-      <AiNutritionModal isOpen={isAiNutritionOpen} onClose={() => setIsAiNutritionOpen(false)} />
-      <AiMoodCuratorModal isOpen={isAiMoodOpen} onClose={() => setIsAiMoodOpen(false)} />
-      <AiSurpriseBoxModal isOpen={isAiSurpriseOpen} onClose={() => setIsAiSurpriseOpen(false)} />
-      <AiUsualFeastModal isOpen={isAiUsualOpen} onClose={() => setIsAiUsualOpen(false)} />
+      <AiNutritionModal
+        isOpen={isAiNutritionOpen}
+        onClose={() => setIsAiNutritionOpen(false)}
+        onBackToHub={() => {
+          setIsAiNutritionOpen(false);
+          setIsAiHubOpen(true);
+        }}
+      />
+      <AiMoodCuratorModal
+        isOpen={isAiMoodOpen}
+        onClose={() => setIsAiMoodOpen(false)}
+        onBackToHub={() => {
+          setIsAiMoodOpen(false);
+          setIsAiHubOpen(true);
+        }}
+      />
+      <AiSurpriseBoxModal
+        isOpen={isAiSurpriseOpen}
+        onClose={() => setIsAiSurpriseOpen(false)}
+        onBackToHub={() => {
+          setIsAiSurpriseOpen(false);
+          setIsAiHubOpen(true);
+        }}
+      />
+      <AiUsualFeastModal
+        isOpen={isAiUsualOpen}
+        onClose={() => setIsAiUsualOpen(false)}
+        onBackToHub={() => {
+          setIsAiUsualOpen(false);
+          setIsAiHubOpen(true);
+        }}
+      />
+      <AiHubModal
+        isOpen={isAiHubOpen}
+        onClose={() => setIsAiHubOpen(false)}
+        onSelectUsual={() => setIsAiUsualOpen(true)}
+        onSelectSurprise={() => setIsAiSurpriseOpen(true)}
+        onSelectMood={() => setIsAiMoodOpen(true)}
+        onSelectNutrition={() => setIsAiNutritionOpen(true)}
+      />
       <Toast />
       <AdminNotificationToast />
 
