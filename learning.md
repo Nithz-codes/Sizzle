@@ -136,12 +136,27 @@ We built two major AI Customer Features:
 
 ### 5️⃣ Google Gemini 1.5 API Dual-Engine Integration
 * **The Concept**: Customers can choose between **⚡ Local Solver Mode** (0ms latency, 100% offline) and **✨ Gemini 1.5 AI Mode** (Generative Large Language Model inference)!
-* **How It Works (Explained Simply)**:
+
+* **🔑 How to Get a Free Gemini API Key**:
+  1. Visit **[aistudio.google.com](https://aistudio.google.com/)** and sign in with your Google account.
+  2. Click **"Get API Key"** $\rightarrow$ **"Create API Key"**.
+  3. Copy your key string (starts with `AIzaSy...`).
+
+* **💾 How API Key Storage & Resolution Works (Explained to a Baby)**:
+  * **Method 1: `.env` File (Project-Level)**:
+    * Stored inside project `.env` as `VITE_GEMINI_API_KEY="AIzaSy..."`.
+    * When running `npm run dev`, Vite automatically injects it into JavaScript memory (`import.meta.env.VITE_GEMINI_API_KEY`). Perfect for developers!
+  * **Method 2: In-App UI Input (Browser-Level)**:
+    * When you click `🔑 Set Gemini API Key` in the UI and click Save, Sizzle stores it in your browser's private mini-database: `localStorage.setItem('sizzle_gemini_api_key', ...)`. Perfect for non-technical users!
+
+* **🎯 Key Lookup Priority Hierarchy**:
+  $$\text{1. UI Pasted Key (LocalStorage)} \xrightarrow{\text{If empty}} \text{2. } .env\text{ File Key} \xrightarrow{\text{If empty}} \text{3. ⚡ Local 0ms Solver Fallback}$$
+
+* **How It Works Under the Hood**:
   1. **Dual-Engine Mode Switcher (`AiEngineToggle.tsx`)**: A sleek toggle button at the top of every AI modal.
   2. **System Menu Injection**: When switched to Gemini Mode, Sizzle sends our full 52-dish menu context to Google Gemini 1.5 Flash API (`@google/genai`).
   3. **Conversational Chef Responses**: Gemini acts as **Chef Mario AI**, returning real-time generative chef quotes, custom free-text mood analysis, and personalized dining advice.
   4. **Automatic Fallback Engine**: If no API key is set or the device is offline, Sizzle automatically falls back to our ultra-fast Local Solver Engine so the app never fails!
-  5. **In-App Key Config**: Diners can click `🔑 Set Gemini API Key` to paste their custom AI Studio key directly in the UI, stored safely in `localStorage`.
 
 ---
 
