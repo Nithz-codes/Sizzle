@@ -165,8 +165,19 @@ We built two major AI Customer Features:
 * **How We Fixed It**:
   1. **Single Master Button**: Consolidated all 4 AI buttons into one elegant header button: **`✨ Sizzle AI Studio`**.
   2. **Clean 2x2 Selection Grid (`AiHubModal.tsx`)**: Clicking the button opens a glassmorphism master modal presenting all 4 AI tools (*Usual Feast, Surprise Me, Mood Curator, Macro Builder*) in a clean 2x2 grid.
-  3. **Seamless 2-Way Navigation**: Added a **`← Back to AI Studio`** button in the header of all 4 AI feature modals (`AiNutritionModal`, `AiMoodCuratorModal`, `AiSurpriseBoxModal`, `AiUsualFeastModal`). Users can now jump back to the 4-card selection grid instantly without closing the modal!
+  3. **Seamless 2-Way Navigation**: Added a **`← Back to AI Studio`** button in the header of all AI feature modals. Users can now jump back to the selection grid instantly without closing the modal!
   4. **Result**: 0 UI clutter, clean navigation, and instant switching across the entire Sizzle AI Suite!
+
+---
+
+### 7️⃣ Feature 11: Sizzle Vision AI (Multimodal Food Plate Photo Scanner & Macro Estimator)
+* **What It Does**: Diners can drag & drop, upload any food plate photo, or click built-in sample photos (*Burger, Pizza, Biryani, Salad*).
+* **Gemini 1.5 Multimodal AI**: Encodes image as Base64 `inlineData` and passes it to `@google/genai` `gemini-1.5-flash` model.
+* **Outputs Generated**:
+  1. **Recognized Dish & Match Confidence** (e.g., *98% Match*).
+  2. **Estimated Nutrition & Macro Breakdown** (Calories, Protein, Carbs, Fat, Fiber).
+  3. **Culinary Health Grade** (e.g. *A+ High Protein*).
+  4. **Matched Sizzle Menu Items**: Automatically matches the photo with Sizzle's 52-dish menu with a 1-tap **"Add to Cart & Order"** button!
 
 ---
 
@@ -206,6 +217,14 @@ Here are the key verification commands used throughout the development of Sizzle
 
 ### 2️⃣ `mvn test-compile` (Backend Java Compiler Check)
 * **What it does**: Compiles all Spring Boot Java backend controllers, services, and repositories to ensure 100% clean Java compilation.
+
+### 3️⃣ `npx.cmd tsx scratch/test_vision_ai.mjs` (Automated AI Engine Tester)
+* **What it does**: Executes an automated test suite that runs the Vision AI engine (`analyzeFoodImage`) against sample food plate photos and prints recognized dish names, confidence match scores, estimated calories/macros, and paired Sizzle menu items to the console.
+* **Command Breakdown**:
+  * **`tsx` (TypeScript Execute)**: A modern, ultra-fast TypeScript executor for Node.js (powered by `esbuild`). It allows running TypeScript & ES Module scripts instantly in-memory without compiling to disk first.
+  * **`scratch/test_vision_ai.mjs`**: The test script that programmatically validates the Vision AI algorithms and menu matching logic.
+  * **`npx.cmd`**: Executes the project's local `tsx` package on Windows.
+* **Why it's essential**: Verifies that new AI algorithms, mathematical formulas, and menu matching logic work 100% correctly before updating the UI!
 
 ---
 
