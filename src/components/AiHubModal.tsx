@@ -9,6 +9,7 @@ import {
   Dumbbell,
   ArrowRight,
   Flame,
+  Camera,
 } from 'lucide-react';
 
 interface AiHubModalProps {
@@ -18,6 +19,7 @@ interface AiHubModalProps {
   onSelectSurprise: () => void;
   onSelectMood: () => void;
   onSelectNutrition: () => void;
+  onSelectVision: () => void;
 }
 
 export const AiHubModal: React.FC<AiHubModalProps> = ({
@@ -27,12 +29,28 @@ export const AiHubModal: React.FC<AiHubModalProps> = ({
   onSelectSurprise,
   onSelectMood,
   onSelectNutrition,
+  onSelectVision,
 }) => {
   const theme = MODAL_THEMES[MODAL_THEMES.active];
 
   if (!isOpen) return null;
 
   const aiFeatures = [
+    {
+      id: 'vision',
+      title: ' Sizzle Vision AI Scanner',
+      subtitle: 'Multimodal Photo Inspector',
+      description:
+        'Upload or snap a photo of any meal to instantly detect calories, protein, macros & order matching Sizzle dishes!',
+      icon: Camera,
+      gradient: 'from-emerald-600 to-teal-600',
+      badge: '📸 Photo Scanner',
+      badgeBg: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      action: () => {
+        onClose();
+        onSelectVision();
+      },
+    },
     {
       id: 'usual',
       title: 'AI One-Tap "Usual Feast"',
@@ -70,9 +88,9 @@ export const AiHubModal: React.FC<AiHubModalProps> = ({
       description:
         'Curates meals matched to your current mood, weather, post-workout, or custom craving prompt.',
       icon: CloudRain,
-      gradient: 'from-amber-500 to-orange-500',
+      gradient: 'from-blue-600 to-cyan-600',
       badge: '🌧️ Mood Matching',
-      badgeBg: 'bg-amber-50 text-amber-700 border-amber-200',
+      badgeBg: 'bg-blue-50 text-blue-700 border-blue-200',
       action: () => {
         onClose();
         onSelectMood();

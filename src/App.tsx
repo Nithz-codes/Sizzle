@@ -29,6 +29,7 @@ import { AiNutritionModal } from './components/AiNutritionModal';
 import { AiMoodCuratorModal } from './components/AiMoodCuratorModal';
 import { AiSurpriseBoxModal } from './components/AiSurpriseBoxModal';
 import { AiUsualFeastModal } from './components/AiUsualFeastModal';
+import { AiVisionScannerModal } from './components/AiVisionScannerModal';
 import { AiHubModal } from './components/AiHubModal';
 
 import { MENU_ITEMS, CATEGORIES } from './data/menuData';
@@ -45,6 +46,7 @@ const MainAppContent: React.FC = () => {
   const [isAiMoodOpen, setIsAiMoodOpen] = useState<boolean>(false);
   const [isAiSurpriseOpen, setIsAiSurpriseOpen] = useState<boolean>(false);
   const [isAiUsualOpen, setIsAiUsualOpen] = useState<boolean>(false);
+  const [isAiVisionOpen, setIsAiVisionOpen] = useState<boolean>(false);
 
   const {
     activeCategory,
@@ -529,6 +531,14 @@ const MainAppContent: React.FC = () => {
           setIsAiHubOpen(true);
         }}
       />
+      <AiVisionScannerModal
+        isOpen={isAiVisionOpen}
+        onClose={() => setIsAiVisionOpen(false)}
+        onBackToHub={() => {
+          setIsAiVisionOpen(false);
+          setIsAiHubOpen(true);
+        }}
+      />
       <AiHubModal
         isOpen={isAiHubOpen}
         onClose={() => setIsAiHubOpen(false)}
@@ -536,6 +546,7 @@ const MainAppContent: React.FC = () => {
         onSelectSurprise={() => setIsAiSurpriseOpen(true)}
         onSelectMood={() => setIsAiMoodOpen(true)}
         onSelectNutrition={() => setIsAiNutritionOpen(true)}
+        onSelectVision={() => setIsAiVisionOpen(true)}
       />
       <Toast />
       <AdminNotificationToast />
