@@ -287,3 +287,31 @@ export interface UsualFeastResponse {
 }
 
 export type OrderReceipt = ReceiptData;
+
+// --- Sizzle Vision AI Scanner Types ---
+export interface VisionMatchedItem {
+  foodItem: FoodItem;
+  similarityScore: number;
+  matchReason: string;
+}
+
+export interface VisionScanResult {
+  recognizedDishName: string;
+  confidenceScore: number;
+  estimatedCalories: number;
+  proteinGrams: number;
+  carbsGrams: number;
+  fatGrams: number;
+  fiberGrams: number;
+  healthGrade: string;
+  summary: string;
+  chefInsights: string;
+  matchedItems: VisionMatchedItem[];
+}
+
+export interface VisionSamplePhoto {
+  id: string;
+  title: string;
+  imageUrl: string;
+  sampleDishName: string;
+}
