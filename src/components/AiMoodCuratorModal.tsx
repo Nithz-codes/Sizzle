@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { curateMoodFeast } from '../services/moodAiCurator';
-import { generateGeminiMoodFeast, getStoredApiKey, saveStoredApiKey } from '../services/geminiAiService';
+import { generateGeminiMoodFeast } from '../services/geminiAiService';
 import { MoodOccasion, MoodFeastResponse } from '../types';
 import { MODAL_THEMES } from './AiNutritionModal';
 import { AiEngineToggle, AiEngineMode } from './AiEngineToggle';
@@ -39,7 +39,6 @@ export const AiMoodCuratorModal: React.FC<AiMoodCuratorModalProps> = ({ isOpen, 
 
   // Dual-Engine AI Mode State
   const [engineMode, setEngineMode] = useState<AiEngineMode>('LOCAL');
-  const [apiKey, setApiKey] = useState<string>(getStoredApiKey());
   const [geminiMoodState, setGeminiMoodState] = useState<MoodFeastResponse | null>(null);
 
   // Compute live AI mood solution
@@ -160,12 +159,6 @@ export const AiMoodCuratorModal: React.FC<AiMoodCuratorModalProps> = ({ isOpen, 
             <AiEngineToggle
               mode={engineMode}
               onModeChange={(m) => setEngineMode(m)}
-              apiKey={apiKey}
-              onSaveApiKey={(k) => {
-                setApiKey(k);
-                saveStoredApiKey(k);
-                showToast('Gemini API Key Saved!');
-              }}
             />
           </div>
 

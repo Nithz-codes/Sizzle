@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { getUsualFeast } from '../services/smartReorderEngine';
-import { getStoredApiKey, saveStoredApiKey } from '../services/geminiAiService';
+
 import { MODAL_THEMES } from './AiNutritionModal';
 import { AiEngineToggle, AiEngineMode } from './AiEngineToggle';
 import {
@@ -31,7 +31,6 @@ export const AiUsualFeastModal: React.FC<AiUsualFeastModalProps> = ({ isOpen, on
 
   const [addedToCart, setAddedToCart] = useState<boolean>(false);
   const [engineMode, setEngineMode] = useState<AiEngineMode>('LOCAL');
-  const [apiKey, setApiKey] = useState<string>(getStoredApiKey());
 
   const customerName = user?.name || 'Gourmet Diner';
 
@@ -118,12 +117,6 @@ export const AiUsualFeastModal: React.FC<AiUsualFeastModalProps> = ({ isOpen, on
             <AiEngineToggle
               mode={engineMode}
               onModeChange={(m) => setEngineMode(m)}
-              apiKey={apiKey}
-              onSaveApiKey={(k) => {
-                setApiKey(k);
-                saveStoredApiKey(k);
-                showToast('Gemini API Key Saved!');
-              }}
             />
           </div>
 

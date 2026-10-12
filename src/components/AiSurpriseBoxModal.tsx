@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { generateMysteryBox, rerollDish } from '../services/tasteDiscoveryEngine';
-import { generateGeminiTasteDiscovery, getStoredApiKey, saveStoredApiKey } from '../services/geminiAiService';
+import { generateGeminiTasteDiscovery } from '../services/geminiAiService';
 import { TasteBudget, TasteVibe, MysteryBoxResponse } from '../types';
 import { MODAL_THEMES } from './AiNutritionModal';
 import { AiEngineToggle, AiEngineMode } from './AiEngineToggle';
@@ -41,7 +41,6 @@ export const AiSurpriseBoxModal: React.FC<AiSurpriseBoxModalProps> = ({ isOpen, 
 
   // Dual-Engine AI Mode State
   const [engineMode, setEngineMode] = useState<AiEngineMode>('LOCAL');
-  const [apiKey, setApiKey] = useState<string>(getStoredApiKey());
   const [geminiBoxState, setGeminiBoxState] = useState<MysteryBoxResponse | null>(null);
 
   // Generate initial box solution
@@ -159,12 +158,6 @@ export const AiSurpriseBoxModal: React.FC<AiSurpriseBoxModalProps> = ({ isOpen, 
             <AiEngineToggle
               mode={engineMode}
               onModeChange={(m) => setEngineMode(m)}
-              apiKey={apiKey}
-              onSaveApiKey={(k) => {
-                setApiKey(k);
-                saveStoredApiKey(k);
-                showToast('Gemini API Key Saved!');
-              }}
             />
           </div>
 

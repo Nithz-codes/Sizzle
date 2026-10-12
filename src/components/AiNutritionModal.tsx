@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { buildMacroMeal, getItemMacros } from '../services/macroAiBuilder';
-import { generateGeminiMacroMeal, getStoredApiKey, saveStoredApiKey } from '../services/geminiAiService';
+import { generateGeminiMacroMeal } from '../services/geminiAiService';
 import { FitnessPreset, FoodItem, MacroMealResponse } from '../types';
 import { MENU_ITEMS } from '../data/menuData';
 import { AiEngineToggle, AiEngineMode } from './AiEngineToggle';
@@ -93,7 +93,6 @@ export const AiNutritionModal: React.FC<AiNutritionModalProps> = ({ isOpen, onCl
 
   // Dual-Engine AI Mode State
   const [engineMode, setEngineMode] = useState<AiEngineMode>('LOCAL');
-  const [apiKey, setApiKey] = useState<string>(getStoredApiKey());
   const [geminiMealState, setGeminiMealState] = useState<MacroMealResponse | null>(null);
   const [isGeminiLoading, setIsGeminiLoading] = useState<boolean>(false);
 
@@ -246,12 +245,6 @@ export const AiNutritionModal: React.FC<AiNutritionModalProps> = ({ isOpen, onCl
           <AiEngineToggle
             mode={engineMode}
             onModeChange={(m) => setEngineMode(m)}
-            apiKey={apiKey}
-            onSaveApiKey={(k) => {
-              setApiKey(k);
-              saveStoredApiKey(k);
-              showToast('Gemini API Key Saved!');
-            }}
           />
         </div>
 

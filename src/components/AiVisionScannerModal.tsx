@@ -18,7 +18,7 @@ import { useCart } from '../context/CartContext';
 import { FoodItem, VisionScanResult } from '../types';
 import { MODAL_THEMES } from './AiNutritionModal';
 import { AiEngineToggle, AiEngineMode } from './AiEngineToggle';
-import { getStoredApiKey, saveStoredApiKey } from '../services/geminiAiService';
+
 import { analyzeFoodImage, SAMPLE_VISION_PHOTOS } from '../services/visionAiEngine';
 
 interface AiVisionScannerModalProps {
@@ -37,7 +37,6 @@ export const AiVisionScannerModal: React.FC<AiVisionScannerModalProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [engineMode, setEngineMode] = useState<AiEngineMode>('LOCAL');
-  const [apiKey, setApiKey] = useState<string>(getStoredApiKey());
 
   const [selectedImage, setSelectedImage] = useState<string>(SAMPLE_VISION_PHOTOS[0].imageUrl);
   const [imageHint, setImageHint] = useState<string>(SAMPLE_VISION_PHOTOS[0].sampleDishName);
@@ -157,12 +156,6 @@ export const AiVisionScannerModal: React.FC<AiVisionScannerModalProps> = ({
             <AiEngineToggle
               mode={engineMode}
               onModeChange={(m) => setEngineMode(m)}
-              apiKey={apiKey}
-              onSaveApiKey={(k) => {
-                setApiKey(k);
-                saveStoredApiKey(k);
-                showToast('Gemini API Key Saved!');
-              }}
             />
           </div>
 

@@ -20,15 +20,16 @@ import { getUsualFeast } from './smartReorderEngine';
 const STORAGE_KEY = 'sizzle_gemini_api_key';
 
 export function getStoredApiKey(): string {
+  const envKey =
+    import.meta.env?.VITE_GEMINI_API_KEY ||
+    (typeof process !== 'undefined' ? process.env?.GEMINI_API_KEY : '');
+  if (envKey && envKey.trim()) return envKey.trim();
+
   if (typeof window !== 'undefined') {
     const local = localStorage.getItem(STORAGE_KEY);
     if (local && local.trim()) return local.trim();
   }
-  return (
-    import.meta.env?.VITE_GEMINI_API_KEY ||
-    (typeof process !== 'undefined' ? process.env?.GEMINI_API_KEY : '') ||
-    ''
-  );
+  return '';
 }
 
 export function saveStoredApiKey(key: string): void {
