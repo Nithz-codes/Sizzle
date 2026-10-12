@@ -31,6 +31,7 @@ import { AiSurpriseBoxModal } from './components/AiSurpriseBoxModal';
 import { AiUsualFeastModal } from './components/AiUsualFeastModal';
 import { AiVisionScannerModal } from './components/AiVisionScannerModal';
 import { AiHubModal } from './components/AiHubModal';
+import { MobileCategoryDrawer } from './components/MobileCategoryDrawer';
 
 import { MENU_ITEMS, CATEGORIES } from './data/menuData';
 import { menuApi } from './services/api';
@@ -47,6 +48,7 @@ const MainAppContent: React.FC = () => {
   const [isAiSurpriseOpen, setIsAiSurpriseOpen] = useState<boolean>(false);
   const [isAiUsualOpen, setIsAiUsualOpen] = useState<boolean>(false);
   const [isAiVisionOpen, setIsAiVisionOpen] = useState<boolean>(false);
+  const [isMobileCategoryDrawerOpen, setIsMobileCategoryDrawerOpen] = useState<boolean>(false);
 
   const {
     activeCategory,
@@ -295,6 +297,7 @@ const MainAppContent: React.FC = () => {
         onOpenAiMood={() => setIsAiMoodOpen(true)}
         onOpenAiSurprise={() => setIsAiSurpriseOpen(true)}
         onOpenAiUsual={() => setIsAiUsualOpen(true)}
+        onOpenMobileCategory={() => setIsMobileCategoryDrawerOpen(true)}
       />
 
       {/* ADMIN PORTAL VIEWS */}
@@ -321,22 +324,66 @@ const MainAppContent: React.FC = () => {
           />
 
           {/* Main Content Area: Category Sidebar + Food Grid */}
-          <main id="menu-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full flex-1">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <main id="menu-section" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 w-full flex-1">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
               
-              {/* Left Column: Category & Dietary Sidebar */}
-              <aside className="lg:col-span-3 lg:sticky lg:top-24 space-y-6">
+              {/* Left Column: Category & Dietary Sidebar - HIDDEN on mobile/tablet (< lg), visible on desktop (lg:block) */}
+              <aside className="hidden lg:block lg:col-span-3 lg:sticky lg:top-24 space-y-6">
                 <CategorySidebar />
               </aside>
 
               {/* Right Column: Food Grid & Explorer */}
-              <section className="lg:col-span-9 space-y-6">
+              <section className="col-span-1 lg:col-span-9 space-y-5 sm:space-y-6">
+
+                {/* Mobile Categories & Filters Quick Action Bar (< lg) */}
+                <div className="lg:hidden flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none no-scrollbar">
+                  <button
+                    onClick={() => setIsMobileCategoryDrawerOpen(true)}
+                    className="flex items-center gap-1.5 bg-[#E85D04] hover:bg-[#C94B00] text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-sm shadow-[#E85D04]/25 active:scale-95 transition-all shrink-0 cursor-pointer"
+                  >
+                    <Filter className="w-3.5 h-3.5" />
+                    <span>Categories &amp; Filters</span>
+                    {(activeCategory !== 'All' || dietaryFilter !== 'All' || priceFilter !== 'All Prices') && (
+                      <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setActiveCategory('All');
+                      setCategoryFilter('All');
+                    }}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer ${
+                      activeCategory === 'All'
+                        ? 'bg-[#1E1E1E] text-white font-bold shadow-xs'
+                        : 'bg-[#FFFFFF] text-[#1E1E1E] border border-[#ECECEC] hover:border-[#E85D04]/40'
+                    }`}
+                  >
+                    All ({itemsList.length})
+                  </button>
+                  {CATEGORIES.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => {
+                        setActiveCategory(cat.name);
+                        setCategoryFilter(cat.name);
+                      }}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer ${
+                        activeCategory === cat.name
+                          ? 'bg-[#1E1E1E] text-white font-bold shadow-xs'
+                          : 'bg-[#FFFFFF] text-[#1E1E1E] border border-[#ECECEC] hover:border-[#E85D04]/40'
+                      }`}
+                    >
+                      {cat.displayName}
+                    </button>
+                  ))}
+                </div>
                 
                 {/* Header Title for Current Category */}
-                <div className={isAdmin ? "bg-[#1E293B] border border-[#374151] rounded-2xl p-5 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4" : "bg-[#FFFFFF] border border-[#ECECEC] rounded-2xl p-5 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"}>
+                <div className={isAdmin ? "bg-[#1E293B] border border-[#374151] rounded-2xl p-4 sm:p-5 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4" : "bg-[#FFFFFF] border border-[#ECECEC] rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4"}>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className={isAdmin ? "text-xl sm:text-2xl font-bold font-['Poppins'] text-[#F9FAFB]" : "text-xl sm:text-2xl font-bold font-['Poppins'] text-[#1E1E1E]"}>
+                      <h2 className={isAdmin ? "text-lg sm:text-2xl font-bold font-['Poppins'] text-[#F9FAFB]" : "text-lg sm:text-2xl font-bold font-['Poppins'] text-[#1E1E1E]"}>
                         {activeCategory === 'All' ? 'All Menu Items' : activeCategoryMeta?.displayName || activeCategory}
                       </h2>
                       <span className={isAdmin ? "bg-[#F97316]/10 text-[#F97316] text-xs font-bold px-2.5 py-0.5 rounded-full border border-[#F97316]/30" : "bg-[#E85D04]/10 text-[#E85D04] text-xs font-bold px-2.5 py-0.5 rounded-full border border-[#E85D04]/20"}>
@@ -475,7 +522,7 @@ const MainAppContent: React.FC = () => {
                     </button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 transition-all duration-300">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 transition-all duration-300">
                     {filteredMenuItems.map((item) => (
                       <FoodCard key={item.id} item={item} />
                     ))}
@@ -547,6 +594,12 @@ const MainAppContent: React.FC = () => {
         onSelectMood={() => setIsAiMoodOpen(true)}
         onSelectNutrition={() => setIsAiNutritionOpen(true)}
         onSelectVision={() => setIsAiVisionOpen(true)}
+      />
+      <MobileCategoryDrawer
+        isOpen={isMobileCategoryDrawerOpen}
+        onClose={() => setIsMobileCategoryDrawerOpen(false)}
+        onOpenAiHub={() => setIsAiHubOpen(true)}
+        onOpenHistory={() => setIsHistoryOpen(true)}
       />
       <Toast />
       <AdminNotificationToast />

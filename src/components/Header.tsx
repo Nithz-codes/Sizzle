@@ -17,6 +17,7 @@ import {
   Settings,
   Utensils,
   Bell,
+  Menu,
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -31,6 +32,7 @@ interface HeaderProps {
   onOpenAiMood?: () => void;
   onOpenAiSurprise?: () => void;
   onOpenAiUsual?: () => void;
+  onOpenMobileCategory?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -40,6 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAiMood,
   onOpenAiSurprise,
   onOpenAiUsual,
+  onOpenMobileCategory,
 }) => {
   const { cartItems, subtotal, setIsCartOpen, pastReceipts } = useCart();
   const { user, isAuthenticated, isAdmin, openAuthModal, openProfileModal, logout } = useAuth();
@@ -64,29 +67,29 @@ export const Header: React.FC<HeaderProps> = ({
           : "sticky top-0 z-40 bg-[#FFFDF8]/95 backdrop-blur-md border-b border-[#ECECEC] text-[#1E1E1E] transition-all duration-300"
       }
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-18 sm:h-20 flex items-center justify-between gap-1.5 sm:gap-4">
 
         {/* Brand Logo & Title */}
         <div
-          className="flex items-center gap-3 cursor-pointer"
+          className="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
           <div
             className={
               isAdmin
-                ? "w-11 h-11 rounded-xl bg-gradient-to-br from-[#F97316] to-[#EA580C] flex items-center justify-center text-white shadow-md shadow-[#F97316]/20"
-                : "w-11 h-11 rounded-xl bg-[#E85D04] flex items-center justify-center text-white shadow-md shadow-[#E85D04]/20"
+                ? "w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[#F97316] to-[#EA580C] flex items-center justify-center text-white shadow-md shadow-[#F97316]/20 shrink-0"
+                : "w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-[#E85D04] flex items-center justify-center text-white shadow-md shadow-[#E85D04]/20 shrink-0"
             }
           >
-            <Flame className="w-6 h-6 animate-pulse" />
+            <Flame className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <span
                 className={
                   isAdmin
-                    ? "font-extrabold text-2xl tracking-tight text-[#F9FAFB] font-['Poppins']"
-                    : "font-extrabold text-2xl tracking-tight text-[#1E1E1E] font-['Poppins']"
+                    ? "font-extrabold text-xl sm:text-2xl tracking-tight text-[#F9FAFB] font-['Poppins']"
+                    : "font-extrabold text-xl sm:text-2xl tracking-tight text-[#1E1E1E] font-['Poppins']"
                 }
               >
                 SIZZLE
@@ -114,19 +117,22 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Header Action Controls */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3">
 
           {/* Single Master Sizzle AI Studio Button */}
           {!isAdmin && onOpenAiHub && (
             <button
               onClick={onOpenAiHub}
-              className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-[#059669] hover:bg-[#047857] text-white font-black text-xs transition-all shadow-[0_0_22px_0_#a7f3d0] hover:shadow-[0_0_32px_0_#a7f3d0] border-2 border-white/40 hover:border-white/70 flex items-center gap-2 cursor-pointer hover:scale-105"
+              className="px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-[#059669] hover:bg-[#047857] text-white font-black text-xs transition-all shadow-[0_0_22px_0_#a7f3d0] hover:shadow-[0_0_32px_0_#a7f3d0] border-2 border-white/40 hover:border-white/70 flex items-center gap-1.5 sm:gap-2 cursor-pointer hover:scale-105 shrink-0"
               title="Open Sizzle AI Studio"
             >
-              <div className="p-1 rounded-full bg-[#FEB157]/25 text-[#FEB157] animate-pulse transition-transform duration-500 hover:scale-125">
+              <div className="p-0.5 sm:p-1 rounded-full bg-[#FEB157]/25 text-[#FEB157] animate-pulse transition-transform duration-500 hover:scale-125">
                 <Sparkles className="w-3.5 h-3.5 text-[#FEB157] fill-[#FEB157]" />
               </div>
-              <span className="tracking-wide">Sizzle AI Studio</span>
+              <span className="tracking-wide">
+                <span className="inline sm:hidden">AI Studio</span>
+                <span className="hidden sm:inline">Sizzle AI Studio</span>
+              </span>
             </button>
           )}
 
@@ -213,20 +219,20 @@ export const Header: React.FC<HeaderProps> = ({
           {!isAdmin && (
             <button
               onClick={() => setIsCartOpen(true)}
-              className="relative flex items-center gap-2.5 bg-[#E85D04] hover:bg-[#C94B00] text-white font-semibold text-sm px-4 py-2.5 rounded-xl shadow-md shadow-[#E85D04]/20 active:scale-95 transition-all cursor-pointer"
+              className="relative flex items-center gap-1.5 sm:gap-2.5 bg-[#E85D04] hover:bg-[#C94B00] text-white font-semibold text-xs sm:text-sm px-2.5 py-2 sm:px-4 sm:py-2.5 rounded-xl shadow-md shadow-[#E85D04]/20 active:scale-95 transition-all cursor-pointer shrink-0"
               aria-label="Open Cart"
             >
               <div className="relative">
-                <ShoppingBag className="w-5 h-5" />
+                <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
                 {totalItemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-white text-[#E85D04] text-[11px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#E85D04] shadow-xs">
+                  <span className="absolute -top-1.5 -right-2 sm:-top-2 sm:-right-2 bg-white text-[#E85D04] text-[10px] sm:text-[11px] font-extrabold w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center border sm:border-2 border-[#E85D04] shadow-xs">
                     {totalItemCount}
                   </span>
                 )}
               </div>
-              <div className="hidden sm:flex flex-col items-start leading-tight">
-                <span className="text-[11px] text-white/80 font-normal">Cart</span>
-                <span className="text-xs font-bold">₹{subtotal.toFixed(2)}</span>
+              <div className="flex flex-col items-start leading-tight">
+                <span className="text-xs sm:text-[11px] text-white font-bold">Cart</span>
+                <span className="hidden sm:inline text-xs font-bold text-white/90">₹{subtotal.toFixed(2)}</span>
               </div>
             </button>
           )}
@@ -236,13 +242,13 @@ export const Header: React.FC<HeaderProps> = ({
             <div
               className={
                 isAdmin
-                  ? "flex items-center gap-2 bg-[#1F2937] border border-[#374151] p-1.5 pr-3 rounded-xl shadow-md"
-                  : "flex items-center gap-2 bg-[#FFFFFF] border border-[#ECECEC] p-1.5 pr-3 rounded-xl shadow-xs"
+                  ? "flex items-center gap-1.5 sm:gap-2 bg-[#1F2937] border border-[#374151] p-1.5 sm:pr-3 rounded-xl shadow-md shrink-0"
+                  : "flex items-center gap-1.5 sm:gap-2 bg-[#FFFFFF] border border-[#ECECEC] p-1.5 sm:pr-3 rounded-xl shadow-xs shrink-0"
               }
             >
               <button
                 onClick={openProfileModal}
-                className="flex items-center gap-2 text-left hover:opacity-85 transition-opacity cursor-pointer"
+                className="flex items-center gap-1.5 sm:gap-2 text-left hover:opacity-85 transition-opacity cursor-pointer"
                 title="View & Edit Profile"
               >
                 {user.avatarUrl ? (
@@ -251,13 +257,13 @@ export const Header: React.FC<HeaderProps> = ({
                     alt={user.name}
                     className={
                       isAdmin
-                        ? "w-8 h-8 rounded-lg object-cover border border-[#F97316]/50"
-                        : "w-8 h-8 rounded-lg object-cover border border-[#E85D04]/30"
+                        ? "w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-cover border border-[#F97316]/50"
+                        : "w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-cover border border-[#E85D04]/30"
                     }
                   />
                 ) : (
                   <div
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${isAdmin
+                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-xs font-bold ${isAdmin
                         ? 'bg-gradient-to-br from-[#F97316] to-[#EA580C] text-white'
                         : 'bg-[#E85D04] text-white'
                       }`}
@@ -287,21 +293,34 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={logout}
                 className={
                   isAdmin
-                    ? "text-[#9CA3AF] hover:text-[#EF4444] p-1.5 hover:bg-[#EF4444]/10 rounded-lg transition-colors cursor-pointer ml-1"
-                    : "text-[#6B7280] hover:text-[#D32F2F] p-1.5 hover:bg-[#D32F2F]/10 rounded-lg transition-colors cursor-pointer ml-1"
+                    ? "text-[#9CA3AF] hover:text-[#EF4444] p-1 sm:p-1.5 hover:bg-[#EF4444]/10 rounded-lg transition-colors cursor-pointer"
+                    : "text-[#6B7280] hover:text-[#D32F2F] p-1 sm:p-1.5 hover:bg-[#D32F2F]/10 rounded-lg transition-colors cursor-pointer"
                 }
                 title="Logout"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
             </div>
           ) : (
             <button
               onClick={() => openAuthModal('customer-login')}
-              className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#1E1E1E] bg-[#FFFFFF] border border-[#ECECEC] hover:border-[#E85D04] px-3.5 py-2.5 rounded-xl transition-all shadow-xs cursor-pointer"
+              className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold text-[#1E1E1E] bg-[#FFFFFF] border border-[#ECECEC] hover:border-[#E85D04] px-2.5 py-2 sm:px-3.5 sm:py-2.5 rounded-xl transition-all shadow-xs cursor-pointer shrink-0"
+              title="Sign In / Register"
             >
               <LogIn className="w-4 h-4 text-[#E85D04]" />
-              <span className="hidden sm:inline">Sign In</span>
+              <span className="font-bold text-xs sm:text-sm">Sign In</span>
+            </button>
+          )}
+
+          {/* Mobile Hamburger Menu Button (Customer Mode) */}
+          {!isAdmin && onOpenMobileCategory && (
+            <button
+              onClick={onOpenMobileCategory}
+              className="p-2 sm:p-2.5 rounded-xl border border-[#ECECEC] bg-[#FFFFFF] hover:bg-[#FFFDF8] text-[#1E1E1E] hover:border-[#E85D04]/40 hover:text-[#E85D04] transition-all shadow-xs flex items-center justify-center cursor-pointer lg:hidden shrink-0"
+              aria-label="Open Categories & Filters Menu"
+              title="Categories & Filters Menu"
+            >
+              <Menu className="w-5 h-5 text-[#E85D04]" />
             </button>
           )}
 

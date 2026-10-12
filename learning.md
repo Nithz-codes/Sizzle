@@ -228,6 +228,25 @@ Here are the key verification commands used throughout the development of Sizzle
 
 ---
 
+## 📱 8. Responsive Breakpoints & Mobile Drawer Architecture
+
+### 1️⃣ Mobile Hamburger & Category Drawer (`MobileCategoryDrawer.tsx`)
+* **The Problem**: On mobile devices (< 1024px), the desktop sidebar (`CategorySidebar.tsx`) stacked above the food cards, forcing users to scroll past 12 category buttons before seeing any food items.
+* **The Solution**:
+  1. **Hidden Aside on Mobile**: Set `hidden lg:block` on `<aside>`, hiding the bulky sidebar from the main mobile page flow.
+  2. **Mobile Quick Action Bar**: Added an ergonomic horizontal category pill bar with a 1-tap **`Categories & Filters`** button right above the food items on mobile.
+  3. **Header Hamburger Menu (`Menu` icon)**: Added a mobile toggle button in the header that opens `MobileCategoryDrawer`.
+  4. **Full Feature Drawer**: Contains Dietary preferences (`All`, `Veg`, `Non-Veg`), Price ranges, all 11 categories with dish counts, Sizzle AI Studio launcher, and reset filters.
+
+### 2️⃣ Explicit Mobile Header Labels (Cart & Sign In)
+* **The Problem**: On mobile screens, Cart and Sign In buttons only displayed icons (`ShoppingBag` and `LogIn`), which confused some diners.
+* **The Solution**:
+  1. **`Cart` Label**: Always visible alongside the icon and badge count across all screen sizes.
+  2. **`Sign In` Label**: Always visible next to the `LogIn` arrow icon on all devices.
+  3. **Adaptive `AI Studio`**: Shows `AI Studio` on mobile and `Sizzle AI Studio` on larger screens.
+
+---
+
 ## 🎉 Summary: Why Sizzle is Special
 
 1. **Fast & Reliable**: 0ms local AI solver latency with zero downtime.
