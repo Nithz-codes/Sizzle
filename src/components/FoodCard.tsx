@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Minus, Clock, ShoppingBag, Check, Star, Edit } from 'lucide-react';
+import { Plus, Minus, Clock, ShoppingBag, Check, Star, Edit, Sparkles } from 'lucide-react';
 import { FoodItem } from '../types';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { EditFoodModal } from './admin/EditFoodModal';
+import { FoodDetailModal } from './FoodDetailModal';
 
 interface FoodCardProps {
   item: FoodItem;
@@ -16,6 +17,7 @@ export const FoodCard: React.FC<FoodCardProps> = ({ item }) => {
   const [qty, setQty] = useState<number>(1);
   const [isAdding, setIsAdding] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
   const [, forceUpdate] = useState({});
 
   const isHighlighted = highlightedItemId === item.id;
@@ -34,7 +36,8 @@ export const FoodCard: React.FC<FoodCardProps> = ({ item }) => {
   const cartEntry = cartItems.find((c) => c.foodItem.id === item.id);
   const inCartQty = cartEntry ? cartEntry.quantity : 0;
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     setIsAdding(true);
     addItem(item, qty);
     setQty(1);
@@ -45,14 +48,15 @@ export const FoodCard: React.FC<FoodCardProps> = ({ item }) => {
     <>
       <div
         id={`food-card-${item.id}`}
+        onClick={() => setIsDetailModalOpen(true)}
         className={
           isAdmin
-            ? `bg-[#1E293B] border border-[#374151] rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between ${
+            ? `bg-[#1E293B] border border-[#374151] rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between cursor-pointer ${
                 isHighlighted
                   ? 'border-[#F97316] ring-4 ring-[#F97316]/30 scale-102 shadow-2xl'
                   : 'hover:border-[#F97316]/50'
               }`
-            : `bg-[#FFFFFF] border rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between ${
+            : `bg-[#FFFFFF] border rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between cursor-pointer ${
                 isHighlighted
                   ? 'border-[#E85D04] ring-4 ring-[#E85D04]/30 scale-102 shadow-2xl'
                   : 'border-[#ECECEC] hover:border-[#E85D04]/40'
@@ -141,20 +145,26 @@ export const FoodCard: React.FC<FoodCardProps> = ({ item }) => {
             {/* ADMIN ACTIONS vs CUSTOMER CART ACTIONS */}
             {isAdmin ? (
               <button
-                onClick={() => setIsEditModalOpen(true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsEditModalOpen(true);
+                }}
                 className="bg-[#F97316] hover:bg-[#EA580C] text-white font-extrabold text-xs px-3.5 py-2.5 rounded-xl transition-all shadow-md shadow-[#F97316]/20 flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Edit className="w-4 h-4" />
                 <span>Edit Dish</span>
               </button>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                 
                 {/* Quantity Stepper */}
                 <div className="flex items-center bg-[#FFFDF8] border border-[#ECECEC] rounded-xl p-1">
                   <button
                     type="button"
-                    onClick={() => setQty((q) => Math.max(1, q - 1))}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setQty((q) => Math.max(1, q - 1));
+                    }}
                     className="w-7 h-7 rounded-lg flex items-center justify-center text-[#1E1E1E] hover:bg-[#ECECEC] transition-colors cursor-pointer"
                     aria-label="Decrease quantity"
                   >
@@ -165,7 +175,10 @@ export const FoodCard: React.FC<FoodCardProps> = ({ item }) => {
                   </span>
                   <button
                     type="button"
-                    onClick={() => setQty((q) => q + 1)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setQty((q) => q + 1);
+                    }}
                     className="w-7 h-7 rounded-lg flex items-center justify-center text-[#1E1E1E] hover:bg-[#ECECEC] transition-colors cursor-pointer"
                     aria-label="Increase quantity"
                   >
@@ -197,13 +210,19 @@ export const FoodCard: React.FC<FoodCardProps> = ({ item }) => {
 
           {/* In-cart indicator banner (Customer mode only) */}
           {!isAdmin && inCartQty > 0 && (
-            <div className="bg-[#2E7D32]/10 border border-[#2E7D32]/20 rounded-xl px-2.5 py-1.5 flex items-center justify-between text-[11px] text-[#2E7D32] font-semibold">
+            <div
+              className="bg-[#2E7D32]/10 border border-[#2E7D32]/20 rounded-xl px-2.5 py-1.5 flex items-center justify-between text-[11px] text-[#2E7D32] font-semibold"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="flex items-center gap-1">
                 <Check className="w-3.5 h-3.5" />
                 <span>In Cart: {inCartQty}</span>
               </div>
               <button
-                onClick={() => updateQuantity(item.id, inCartQty + 1)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateQuantity(item.id, inCartQty + 1);
+                }}
                 className="hover:underline text-[11px] font-bold cursor-pointer"
               >
                 + Add more
@@ -220,6 +239,13 @@ export const FoodCard: React.FC<FoodCardProps> = ({ item }) => {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSave={() => forceUpdate({})}
+      />
+
+      {/* Customer Food Detail & Reviews Modal */}
+      <FoodDetailModal
+        item={item}
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
       />
     </>
   );
