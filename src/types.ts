@@ -1,3 +1,14 @@
+export interface DishReview {
+  id: string;
+  userName: string;
+  rating: number; // 1 to 5
+  date: string;
+  comment: string;
+  verifiedDiner?: boolean;
+  avatarColor?: string;
+  helpfulCount?: number;
+}
+
 export interface FoodItem {
   id: number;
   name: string;
@@ -14,6 +25,11 @@ export interface FoodItem {
   protein?: number;
   carbs?: number;
   fat?: number;
+  ingredients?: string[];
+  allergens?: string[];
+  chefNotes?: string;
+  reviews?: DishReview[];
+  reviewCount?: number;
 }
 
 export interface CartItem {
