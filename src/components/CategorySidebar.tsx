@@ -10,9 +10,9 @@ import {
   Cake,
   Coffee,
   Sparkles,
-  Beef,
   CookingPot,
   Filter,
+  Hamburger,
 } from 'lucide-react';
 import { CATEGORIES, MENU_ITEMS } from '../data/menuData';
 import { useCart } from '../context/CartContext';
@@ -29,46 +29,124 @@ export const CategorySidebar: React.FC = () => {
 
   const { isAdmin } = useAuth();
 
-  // Helper to map icon string to Lucide component
+  // Helper to map icon string to Lucide component with subtle, in-frame hover animations
   const renderCategoryIcon = (iconName: string, isSelected: boolean) => {
-    const iconProps = {
-      className: `w-4 h-4 transition-colors ${
-        isSelected
-          ? isAdmin
-            ? 'text-[#F97316]'
-            : 'text-[#E85D04]'
-          : isAdmin
-          ? 'text-[#9CA3AF]'
-          : 'text-[#6B7280]'
-      }`,
-    };
+    const baseColor = isSelected
+      ? isAdmin
+        ? 'text-[#F97316]'
+        : 'text-[#E85D04]'
+      : isAdmin
+      ? 'text-[#9CA3AF] group-hover:text-[#F97316]'
+      : 'text-[#6B7280] group-hover:text-[#E85D04]';
+
+    const baseClass = `w-4 h-4 transition-transform duration-200 ease-out ${baseColor}`;
+
+    let iconElement: React.ReactNode;
 
     switch (iconName) {
+      case 'Hamburger':
+      case 'Burger':
       case 'Beef':
-        return <Beef {...iconProps} />;
+        iconElement = (
+          <Hamburger
+            className={`${baseClass} group-hover:scale-110 group-hover:-translate-y-0.5`}
+          />
+        );
+        break;
       case 'Pizza':
-        return <Pizza {...iconProps} />;
+        iconElement = (
+          <Pizza
+            className={`${baseClass} group-hover:rotate-6 group-hover:scale-110 origin-center`}
+          />
+        );
+        break;
       case 'UtensilsCrossed':
-        return <Utensils {...iconProps} />;
+      case 'Pasta':
+        iconElement = (
+          <Utensils
+            className={`${baseClass} group-hover:-rotate-6 group-hover:scale-110 origin-center`}
+          />
+        );
+        break;
       case 'Flame':
-        return <Flame {...iconProps} />;
+      case 'Chinese':
+        iconElement = (
+          <Flame
+            className={`${baseClass} group-hover:scale-110 group-hover:-translate-y-0.5`}
+          />
+        );
+        break;
       case 'Soup':
-        return <Soup {...iconProps} />;
+      case 'Biryani':
+        iconElement = (
+          <Soup
+            className={`${baseClass} group-hover:-translate-y-0.5 group-hover:scale-105`}
+          />
+        );
+        break;
       case 'Bowl':
-        return <CookingPot {...iconProps} />;
+      case 'CookingPot':
+      case 'Indian Curry':
+        iconElement = (
+          <CookingPot
+            className={`${baseClass} group-hover:rotate-6 group-hover:scale-105 origin-bottom`}
+          />
+        );
+        break;
       case 'Wheat':
-        return <Wheat {...iconProps} />;
+      case 'Breads':
+        iconElement = (
+          <Wheat
+            className={`${baseClass} group-hover:rotate-6 group-hover:scale-110 origin-bottom`}
+          />
+        );
+        break;
       case 'Drumstick':
-        return <Drumstick {...iconProps} />;
+      case 'Grill':
+        iconElement = (
+          <Drumstick
+            className={`${baseClass} group-hover:-rotate-6 group-hover:scale-110 origin-center`}
+          />
+        );
+        break;
       case 'Cookie':
-        return <Cookie {...iconProps} />;
+      case 'Starters':
+        iconElement = (
+          <Cookie
+            className={`${baseClass} group-hover:scale-110 group-hover:rotate-6`}
+          />
+        );
+        break;
       case 'Cake':
-        return <Cake {...iconProps} />;
+      case 'Dessert':
+        iconElement = (
+          <Cake
+            className={`${baseClass} group-hover:-translate-y-0.5 group-hover:scale-110`}
+          />
+        );
+        break;
       case 'Coffee':
-        return <Coffee {...iconProps} />;
+      case 'Beverage':
+        iconElement = (
+          <Coffee
+            className={`${baseClass} group-hover:rotate-6 group-hover:-translate-y-0.5 group-hover:scale-110`}
+          />
+        );
+        break;
       default:
-        return <Sparkles {...iconProps} />;
+        iconElement = (
+          <Sparkles
+            className={`${baseClass} group-hover:rotate-12 group-hover:scale-110`}
+          />
+        );
+        break;
     }
+
+    return (
+      <span className="w-5 h-5 flex items-center justify-center shrink-0">
+        {iconElement}
+      </span>
+    );
   };
 
   const getCategoryCount = (catName: string) => {
@@ -180,7 +258,7 @@ export const CategorySidebar: React.FC = () => {
           {/* All Items Option */}
           <button
             onClick={() => setActiveCategory('All')}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer group ${
               activeCategory === 'All'
                 ? isAdmin
                   ? 'bg-[#F97316]/10 text-[#F97316] border border-[#F97316]/30 font-bold'
@@ -191,17 +269,19 @@ export const CategorySidebar: React.FC = () => {
             }`}
           >
             <div className="flex items-center gap-2.5">
-              <Sparkles
-                className={`w-4 h-4 ${
-                  activeCategory === 'All'
-                    ? isAdmin
-                      ? 'text-[#F97316]'
-                      : 'text-[#E85D04]'
-                    : isAdmin
-                    ? 'text-[#9CA3AF]'
-                    : 'text-[#6B7280]'
-                }`}
-              />
+              <span className="w-5 h-5 flex items-center justify-center shrink-0">
+                <Sparkles
+                  className={`w-4 h-4 transition-transform duration-200 ease-out group-hover:rotate-12 group-hover:scale-110 ${
+                    activeCategory === 'All'
+                      ? isAdmin
+                        ? 'text-[#F97316]'
+                        : 'text-[#E85D04]'
+                      : isAdmin
+                      ? 'text-[#9CA3AF] group-hover:text-[#F97316]'
+                      : 'text-[#6B7280] group-hover:text-[#E85D04]'
+                  }`}
+                />
+              </span>
               <span>All Categories</span>
             </div>
             <span
@@ -229,7 +309,7 @@ export const CategorySidebar: React.FC = () => {
                 <button
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.name)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer group ${
                     isSelected
                       ? isAdmin
                         ? 'bg-[#F97316]/10 text-[#F97316] font-bold border border-[#F97316]/30'
