@@ -92,7 +92,7 @@ public class DataInitializer implements CommandLineRunner {
     private void seedCategoriesAndMenuItems() {
         log.info("Synchronizing full suite of 52 categories and menu items with legitimate image URLs...");
 
-        Category burger = getOrCreateCategory("Burger", "Burgers & Sandwiches", "Beef", "Juicy handcrafted patties & toasted artisanal sandwiches");
+        Category burger = getOrCreateCategory("Burger", "Burgers & Sandwiches", "Hamburger", "Juicy handcrafted patties & toasted artisanal sandwiches");
         Category pizza = getOrCreateCategory("Pizza", "Pizza", "Pizza", "Stone-baked thin crust pizzas topped with rich mozzarella");
         Category pasta = getOrCreateCategory("Pasta", "Pasta", "UtensilsCrossed", "Silky pasta tossed in rich simmered artisanal sauces");
         Category chinese = getOrCreateCategory("Chinese", "Chinese", "Flame", "Wok-tossed noodles, fragrant rice, and spicy Manchurians");

@@ -5,7 +5,7 @@ export const CATEGORIES: CategoryOption[] = [
     id: 1,
     name: 'Burger',
     displayName: 'Burgers & Sandwiches',
-    icon: 'Beef',
+    icon: 'Hamburger',
     description: 'Juicy handcrafted patties & toasted artisanal sandwiches',
     itemCount: 7,
   },
