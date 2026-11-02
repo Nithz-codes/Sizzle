@@ -10,7 +10,6 @@ import {
   DollarSign,
   ShoppingBag,
   Clock,
-  PackageAlert,
   ArrowUpRight,
   Flame,
   Award,

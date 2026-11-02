@@ -60,7 +60,7 @@ export const FoodDetailModal: React.FC<FoodDetailModalProps> = ({ item, isOpen, 
         .getWaitTime(item.id)
         .then((data) => {
           if (isMounted) {
-            setWaitTime(data);
+            setWaitTime(data.data || (data as any));
             setLoadingWaitTime(false);
           }
         })

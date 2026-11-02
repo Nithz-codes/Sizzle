@@ -41,7 +41,7 @@ export const CartDrawer: React.FC = () => {
         .getCartWaitTime(itemIds)
         .then((data) => {
           if (isMounted) {
-            setCartWaitTime(data);
+            setCartWaitTime(data.data || (data as any));
             setLoadingWaitTime(false);
           }
         })
