@@ -4,7 +4,7 @@ import { adminApi, orderApi } from '../services/api';
 import { MENU_ITEMS } from '../data/menuData';
 import { useAuth } from './AuthContext';
 
-export type AdminTab = 'dashboard' | 'kitchen' | 'inventory' | 'orders' | 'reservations' | 'customers' | 'reports' | 'settings' | 'menu';
+export type AdminTab = 'dashboard' | 'pulse' | 'what-if' | 'kitchen' | 'inventory' | 'orders' | 'reservations' | 'customers' | 'reports' | 'settings' | 'menu';
 
 interface AdminContextType {
   activeTab: AdminTab;

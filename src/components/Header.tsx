@@ -18,6 +18,7 @@ import {
   Utensils,
   Bell,
   Menu,
+  Activity,
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -333,6 +334,8 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="max-w-7xl mx-auto flex items-center gap-2 text-xs font-semibold font-['Poppins']">
             {[
               { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+              { id: 'pulse', label: 'Restaurant Pulse', icon: Activity, aiBadge: true },
+              { id: 'what-if', label: 'What-If Copilot', icon: Sparkles, aiBadge: true },
               {
                 id: 'kitchen',
                 label: 'Kitchen KDS',
@@ -365,6 +368,11 @@ export const Header: React.FC<HeaderProps> = ({
                 >
                   <Icon className="w-4 h-4 shrink-0" />
                   <span>{tab.label}</span>
+                  {tab.aiBadge && (
+                    <span className="px-1.5 py-0.5 rounded-md text-[9px] font-extrabold bg-[#E85D04]/20 text-[#FEB157] border border-[#E85D04]/40 uppercase tracking-wider">
+                      AI
+                    </span>
+                  )}
                   {tab.badge !== undefined && tab.badge > 0 && (
                     <span
                       className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${isActive

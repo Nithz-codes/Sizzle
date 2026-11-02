@@ -10,6 +10,8 @@ import {
   Calendar,
   UtensilsCrossed,
   Flame,
+  Sparkles,
+  Activity,
   Award,
   TrendingUp,
   ArrowUpRight,
@@ -117,6 +119,20 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
           <button
+              onClick={() => setActiveTab('pulse')}
+              className="bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:opacity-90 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition-all shadow-lg shadow-[#F97316]/20 flex items-center gap-2 cursor-pointer"
+            >
+              <Activity className="w-4 h-4" />
+              <span>AI Pulse Analytics</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('what-if')}
+              className="bg-[#1E293B] hover:bg-[#374151] text-[#FEB157] border border-[#F97316]/40 font-bold text-xs px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-md"
+            >
+              <Sparkles className="w-4 h-4 text-[#F97316]" />
+              <span>What-If Copilot</span>
+            </button>
+            <button
             onClick={() => setActiveTab('kitchen')}
             className="bg-[#F97316] hover:bg-[#EA580C] text-white font-extrabold text-xs px-6 py-3.5 rounded-xl shadow-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer hover:scale-105"
           >
