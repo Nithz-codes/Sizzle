@@ -46,6 +46,7 @@ class SizzleIntelligenceTest {
         private MenuItemRepository menuItemRepository;
         private OrderRepository orderRepository;
         private InventoryRepository inventoryRepository;
+        private com.sizzle.backend.service.AnalyticsService analyticsService;
         private AIServiceImpl aiService;
 
         @BeforeEach
@@ -58,8 +59,9 @@ class SizzleIntelligenceTest {
                 menuItemRepository = Mockito.mock(MenuItemRepository.class);
                 orderRepository = Mockito.mock(OrderRepository.class);
                 inventoryRepository = Mockito.mock(InventoryRepository.class);
+                analyticsService = Mockito.mock(com.sizzle.backend.service.AnalyticsService.class);
                 aiService = new AIServiceImpl(aiClient, menuItemRepository, orderRepository, inventoryRepository,
-                                objectMapper);
+                                objectMapper, analyticsService);
         }
 
         @Test

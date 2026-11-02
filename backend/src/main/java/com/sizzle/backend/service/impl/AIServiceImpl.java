@@ -49,17 +49,20 @@ public class AIServiceImpl implements AIService {
     private final OrderRepository orderRepository;
     private final InventoryRepository inventoryRepository;
     private final ObjectMapper objectMapper;
+    private final com.sizzle.backend.service.AnalyticsService analyticsService;
 
     public AIServiceImpl(AIClient aiClient,
                           MenuItemRepository menuItemRepository,
                           OrderRepository orderRepository,
                           InventoryRepository inventoryRepository,
-                          ObjectMapper objectMapper) {
+                          ObjectMapper objectMapper,
+                          com.sizzle.backend.service.AnalyticsService analyticsService) {
         this.aiClient = aiClient;
         this.menuItemRepository = menuItemRepository;
         this.orderRepository = orderRepository;
         this.inventoryRepository = inventoryRepository;
         this.objectMapper = objectMapper;
+        this.analyticsService = analyticsService;
     }
 
     @Override
@@ -831,6 +834,19 @@ public class AIServiceImpl implements AIService {
         if (pulse == null || pulse.getInsights() == null || pulse.getInsights().isEmpty()) {
             pulse = buildDeterministicPulseFallback(cleanPeriod, periodLabel, totalRevenue, totalOrders, aov,
                     topItem, topQty, leastItem, peakHour, slowHour, lowStockCount, lowStockNames, (int) activeOrdersCount);
+        }
+
+        // Populate Infographic visual models
+        try {
+            pulse.setCategoryBreakdown(analyticsService.getCategorySales());
+            pulse.setTopPerformingDishes(analyticsService.getTopDishes(6));
+            pulse.setHourlyDistribution(analyticsService.getHourlyDemand());
+            com.sizzle.backend.dto.AnalyticsOverviewResponse overview = analyticsService.getOverview();
+            if (overview != null && overview.getDailyTrends() != null) {
+                pulse.setRevenueTrends(overview.getDailyTrends());
+            }
+        } catch (Exception e) {
+            log.warn("Could not attach infographic analytics to pulse: {}", e.getMessage());
         }
 
         return pulse;

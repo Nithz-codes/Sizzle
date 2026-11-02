@@ -769,6 +769,34 @@ export interface PulseInsightData {
   evidence: string;
 }
 
+export interface PulseCategoryShare {
+  categoryName: string;
+  itemsSold: number;
+  totalRevenue: number;
+  percentageShare: number;
+}
+
+export interface PulseDailyRevenue {
+  date: string;
+  revenue: number;
+  orderCount: number;
+}
+
+export interface PulseHourlyDemand {
+  hour: number;
+  orderCount: number;
+  totalRevenue: number;
+}
+
+export interface PulseTopDish {
+  menuItemId: number;
+  dishName: string;
+  categoryName: string;
+  quantitySold: number;
+  totalRevenue: number;
+  imageUrl?: string;
+}
+
 export interface RestaurantPulseData {
   period: 'today' | '7days' | '30days';
   totalRevenue: number;
@@ -785,6 +813,10 @@ export interface RestaurantPulseData {
   recommendations: string[];
   source: string;
   generatedAt: string;
+  categoryBreakdown?: PulseCategoryShare[];
+  revenueTrends?: PulseDailyRevenue[];
+  hourlyDistribution?: PulseHourlyDemand[];
+  topPerformingDishes?: PulseTopDish[];
 }
 
 export interface WhatIfState {

@@ -1,7 +1,6 @@
 package com.sizzle.backend.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +20,13 @@ public class RestaurantPulseResponse {
     private List<PulseInsight> insights = new ArrayList<>();
     private List<String> recommendations = new ArrayList<>();
     private String source; // "AI" or "DETERMINISTIC_FALLBACK"
-    private LocalDateTime generatedAt = LocalDateTime.now();
+    private java.time.LocalDateTime generatedAt = java.time.LocalDateTime.now();
+
+    // Infographic Rich Data Models
+    private List<CategorySalesDTO> categoryBreakdown = new ArrayList<>();
+    private List<DailyRevenueDTO> revenueTrends = new ArrayList<>();
+    private List<HourlyDemandDTO> hourlyDistribution = new ArrayList<>();
+    private List<TopDishDTO> topPerformingDishes = new ArrayList<>();
 
     public RestaurantPulseResponse() {}
 
@@ -30,7 +35,11 @@ public class RestaurantPulseResponse {
                                    String leastPerformingItem, String peakHour, String slowHour,
                                    Integer lowStockItemsCount, String summary,
                                    List<PulseInsight> insights, List<String> recommendations,
-                                   String source) {
+                                   String source,
+                                   List<CategorySalesDTO> categoryBreakdown,
+                                   List<DailyRevenueDTO> revenueTrends,
+                                   List<HourlyDemandDTO> hourlyDistribution,
+                                   List<TopDishDTO> topPerformingDishes) {
         this.period = period;
         this.totalRevenue = totalRevenue;
         this.totalOrders = totalOrders;
@@ -45,7 +54,11 @@ public class RestaurantPulseResponse {
         this.insights = (insights != null) ? insights : new ArrayList<>();
         this.recommendations = (recommendations != null) ? recommendations : new ArrayList<>();
         this.source = source;
-        this.generatedAt = LocalDateTime.now();
+        this.categoryBreakdown = (categoryBreakdown != null) ? categoryBreakdown : new ArrayList<>();
+        this.revenueTrends = (revenueTrends != null) ? revenueTrends : new ArrayList<>();
+        this.hourlyDistribution = (hourlyDistribution != null) ? hourlyDistribution : new ArrayList<>();
+        this.topPerformingDishes = (topPerformingDishes != null) ? topPerformingDishes : new ArrayList<>();
+        this.generatedAt = java.time.LocalDateTime.now();
     }
 
     public static Builder builder() {
@@ -94,8 +107,20 @@ public class RestaurantPulseResponse {
     public String getSource() { return source; }
     public void setSource(String source) { this.source = source; }
 
-    public LocalDateTime getGeneratedAt() { return generatedAt; }
-    public void setGeneratedAt(LocalDateTime generatedAt) { this.generatedAt = generatedAt; }
+    public java.time.LocalDateTime getGeneratedAt() { return generatedAt; }
+    public void setGeneratedAt(java.time.LocalDateTime generatedAt) { this.generatedAt = generatedAt; }
+
+    public List<CategorySalesDTO> getCategoryBreakdown() { return categoryBreakdown; }
+    public void setCategoryBreakdown(List<CategorySalesDTO> categoryBreakdown) { this.categoryBreakdown = categoryBreakdown; }
+
+    public List<DailyRevenueDTO> getRevenueTrends() { return revenueTrends; }
+    public void setRevenueTrends(List<DailyRevenueDTO> revenueTrends) { this.revenueTrends = revenueTrends; }
+
+    public List<HourlyDemandDTO> getHourlyDistribution() { return hourlyDistribution; }
+    public void setHourlyDistribution(List<HourlyDemandDTO> hourlyDistribution) { this.hourlyDistribution = hourlyDistribution; }
+
+    public List<TopDishDTO> getTopPerformingDishes() { return topPerformingDishes; }
+    public void setTopPerformingDishes(List<TopDishDTO> topPerformingDishes) { this.topPerformingDishes = topPerformingDishes; }
 
     public static class Builder {
         private String period;
@@ -112,6 +137,10 @@ public class RestaurantPulseResponse {
         private List<PulseInsight> insights = new ArrayList<>();
         private List<String> recommendations = new ArrayList<>();
         private String source;
+        private List<CategorySalesDTO> categoryBreakdown = new ArrayList<>();
+        private List<DailyRevenueDTO> revenueTrends = new ArrayList<>();
+        private List<HourlyDemandDTO> hourlyDistribution = new ArrayList<>();
+        private List<TopDishDTO> topPerformingDishes = new ArrayList<>();
 
         public Builder period(String period) { this.period = period; return this; }
         public Builder totalRevenue(BigDecimal totalRevenue) { this.totalRevenue = totalRevenue; return this; }
@@ -127,12 +156,16 @@ public class RestaurantPulseResponse {
         public Builder insights(List<PulseInsight> insights) { this.insights = insights; return this; }
         public Builder recommendations(List<String> recommendations) { this.recommendations = recommendations; return this; }
         public Builder source(String source) { this.source = source; return this; }
+        public Builder categoryBreakdown(List<CategorySalesDTO> categoryBreakdown) { this.categoryBreakdown = categoryBreakdown; return this; }
+        public Builder revenueTrends(List<DailyRevenueDTO> revenueTrends) { this.revenueTrends = revenueTrends; return this; }
+        public Builder hourlyDistribution(List<HourlyDemandDTO> hourlyDistribution) { this.hourlyDistribution = hourlyDistribution; return this; }
+        public Builder topPerformingDishes(List<TopDishDTO> topPerformingDishes) { this.topPerformingDishes = topPerformingDishes; return this; }
 
         public RestaurantPulseResponse build() {
             return new RestaurantPulseResponse(period, totalRevenue, totalOrders, averageOrderValue,
                     topItem, topItemQuantity, leastPerformingItem, peakHour, slowHour,
-                    lowStockItemsCount, summary, insights, recommendations, source);
+                    lowStockItemsCount, summary, insights, recommendations, source,
+                    categoryBreakdown, revenueTrends, hourlyDistribution, topPerformingDishes);
         }
     }
 }
-
