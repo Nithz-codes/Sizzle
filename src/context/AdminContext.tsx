@@ -408,8 +408,9 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Trigger sync on mount, when admin logs in, when tab changes, or on 4s background interval
   useEffect(() => {
+    if (!isAdmin) return;
     refreshOrders();
-    const interval = setInterval(refreshOrders, 4000);
+    const interval = setInterval(refreshOrders, 5000);
     return () => clearInterval(interval);
   }, [isAdmin, activeTab, refreshOrders]);
 
@@ -708,3 +709,4 @@ export const useAdmin = () => {
   }
   return context;
 };
+

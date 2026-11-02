@@ -34,7 +34,7 @@ public class AIClientImpl implements AIClient {
     @Value("${sizzle.intelligence.api-key:${AI_API_KEY:${GEMINI_API_KEY:${GOOGLE_API_KEY:}}}}")
     private String configuredApiKey;
 
-    @Value("${sizzle.intelligence.model:${AI_MODEL:gemini-3.5-flash-lite}}")
+    @Value("${sizzle.intelligence.model:${AI_MODEL:gemini-3-flash-preview}}")
     private String configuredModel;
 
     @Value("${sizzle.intelligence.timeout-ms:${AI_TIMEOUT_MS:15000}}")
@@ -58,7 +58,7 @@ public class AIClientImpl implements AIClient {
         this.configuredModel = resolveModel();
         if (isConfigured()) {
             try {
-                int effectiveTimeoutMs = (int) Math.max(15000, timeoutMs);
+                int effectiveTimeoutMs = (int) Math.min(3500, Math.max(1000, timeoutMs));
                 HttpOptions httpOptions = HttpOptions.builder()
                         .timeout(effectiveTimeoutMs)
                         .build();
@@ -121,7 +121,7 @@ public class AIClientImpl implements AIClient {
             return client.models.generateContent(configuredModel, request.getPrompt(), configBuilder.build());
         });
 
-        long waitTimeoutMs = Math.max(20000, timeoutMs);
+        long waitTimeoutMs = Math.min(3500, Math.max(1000, timeoutMs));
         GenerateContentResponse response;
         try {
             response = future.get(waitTimeoutMs, TimeUnit.MILLISECONDS);
@@ -178,9 +178,8 @@ public class AIClientImpl implements AIClient {
     private boolean isValidKey(String key) {
         return key != null &&
                 !key.isBlank() &&
-                !key.equalsIgnoreCase("MY_GEMINI_API_KEY") &&
-                !key.equalsIgnoreCase("your-api-key-here") &&
-                key.length() > 5;
+                key.trim().startsWith("AIza") &&
+                key.trim().length() > 20;
     }
 
     private List<Path> getCandidateEnvPaths() {
@@ -260,13 +259,18 @@ public class AIClientImpl implements AIClient {
         for (Path path : getCandidateEnvPaths()) {
             Map<String, String> envMap = parseEnvFile(path);
             if (envMap.containsKey("AI_MODEL") && !envMap.get("AI_MODEL").isBlank()) {
-                return envMap.get("AI_MODEL").trim();
+                String m = envMap.get("AI_MODEL").trim();
+                if (!"gemini-3.5-flash-lite".equalsIgnoreCase(m) && !"gemini-3.8-flash".equalsIgnoreCase(m)) {
+                    return m;
+                }
             }
         }
         if (configuredModel != null && !configuredModel.isBlank()) {
-            return configuredModel.trim();
+            if (!"gemini-3.5-flash-lite".equalsIgnoreCase(configuredModel) && !"gemini-3.8-flash".equalsIgnoreCase(configuredModel)) {
+                return configuredModel.trim();
+            }
         }
-        return "gemini-3.5-flash-lite";
+        return "gemini-3-flash-preview";
     }
 
     private String extractJsonPayload(String text) {

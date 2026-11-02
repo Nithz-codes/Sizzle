@@ -701,8 +701,17 @@ export const intelligenceApi = {
     return data;
   },
 
-  getRestaurantPulse: async (period: 'today' | '7days' | '30days' = '7days'): Promise<ApiResponse<RestaurantPulseData>> => {
-    const response = await fetch(`${API_BASE_URL}/intelligence/restaurant-pulse?period=${period}`, {
+  getRestaurantPulse: async (
+    period: 'today' | '7days' | '30days' | 'all' | 'custom' | string = '7days',
+    startDate?: string,
+    endDate?: string
+  ): Promise<ApiResponse<RestaurantPulseData>> => {
+    const params = new URLSearchParams();
+    if (period) params.append('period', period);
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    const response = await fetch(`${API_BASE_URL}/intelligence/restaurant-pulse${queryString}`, {
       method: 'GET',
       headers: getAuthHeaders(),
     });
@@ -772,8 +781,11 @@ export interface PulseInsightData {
 export interface PulseCategoryShare {
   categoryName: string;
   itemsSold: number;
+  quantitySold?: number;
   totalRevenue: number;
-  percentageShare: number;
+  quantityShare: number;
+  revenueShare: number;
+  percentageShare?: number;
 }
 
 export interface PulseDailyRevenue {
@@ -786,6 +798,8 @@ export interface PulseHourlyDemand {
   hour: number;
   orderCount: number;
   totalRevenue: number;
+  averageOrderValue?: number;
+  orderShare?: number;
 }
 
 export interface PulseTopDish {
@@ -795,13 +809,20 @@ export interface PulseTopDish {
   quantitySold: number;
   totalRevenue: number;
   imageUrl?: string;
+  quantityShare?: number;
+  revenueShare?: number;
+  rank?: number;
 }
 
 export interface RestaurantPulseData {
-  period: 'today' | '7days' | '30days';
+  period: 'today' | '7days' | '30days' | 'all' | 'custom' | string;
+  startDate?: string;
+  endDate?: string;
   totalRevenue: number;
   totalOrders: number;
   averageOrderValue: number;
+  averagePrepTimeMinutes?: number;
+  prepTimeSubtitle?: string;
   topItem: string;
   topItemQuantity: number;
   leastPerformingItem: string;
@@ -817,6 +838,13 @@ export interface RestaurantPulseData {
   revenueTrends?: PulseDailyRevenue[];
   hourlyDistribution?: PulseHourlyDemand[];
   topPerformingDishes?: PulseTopDish[];
+  bottomPerformingDishes?: PulseTopDish[];
+  revenuePercentageChange?: number;
+  ordersPercentageChange?: number;
+  comparisonPeriodLabel?: string;
+  totalQuantitySold?: number;
+  quantityShareLeader?: string;
+  revenueShareLeader?: string;
 }
 
 export interface WhatIfState {

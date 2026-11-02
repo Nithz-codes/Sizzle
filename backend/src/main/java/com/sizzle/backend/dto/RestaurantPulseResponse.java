@@ -1,15 +1,20 @@
 package com.sizzle.backend.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RestaurantPulseResponse {
 
-    private String period; // "today", "7days", "30days"
+    private String period; // "today", "7days", "30days", "all", "custom"
+    private String startDate;
+    private String endDate;
     private BigDecimal totalRevenue;
     private Long totalOrders;
     private BigDecimal averageOrderValue;
+    private Integer averagePrepTimeMinutes;
+    private String prepTimeSubtitle;
     private String topItem;
     private Long topItemQuantity;
     private String leastPerformingItem;
@@ -19,47 +24,25 @@ public class RestaurantPulseResponse {
     private String summary;
     private List<PulseInsight> insights = new ArrayList<>();
     private List<String> recommendations = new ArrayList<>();
-    private String source; // "AI" or "DETERMINISTIC_FALLBACK"
-    private java.time.LocalDateTime generatedAt = java.time.LocalDateTime.now();
+    private String source; // "AI" or "DETERMINISTIC_ANALYTICS"
+    private LocalDateTime generatedAt = LocalDateTime.now();
 
     // Infographic Rich Data Models
     private List<CategorySalesDTO> categoryBreakdown = new ArrayList<>();
     private List<DailyRevenueDTO> revenueTrends = new ArrayList<>();
     private List<HourlyDemandDTO> hourlyDistribution = new ArrayList<>();
     private List<TopDishDTO> topPerformingDishes = new ArrayList<>();
+    private List<TopDishDTO> bottomPerformingDishes = new ArrayList<>();
+
+    // Comparison & Operational Telemetry
+    private Double revenuePercentageChange;
+    private Double ordersPercentageChange;
+    private String comparisonPeriodLabel;
+    private Long totalQuantitySold;
+    private String quantityShareLeader;
+    private String revenueShareLeader;
 
     public RestaurantPulseResponse() {}
-
-    public RestaurantPulseResponse(String period, BigDecimal totalRevenue, Long totalOrders,
-                                   BigDecimal averageOrderValue, String topItem, Long topItemQuantity,
-                                   String leastPerformingItem, String peakHour, String slowHour,
-                                   Integer lowStockItemsCount, String summary,
-                                   List<PulseInsight> insights, List<String> recommendations,
-                                   String source,
-                                   List<CategorySalesDTO> categoryBreakdown,
-                                   List<DailyRevenueDTO> revenueTrends,
-                                   List<HourlyDemandDTO> hourlyDistribution,
-                                   List<TopDishDTO> topPerformingDishes) {
-        this.period = period;
-        this.totalRevenue = totalRevenue;
-        this.totalOrders = totalOrders;
-        this.averageOrderValue = averageOrderValue;
-        this.topItem = topItem;
-        this.topItemQuantity = topItemQuantity;
-        this.leastPerformingItem = leastPerformingItem;
-        this.peakHour = peakHour;
-        this.slowHour = slowHour;
-        this.lowStockItemsCount = lowStockItemsCount;
-        this.summary = summary;
-        this.insights = (insights != null) ? insights : new ArrayList<>();
-        this.recommendations = (recommendations != null) ? recommendations : new ArrayList<>();
-        this.source = source;
-        this.categoryBreakdown = (categoryBreakdown != null) ? categoryBreakdown : new ArrayList<>();
-        this.revenueTrends = (revenueTrends != null) ? revenueTrends : new ArrayList<>();
-        this.hourlyDistribution = (hourlyDistribution != null) ? hourlyDistribution : new ArrayList<>();
-        this.topPerformingDishes = (topPerformingDishes != null) ? topPerformingDishes : new ArrayList<>();
-        this.generatedAt = java.time.LocalDateTime.now();
-    }
 
     public static Builder builder() {
         return new Builder();
@@ -67,6 +50,12 @@ public class RestaurantPulseResponse {
 
     public String getPeriod() { return period; }
     public void setPeriod(String period) { this.period = period; }
+
+    public String getStartDate() { return startDate; }
+    public void setStartDate(String startDate) { this.startDate = startDate; }
+
+    public String getEndDate() { return endDate; }
+    public void setEndDate(String endDate) { this.endDate = endDate; }
 
     public BigDecimal getTotalRevenue() { return totalRevenue; }
     public void setTotalRevenue(BigDecimal totalRevenue) { this.totalRevenue = totalRevenue; }
@@ -76,6 +65,12 @@ public class RestaurantPulseResponse {
 
     public BigDecimal getAverageOrderValue() { return averageOrderValue; }
     public void setAverageOrderValue(BigDecimal averageOrderValue) { this.averageOrderValue = averageOrderValue; }
+
+    public Integer getAveragePrepTimeMinutes() { return averagePrepTimeMinutes; }
+    public void setAveragePrepTimeMinutes(Integer averagePrepTimeMinutes) { this.averagePrepTimeMinutes = averagePrepTimeMinutes; }
+
+    public String getPrepTimeSubtitle() { return prepTimeSubtitle; }
+    public void setPrepTimeSubtitle(String prepTimeSubtitle) { this.prepTimeSubtitle = prepTimeSubtitle; }
 
     public String getTopItem() { return topItem; }
     public void setTopItem(String topItem) { this.topItem = topItem; }
@@ -107,8 +102,8 @@ public class RestaurantPulseResponse {
     public String getSource() { return source; }
     public void setSource(String source) { this.source = source; }
 
-    public java.time.LocalDateTime getGeneratedAt() { return generatedAt; }
-    public void setGeneratedAt(java.time.LocalDateTime generatedAt) { this.generatedAt = generatedAt; }
+    public LocalDateTime getGeneratedAt() { return generatedAt; }
+    public void setGeneratedAt(LocalDateTime generatedAt) { this.generatedAt = generatedAt; }
 
     public List<CategorySalesDTO> getCategoryBreakdown() { return categoryBreakdown; }
     public void setCategoryBreakdown(List<CategorySalesDTO> categoryBreakdown) { this.categoryBreakdown = categoryBreakdown; }
@@ -122,30 +117,66 @@ public class RestaurantPulseResponse {
     public List<TopDishDTO> getTopPerformingDishes() { return topPerformingDishes; }
     public void setTopPerformingDishes(List<TopDishDTO> topPerformingDishes) { this.topPerformingDishes = topPerformingDishes; }
 
+    public List<TopDishDTO> getBottomPerformingDishes() { return bottomPerformingDishes; }
+    public void setBottomPerformingDishes(List<TopDishDTO> bottomPerformingDishes) { this.bottomPerformingDishes = bottomPerformingDishes; }
+
+    public Double getRevenuePercentageChange() { return revenuePercentageChange; }
+    public void setRevenuePercentageChange(Double revenuePercentageChange) { this.revenuePercentageChange = revenuePercentageChange; }
+
+    public Double getOrdersPercentageChange() { return ordersPercentageChange; }
+    public void setOrdersPercentageChange(Double ordersPercentageChange) { this.ordersPercentageChange = ordersPercentageChange; }
+
+    public String getComparisonPeriodLabel() { return comparisonPeriodLabel; }
+    public void setComparisonPeriodLabel(String comparisonPeriodLabel) { this.comparisonPeriodLabel = comparisonPeriodLabel; }
+
+    public Long getTotalQuantitySold() { return totalQuantitySold; }
+    public void setTotalQuantitySold(Long totalQuantitySold) { this.totalQuantitySold = totalQuantitySold; }
+
+    public String getQuantityShareLeader() { return quantityShareLeader; }
+    public void setQuantityShareLeader(String quantityShareLeader) { this.quantityShareLeader = quantityShareLeader; }
+
+    public String getRevenueShareLeader() { return revenueShareLeader; }
+    public void setRevenueShareLeader(String revenueShareLeader) { this.revenueShareLeader = revenueShareLeader; }
+
     public static class Builder {
         private String period;
-        private BigDecimal totalRevenue;
-        private Long totalOrders;
-        private BigDecimal averageOrderValue;
+        private String startDate;
+        private String endDate;
+        private BigDecimal totalRevenue = BigDecimal.ZERO;
+        private Long totalOrders = 0L;
+        private BigDecimal averageOrderValue = BigDecimal.ZERO;
+        private Integer averagePrepTimeMinutes;
+        private String prepTimeSubtitle;
         private String topItem;
-        private Long topItemQuantity;
+        private Long topItemQuantity = 0L;
         private String leastPerformingItem;
         private String peakHour;
         private String slowHour;
-        private Integer lowStockItemsCount;
+        private Integer lowStockItemsCount = 0;
         private String summary;
         private List<PulseInsight> insights = new ArrayList<>();
         private List<String> recommendations = new ArrayList<>();
-        private String source;
+        private String source = "DETERMINISTIC_ANALYTICS";
         private List<CategorySalesDTO> categoryBreakdown = new ArrayList<>();
         private List<DailyRevenueDTO> revenueTrends = new ArrayList<>();
         private List<HourlyDemandDTO> hourlyDistribution = new ArrayList<>();
         private List<TopDishDTO> topPerformingDishes = new ArrayList<>();
+        private List<TopDishDTO> bottomPerformingDishes = new ArrayList<>();
+        private Double revenuePercentageChange;
+        private Double ordersPercentageChange;
+        private String comparisonPeriodLabel;
+        private Long totalQuantitySold = 0L;
+        private String quantityShareLeader;
+        private String revenueShareLeader;
 
         public Builder period(String period) { this.period = period; return this; }
+        public Builder startDate(String startDate) { this.startDate = startDate; return this; }
+        public Builder endDate(String endDate) { this.endDate = endDate; return this; }
         public Builder totalRevenue(BigDecimal totalRevenue) { this.totalRevenue = totalRevenue; return this; }
         public Builder totalOrders(Long totalOrders) { this.totalOrders = totalOrders; return this; }
         public Builder averageOrderValue(BigDecimal averageOrderValue) { this.averageOrderValue = averageOrderValue; return this; }
+        public Builder averagePrepTimeMinutes(Integer averagePrepTimeMinutes) { this.averagePrepTimeMinutes = averagePrepTimeMinutes; return this; }
+        public Builder prepTimeSubtitle(String prepTimeSubtitle) { this.prepTimeSubtitle = prepTimeSubtitle; return this; }
         public Builder topItem(String topItem) { this.topItem = topItem; return this; }
         public Builder topItemQuantity(Long topItemQuantity) { this.topItemQuantity = topItemQuantity; return this; }
         public Builder leastPerformingItem(String leastPerformingItem) { this.leastPerformingItem = leastPerformingItem; return this; }
@@ -160,12 +191,47 @@ public class RestaurantPulseResponse {
         public Builder revenueTrends(List<DailyRevenueDTO> revenueTrends) { this.revenueTrends = revenueTrends; return this; }
         public Builder hourlyDistribution(List<HourlyDemandDTO> hourlyDistribution) { this.hourlyDistribution = hourlyDistribution; return this; }
         public Builder topPerformingDishes(List<TopDishDTO> topPerformingDishes) { this.topPerformingDishes = topPerformingDishes; return this; }
+        public Builder bottomPerformingDishes(List<TopDishDTO> bottomPerformingDishes) { this.bottomPerformingDishes = bottomPerformingDishes; return this; }
+        public Builder revenuePercentageChange(Double revenuePercentageChange) { this.revenuePercentageChange = revenuePercentageChange; return this; }
+        public Builder ordersPercentageChange(Double ordersPercentageChange) { this.ordersPercentageChange = ordersPercentageChange; return this; }
+        public Builder comparisonPeriodLabel(String comparisonPeriodLabel) { this.comparisonPeriodLabel = comparisonPeriodLabel; return this; }
+        public Builder totalQuantitySold(Long totalQuantitySold) { this.totalQuantitySold = totalQuantitySold; return this; }
+        public Builder quantityShareLeader(String quantityShareLeader) { this.quantityShareLeader = quantityShareLeader; return this; }
+        public Builder revenueShareLeader(String revenueShareLeader) { this.revenueShareLeader = revenueShareLeader; return this; }
 
         public RestaurantPulseResponse build() {
-            return new RestaurantPulseResponse(period, totalRevenue, totalOrders, averageOrderValue,
-                    topItem, topItemQuantity, leastPerformingItem, peakHour, slowHour,
-                    lowStockItemsCount, summary, insights, recommendations, source,
-                    categoryBreakdown, revenueTrends, hourlyDistribution, topPerformingDishes);
+            RestaurantPulseResponse r = new RestaurantPulseResponse();
+            r.period = this.period;
+            r.startDate = this.startDate;
+            r.endDate = this.endDate;
+            r.totalRevenue = this.totalRevenue;
+            r.totalOrders = this.totalOrders;
+            r.averageOrderValue = this.averageOrderValue;
+            r.averagePrepTimeMinutes = this.averagePrepTimeMinutes;
+            r.prepTimeSubtitle = this.prepTimeSubtitle;
+            r.topItem = this.topItem;
+            r.topItemQuantity = this.topItemQuantity;
+            r.leastPerformingItem = this.leastPerformingItem;
+            r.peakHour = this.peakHour;
+            r.slowHour = this.slowHour;
+            r.lowStockItemsCount = this.lowStockItemsCount;
+            r.summary = this.summary;
+            r.insights = this.insights != null ? this.insights : new ArrayList<>();
+            r.recommendations = this.recommendations != null ? this.recommendations : new ArrayList<>();
+            r.source = this.source != null ? this.source : "DETERMINISTIC_ANALYTICS";
+            r.categoryBreakdown = this.categoryBreakdown != null ? this.categoryBreakdown : new ArrayList<>();
+            r.revenueTrends = this.revenueTrends != null ? this.revenueTrends : new ArrayList<>();
+            r.hourlyDistribution = this.hourlyDistribution != null ? this.hourlyDistribution : new ArrayList<>();
+            r.topPerformingDishes = this.topPerformingDishes != null ? this.topPerformingDishes : new ArrayList<>();
+            r.bottomPerformingDishes = this.bottomPerformingDishes != null ? this.bottomPerformingDishes : new ArrayList<>();
+            r.revenuePercentageChange = this.revenuePercentageChange;
+            r.ordersPercentageChange = this.ordersPercentageChange;
+            r.comparisonPeriodLabel = this.comparisonPeriodLabel;
+            r.totalQuantitySold = this.totalQuantitySold;
+            r.quantityShareLeader = this.quantityShareLeader;
+            r.revenueShareLeader = this.revenueShareLeader;
+            r.generatedAt = LocalDateTime.now();
+            return r;
         }
     }
 }

@@ -9,6 +9,10 @@ import com.sizzle.backend.dto.MealOptimizationResponse;
 import com.sizzle.backend.dto.OptimizedBasketItem;
 import com.sizzle.backend.dto.PulseInsight;
 import com.sizzle.backend.dto.RestaurantPulseResponse;
+import com.sizzle.backend.dto.CategorySalesDTO;
+import com.sizzle.backend.dto.DailyRevenueDTO;
+import com.sizzle.backend.dto.HourlyDemandDTO;
+import com.sizzle.backend.dto.TopDishDTO;
 import com.sizzle.backend.dto.WaitTimeResponse;
 import com.sizzle.backend.dto.WhatIfImpact;
 import com.sizzle.backend.dto.WhatIfRequest;
@@ -50,6 +54,22 @@ public class AIServiceImpl implements AIService {
     private final InventoryRepository inventoryRepository;
     private final ObjectMapper objectMapper;
     private final com.sizzle.backend.service.AnalyticsService analyticsService;
+
+    // Fast in-memory caches for high-frequency user interactions
+    private final Map<String, String> waitTimeExplanationCache = new java.util.concurrent.ConcurrentHashMap<>();
+    private final Map<String, CachedPulse> pulseCache = new java.util.concurrent.ConcurrentHashMap<>();
+
+    private static class CachedPulse {
+        final RestaurantPulseResponse response;
+        final long timestamp;
+        CachedPulse(RestaurantPulseResponse response) {
+            this.response = response;
+            this.timestamp = System.currentTimeMillis();
+        }
+        boolean isExpired() {
+            return System.currentTimeMillis() - timestamp > 60_000; // 60s TTL
+        }
+    }
 
     public AIServiceImpl(AIClient aiClient,
                           MenuItemRepository menuItemRepository,
@@ -258,56 +278,25 @@ public class AIServiceImpl implements AIService {
 
     private String generateCustomerExplanation(String dishOrCart, int baseMinutes, int queueLoad, int complexity,
                                                 int activeOrders, int estimatedMinutes, String kitchenStatus) {
-        String deterministicFallback;
+        String cacheKey = (dishOrCart != null ? dishOrCart.trim().toLowerCase() : "") + "_" + activeOrders + "_" + estimatedMinutes;
+        String cached = waitTimeExplanationCache.get(cacheKey);
+        if (cached != null) {
+            return cached;
+        }
+
+        String explanation;
         if ("LIGHT".equals(kitchenStatus)) {
-            deterministicFallback = String.format("Estimated preparation time is about %d minutes. The kitchen workload is currently light.", estimatedMinutes);
+            explanation = String.format("Estimated preparation time is about %d minutes. The kitchen workload is currently light.", estimatedMinutes);
         } else if ("MODERATE".equals(kitchenStatus)) {
-            deterministicFallback = String.format("Estimated preparation time is about %d minutes because the kitchen is actively handling %d active %s.",
+            explanation = String.format("Estimated preparation time is about %d minutes because the kitchen is actively handling %d active %s.",
                     estimatedMinutes, activeOrders, activeOrders == 1 ? "order" : "orders");
         } else {
-            deterministicFallback = String.format("Estimated preparation time is about %d minutes due to high kitchen order volume (%d orders in queue).",
+            explanation = String.format("Estimated preparation time is about %d minutes due to high kitchen order volume (%d orders in queue).",
                     estimatedMinutes, activeOrders);
         }
 
-        if (!aiClient.isConfigured()) {
-            return deterministicFallback;
-        }
-
-        try {
-            String prompt = String.format(
-                    "Dish/Order: %s. Base preparation time: %d min. Kitchen queue adjustment: +%d min (%d active kitchen orders). " +
-                    "Recipe complexity: +%d min. Total calculated wait time: %d minutes. Kitchen load status: %s. " +
-                    "Write a single natural, friendly customer sentence explaining why this order will take about %d minutes. " +
-                    "CRITICAL: You must NOT change or recalculate the %d minutes. Maximum 25 words.",
-                    dishOrCart, baseMinutes, queueLoad, activeOrders, complexity, estimatedMinutes, kitchenStatus, estimatedMinutes, estimatedMinutes
-            );
-
-            AIRequest request = AIRequest.builder()
-                    .prompt(prompt)
-                    .systemInstruction("You are Sizzle Intelligence, an AI kitchen preparation advisor for Sizzle Restaurant. " +
-                            "Output strictly a JSON object: {\"explanation\": \"<single sentence>\"}. " +
-                            "Do not mention any external AI models or technical provider names.")
-                    .temperature(0.3)
-                    .jsonMode(true)
-                    .build();
-
-            AIResponse aiResponse = aiClient.execute(request);
-            if (aiResponse != null && !aiResponse.isFallback() && aiResponse.getStructuredData() != null) {
-                if (aiResponse.getStructuredData() instanceof Map<?, ?> dataMap) {
-                    Object exp = dataMap.get("explanation");
-                    if (exp != null && !exp.toString().isBlank()) {
-                        String explanation = exp.toString().trim();
-                        if (explanation.contains(String.valueOf(estimatedMinutes)) || explanation.length() < 120) {
-                            return explanation;
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            log.warn("Sizzle Intelligence could not generate AI wait-time explanation; using deterministic fallback: {}", e.getMessage());
-        }
-
-        return deterministicFallback;
+        waitTimeExplanationCache.put(cacheKey, explanation);
+        return explanation;
     }
 
     @Override
@@ -416,7 +405,7 @@ public class AIServiceImpl implements AIService {
                     double rB = b.getRating() != null ? b.getRating() : 4.0;
                     return Double.compare(rB, rA);
                 })
-                .limit(25)
+                .limit(10)
                 .toList();
     }
 
@@ -426,7 +415,7 @@ public class AIServiceImpl implements AIService {
                                                                  int people,
                                                                  BigDecimal budget) {
         List<Map<String, Object>> candidateList = candidates.stream()
-                .limit(25)
+                .limit(10)
                 .map(m -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("id", m.getId());
@@ -696,34 +685,86 @@ public class AIServiceImpl implements AIService {
 
     @Override
     public RestaurantPulseResponse getRestaurantPulse(String period) {
+        return getRestaurantPulse(period, null, null);
+    }
+
+    @Override
+    public RestaurantPulseResponse getRestaurantPulse(String period, String startDate, String endDate) {
         String cleanPeriod = (period != null && !period.isBlank()) ? period.toLowerCase().trim() : "7days";
-        LocalDateTime since;
+        String cacheKey = cleanPeriod + "_" + (startDate != null ? startDate.trim() : "") + "_" + (endDate != null ? endDate.trim() : "");
+        CachedPulse cachedPulse = pulseCache.get(cacheKey);
+        if (cachedPulse != null && !cachedPulse.isExpired()) {
+            log.info("Serving restaurant pulse from fast in-memory cache for [{}]", cacheKey);
+            return cachedPulse.response;
+        }
+        LocalDateTime since = null;
+        LocalDateTime until = LocalDateTime.now();
+        LocalDateTime priorSince = null;
+        LocalDateTime priorUntil = null;
         String periodLabel;
+        String comparisonLabel = null;
 
         if ("today".equals(cleanPeriod)) {
             since = LocalDate.now().atStartOfDay();
             periodLabel = "Today";
+            priorSince = LocalDate.now().minusDays(1).atStartOfDay();
+            priorUntil = since;
+            comparisonLabel = "vs Yesterday";
         } else if ("30days".equals(cleanPeriod)) {
             since = LocalDate.now().minusDays(30).atStartOfDay();
             periodLabel = "Last 30 Days";
+            priorSince = LocalDate.now().minusDays(60).atStartOfDay();
+            priorUntil = since;
+            comparisonLabel = "vs Prior 30 Days";
+        } else if ("all".equals(cleanPeriod)) {
+            since = null;
+            periodLabel = "All Time";
+            comparisonLabel = "All Historical Records";
+        } else if ("custom".equals(cleanPeriod) && startDate != null && !startDate.isBlank()) {
+            try {
+                LocalDate start = LocalDate.parse(startDate.trim());
+                LocalDate end = (endDate != null && !endDate.isBlank()) ? LocalDate.parse(endDate.trim()) : LocalDate.now();
+                since = start.atStartOfDay();
+                until = end.plusDays(1).atStartOfDay().minusNanos(1);
+                periodLabel = start + " to " + end;
+                long daysBetween = Math.max(1, java.time.temporal.ChronoUnit.DAYS.between(start, end) + 1);
+                priorSince = start.minusDays(daysBetween).atStartOfDay();
+                priorUntil = since;
+                comparisonLabel = "vs Prior " + daysBetween + " Days";
+            } catch (Exception ex) {
+                cleanPeriod = "7days";
+                since = LocalDate.now().minusDays(7).atStartOfDay();
+                periodLabel = "Last 7 Days";
+                priorSince = LocalDate.now().minusDays(14).atStartOfDay();
+                priorUntil = since;
+                comparisonLabel = "vs Prior 7 Days";
+            }
         } else {
             cleanPeriod = "7days";
             since = LocalDate.now().minusDays(7).atStartOfDay();
             periodLabel = "Last 7 Days";
+            priorSince = LocalDate.now().minusDays(14).atStartOfDay();
+            priorUntil = since;
+            comparisonLabel = "vs Prior 7 Days";
         }
 
-        // Fetch orders in period
-        List<Order> ordersInPeriod = orderRepository.findByCreatedAtAfterOrderByCreatedAtDesc(since);
-        if (ordersInPeriod.isEmpty()) {
-            // If no orders in specific window, check all orders so we don't return an empty pulse if DB has data
-            ordersInPeriod = orderRepository.findAllByOrderByCreatedAtDesc();
-        }
+        List<Order> allOrders = orderRepository.findAllByOrderByCreatedAtDesc();
+        final LocalDateTime fSince = since;
+        final LocalDateTime fUntil = until;
+
+        List<Order> ordersInPeriod = allOrders.stream()
+                .filter(o -> {
+                    if (o.getCreatedAt() == null) return false;
+                    if (fSince != null && o.getCreatedAt().isBefore(fSince)) return false;
+                    if (fUntil != null && o.getCreatedAt().isAfter(fUntil)) return false;
+                    return true;
+                })
+                .toList();
 
         List<Order> validOrders = ordersInPeriod.stream()
                 .filter(o -> o.getOrderStatus() != OrderStatus.CANCELLED)
                 .toList();
 
-        // 1. Core financial metrics
         long totalOrders = validOrders.size();
         BigDecimal totalRevenue = validOrders.stream()
                 .map(Order::getGrandTotal)
@@ -734,74 +775,121 @@ public class AIServiceImpl implements AIService {
                 ? totalRevenue.divide(BigDecimal.valueOf(totalOrders), 2, RoundingMode.HALF_UP)
                 : BigDecimal.ZERO;
 
-        // 2. Dish Performance
-        Map<String, Long> dishQtyMap = new HashMap<>();
-        Map<String, BigDecimal> dishRevMap = new HashMap<>();
+        Double revenuePctChange = null;
+        Double ordersPctChange = null;
+        final LocalDateTime fPriorSince = priorSince;
+        final LocalDateTime fPriorUntil = priorUntil;
 
-        for (Order o : validOrders) {
-            if (o.getItems() == null) continue;
-            for (OrderItem item : o.getItems()) {
-                String name = (item.getItemName() != null) ? item.getItemName() : "Menu Dish";
-                long qty = (item.getQuantity() != null) ? item.getQuantity() : 1;
-                dishQtyMap.merge(name, qty, Long::sum);
+        if (fPriorSince != null && fPriorUntil != null) {
+            List<Order> priorOrders = allOrders.stream()
+                    .filter(o -> o.getOrderStatus() != OrderStatus.CANCELLED)
+                    .filter(o -> o.getCreatedAt() != null && !o.getCreatedAt().isBefore(fPriorSince) && o.getCreatedAt().isBefore(fPriorUntil))
+                    .toList();
 
-                BigDecimal subtotal = (item.getSubtotal() != null)
-                        ? item.getSubtotal()
-                        : (item.getPrice() != null ? item.getPrice().multiply(BigDecimal.valueOf(qty)) : BigDecimal.ZERO);
-                dishRevMap.merge(name, subtotal, BigDecimal::add);
+            if (!priorOrders.isEmpty()) {
+                BigDecimal priorRevenue = priorOrders.stream()
+                        .map(Order::getGrandTotal)
+                        .filter(Objects::nonNull)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                if (priorRevenue.compareTo(BigDecimal.ZERO) > 0) {
+                    revenuePctChange = totalRevenue.subtract(priorRevenue)
+                            .multiply(BigDecimal.valueOf(100))
+                            .divide(priorRevenue, 1, RoundingMode.HALF_UP)
+                            .doubleValue();
+                }
+                ordersPctChange = BigDecimal.valueOf((totalOrders - priorOrders.size()) * 100.0)
+                        .divide(BigDecimal.valueOf(priorOrders.size()), 1, RoundingMode.HALF_UP)
+                        .doubleValue();
             }
         }
 
-        String topItem = "Chicken Biryani";
+        if (revenuePctChange == null) {
+            comparisonLabel = "Baseline Period";
+        }
+
+        Integer avgPrepMinutes = null;
+        String prepSubtitle = "Menu Recipe Average";
+        List<Order> completedOrders = validOrders.stream()
+                .filter(o -> (o.getOrderStatus() == OrderStatus.DELIVERED || o.getOrderStatus() == OrderStatus.READY))
+                .filter(o -> o.getCreatedAt() != null && o.getUpdatedAt() != null && o.getUpdatedAt().isAfter(o.getCreatedAt()))
+                .toList();
+
+        if (!completedOrders.isEmpty()) {
+            long totalDurationMins = 0;
+            for (Order o : completedOrders) {
+                totalDurationMins += java.time.Duration.between(o.getCreatedAt(), o.getUpdatedAt()).toMinutes();
+            }
+            avgPrepMinutes = (int) Math.round((double) totalDurationMins / completedOrders.size());
+            prepSubtitle = "Kitchen Fulfillment Average";
+        } else if (!validOrders.isEmpty()) {
+            long totalMinutes = 0;
+            long totalItems = 0;
+            for (Order o : validOrders) {
+                if (o.getItems() == null) continue;
+                for (OrderItem item : o.getItems()) {
+                    int base = 15;
+                    if (item.getMenuItem() != null && item.getMenuItem().getPrepTime() != null) {
+                        base = parseBasePrepMinutes(item.getMenuItem().getPrepTime());
+                    }
+                    long q = item.getQuantity() != null ? item.getQuantity() : 1;
+                    totalMinutes += (base * q);
+                    totalItems += q;
+                }
+            }
+            if (totalItems > 0) {
+                avgPrepMinutes = (int) Math.round((double) totalMinutes / totalItems);
+                prepSubtitle = "Menu Recipe Average";
+            }
+        }
+
+        List<CategorySalesDTO> categoryBreakdown = analyticsService.getCategorySales(validOrders);
+        List<TopDishDTO> topPerformingDishes = analyticsService.getTopDishes(validOrders, 5);
+        List<TopDishDTO> bottomPerformingDishes = analyticsService.getLowestPerformingDishes(validOrders, 5);
+        List<HourlyDemandDTO> hourlyDistribution = analyticsService.getHourlyDemand(validOrders);
+        List<DailyRevenueDTO> revenueTrends = analyticsService.getDailyTrends(validOrders);
+
+        long totalQuantitySold = categoryBreakdown.stream().mapToLong(CategorySalesDTO::getItemsSold).sum();
+
+        String quantityShareLeader = "None";
+        String revenueShareLeader = "None";
+        if (!categoryBreakdown.isEmpty()) {
+            CategorySalesDTO rTop = categoryBreakdown.get(0);
+            revenueShareLeader = String.format("%s (%.1f%%)", rTop.getCategoryName(), rTop.getRevenueShare());
+            CategorySalesDTO qTop = categoryBreakdown.stream().max(Comparator.comparingLong(CategorySalesDTO::getItemsSold)).orElse(rTop);
+            quantityShareLeader = String.format("%s (%.1f%%)", qTop.getCategoryName(), qTop.getQuantityShare());
+        }
+
+        String topItem = "None";
         long topQty = 0;
-        if (!dishQtyMap.isEmpty()) {
-            Map.Entry<String, Long> topEntry = dishQtyMap.entrySet().stream()
-                    .max(Map.Entry.comparingByValue())
-                    .orElse(null);
-            if (topEntry != null) {
-                topItem = topEntry.getKey();
-                topQty = topEntry.getValue();
-            }
+        if (!topPerformingDishes.isEmpty()) {
+            topItem = topPerformingDishes.get(0).getDishName();
+            topQty = topPerformingDishes.get(0).getQuantitySold();
         }
 
-        // Find least performing item from menu
-        List<MenuItem> allMenuItems = menuItemRepository.findByIsAvailableTrue();
-        String leastItem = "Veg Pasta";
-        if (!allMenuItems.isEmpty()) {
-            leastItem = allMenuItems.stream()
-                    .min(Comparator.comparingLong(m -> dishQtyMap.getOrDefault(m.getName(), 0L)))
-                    .map(MenuItem::getName)
-                    .orElse("Veg Pasta");
-        }
-
-        // 3. Hourly traffic
-        int[] hourlyOrders = new int[24];
-        for (Order o : validOrders) {
-            LocalDateTime dt = (o.getCreatedAt() != null) ? o.getCreatedAt() : LocalDateTime.now();
-            hourlyOrders[dt.getHour()]++;
+        String leastItem = "None";
+        if (!bottomPerformingDishes.isEmpty()) {
+            leastItem = bottomPerformingDishes.get(0).getDishName();
         }
 
         int maxHour = 19;
-        int maxHourCount = -1;
-        for (int h = 0; h < 24; h++) {
-            if (hourlyOrders[h] > maxHourCount) {
-                maxHourCount = hourlyOrders[h];
-                maxHour = h;
+        long maxHourCount = 0;
+        int minHour = 15;
+        long minHourCount = Long.MAX_VALUE;
+
+        for (HourlyDemandDTO h : hourlyDistribution) {
+            if (h.getOrderCount() > maxHourCount) {
+                maxHourCount = h.getOrderCount();
+                maxHour = h.getHour();
+            }
+            if (h.getHour() >= 11 && h.getHour() <= 22 && h.getOrderCount() < minHourCount) {
+                minHourCount = h.getOrderCount();
+                minHour = h.getHour();
             }
         }
         String peakHour = String.format("%02d:00 - %02d:00", maxHour, (maxHour + 2) % 24);
-
-        int minHour = 15;
-        int minHourCount = Integer.MAX_VALUE;
-        for (int h = 11; h <= 22; h++) {
-            if (h != maxHour && hourlyOrders[h] < minHourCount) {
-                minHourCount = hourlyOrders[h];
-                minHour = h;
-            }
-        }
         String slowHour = String.format("%02d:00 - %02d:00", minHour, (minHour + 2) % 24);
 
-        // 4. Inventory Warnings
         List<InventoryItem> allInventory = inventoryRepository.findAll();
         List<InventoryItem> lowStockList = allInventory.stream()
                 .filter(i -> i.getStatus() == StockStatus.LOW_STOCK || i.getStatus() == StockStatus.OUT_OF_STOCK ||
@@ -817,38 +905,52 @@ public class AIServiceImpl implements AIService {
             lowStockNames = "None (All ingredients in stock)";
         }
 
-        // 5. Kitchen Queue Bottlenecks
         long activeOrdersCount = orderRepository.countByOrderStatusIn(List.of(OrderStatus.PENDING, OrderStatus.PREPARING));
 
-        // Try AI generation if configured
         RestaurantPulseResponse pulse = null;
-        if (aiClient.isConfigured()) {
+        if (totalOrders > 0 && aiClient.isConfigured()) {
             try {
                 pulse = generateAiPulseAnalytics(cleanPeriod, periodLabel, totalRevenue, totalOrders, aov,
-                        topItem, topQty, leastItem, peakHour, slowHour, lowStockCount, lowStockNames, (int) activeOrdersCount);
+                        topItem, topQty, leastItem, peakHour, slowHour, lowStockCount, lowStockNames, (int) activeOrdersCount,
+                        quantityShareLeader, revenueShareLeader, revenuePctChange, comparisonLabel);
             } catch (Exception e) {
-                log.warn("AI Restaurant Pulse generation failed; falling back to deterministic pulse: {}", e.getMessage());
+                log.warn("AI Restaurant Pulse generation failed; falling back to deterministic analytics: {}", e.getMessage());
             }
         }
 
         if (pulse == null || pulse.getInsights() == null || pulse.getInsights().isEmpty()) {
             pulse = buildDeterministicPulseFallback(cleanPeriod, periodLabel, totalRevenue, totalOrders, aov,
-                    topItem, topQty, leastItem, peakHour, slowHour, lowStockCount, lowStockNames, (int) activeOrdersCount);
+                    topItem, topQty, leastItem, peakHour, slowHour, lowStockCount, lowStockNames, (int) activeOrdersCount,
+                    quantityShareLeader, revenueShareLeader, revenuePctChange, comparisonLabel);
         }
 
-        // Populate Infographic visual models
-        try {
-            pulse.setCategoryBreakdown(analyticsService.getCategorySales());
-            pulse.setTopPerformingDishes(analyticsService.getTopDishes(6));
-            pulse.setHourlyDistribution(analyticsService.getHourlyDemand());
-            com.sizzle.backend.dto.AnalyticsOverviewResponse overview = analyticsService.getOverview();
-            if (overview != null && overview.getDailyTrends() != null) {
-                pulse.setRevenueTrends(overview.getDailyTrends());
-            }
-        } catch (Exception e) {
-            log.warn("Could not attach infographic analytics to pulse: {}", e.getMessage());
-        }
+        pulse.setPeriod(cleanPeriod);
+        pulse.setStartDate(startDate);
+        pulse.setEndDate(endDate);
+        pulse.setTotalRevenue(totalRevenue);
+        pulse.setTotalOrders(totalOrders);
+        pulse.setAverageOrderValue(aov);
+        pulse.setAveragePrepTimeMinutes(avgPrepMinutes);
+        pulse.setPrepTimeSubtitle(prepSubtitle);
+        pulse.setTopItem(topItem);
+        pulse.setTopItemQuantity(topQty);
+        pulse.setLeastPerformingItem(leastItem);
+        pulse.setPeakHour(peakHour);
+        pulse.setSlowHour(slowHour);
+        pulse.setLowStockItemsCount(lowStockCount);
+        pulse.setCategoryBreakdown(categoryBreakdown);
+        pulse.setTopPerformingDishes(topPerformingDishes);
+        pulse.setBottomPerformingDishes(bottomPerformingDishes);
+        pulse.setHourlyDistribution(hourlyDistribution);
+        pulse.setRevenueTrends(revenueTrends);
+        pulse.setTotalQuantitySold(totalQuantitySold);
+        pulse.setQuantityShareLeader(quantityShareLeader);
+        pulse.setRevenueShareLeader(revenueShareLeader);
+        pulse.setRevenuePercentageChange(revenuePctChange);
+        pulse.setOrdersPercentageChange(ordersPctChange);
+        pulse.setComparisonPeriodLabel(comparisonLabel);
 
+        pulseCache.put(cacheKey, new CachedPulse(pulse));
         return pulse;
     }
 
@@ -856,28 +958,42 @@ public class AIServiceImpl implements AIService {
                                                               BigDecimal totalRevenue, long totalOrders, BigDecimal aov,
                                                               String topItem, long topQty, String leastItem,
                                                               String peakHour, String slowHour,
-                                                              int lowStockCount, String lowStockNames, int activeOrders) {
+                                                              int lowStockCount, String lowStockNames, int activeOrders,
+                                                              String quantityLeader, String revenueLeader,
+                                                              Double revenuePctChange, String comparisonLabel) {
+        String changeStr = (revenuePctChange != null)
+                ? String.format("%+.1f%% %s", revenuePctChange, comparisonLabel)
+                : "Baseline period (no prior comparison history)";
+
         String metricsContext = String.format(
                 "Time Window: %s\n" +
                 "Total Revenue: ₹%s\n" +
                 "Total Valid Orders: %d\n" +
                 "Average Order Value (AOV): ₹%s\n" +
-                "Top-Selling Item: %s (%d units sold)\n" +
-                "Underperforming Menu Dish: %s\n" +
-                "Peak Traffic Hours: %s\n" +
-                "Slow Traffic Hours: %s\n" +
-                "Low-Stock/Depleted Ingredients: %d items (%s)\n" +
-                "Active Kitchen Orders In Queue: %d",
+                "Revenue Growth Velocity: %s\n" +
+                "Top-Selling Dish: %s (%d units sold)\n" +
+                "Lowest-Velocity Dish: %s\n" +
+                "Revenue Share Leading Category: %s\n" +
+                "Volume Share Leading Category: %s\n" +
+                "Peak Service Window: %s\n" +
+                "Slowest Service Window: %s\n" +
+                "Low-Stock Ingredients: %d items (%s)\n" +
+                "Active Kitchen Queue Orders: %d",
                 periodLabel, totalRevenue.toPlainString(), totalOrders, aov.toPlainString(),
-                topItem, topQty, leastItem, peakHour, slowHour, lowStockCount, lowStockNames, activeOrders
+                changeStr, topItem, topQty, leastItem, revenueLeader, quantityLeader,
+                peakHour, slowHour, lowStockCount, lowStockNames, activeOrders
         );
 
         String prompt = "You are an executive restaurant operations consultant. Evaluate these verified operational metrics for Sizzle Restaurant:\n\n" +
                 metricsContext + "\n\n" +
                 "Requirements:\n" +
-                "1. summary: A 2-3 sentence executive pulse overview evaluating restaurant performance and operational pace.\n" +
-                "2. insights: Exactly 3 or 4 key insights. Each insight MUST have: 'title', 'severity' (one of 'POSITIVE', 'WARNING', 'INFO'), 'description' (interpret the business trend or operational bottleneck), and 'evidence' (cite the factual verified metrics).\n" +
-                "3. recommendations: Exactly 3 or 4 practical, actionable operational recommendations for management or the head chef.\n" +
+                "1. summary: A 2-3 sentence executive pulse overview evaluating restaurant financial velocity, category mix dynamics, and operational pace.\n" +
+                "2. insights: Exactly 4 key insights. Each insight MUST have: 'title', 'severity' (one of 'POSITIVE', 'WARNING', 'INFO'), 'description' (interpret the business trend, category mix, or bottleneck), and 'evidence' (cite the factual verified metrics).\n" +
+                "   - Insight 1: Financial & Category Mix (cite revenue leader vs volume leader).\n" +
+                "   - Insight 2: Peak Hours & Kitchen Queue (cite peak hours vs slow hours).\n" +
+                "   - Insight 3: Dish Velocity & Underperforming Items (cite top dish vs low-velocity dish).\n" +
+                "   - Insight 4: Inventory Telemetry & Workload Balance.\n" +
+                "3. recommendations: Exactly 4 practical, actionable operational recommendations for management or kitchen stations.\n" +
                 "4. Output strictly a JSON object conforming to: {\"summary\": \"...\", \"insights\": [{\"title\": \"...\", \"severity\": \"...\", \"description\": \"...\", \"evidence\": \"...\"}], \"recommendations\": [\"...\"]}.\n" +
                 "CRITICAL: Do NOT invent numbers, revenue figures, or dishes. Interpret only the provided verified facts.";
 
@@ -965,72 +1081,97 @@ public class AIServiceImpl implements AIService {
                                                                      BigDecimal totalRevenue, long totalOrders, BigDecimal aov,
                                                                      String topItem, long topQty, String leastItem,
                                                                      String peakHour, String slowHour, int lowStockCount,
-                                                                     String lowStockNames, int activeOrders) {
-        String summary = String.format(
-                "Sizzle generated ₹%s across %d verified orders during %s, maintaining an average order value of ₹%s. " +
-                "%s remains your primary revenue anchor, while service volume peaks during %s.",
-                totalRevenue.toPlainString(), totalOrders, periodLabel.toLowerCase(), aov.toPlainString(),
-                topItem, peakHour
-        );
+                                                                     String lowStockNames, int activeOrders,
+                                                                     String quantityLeader, String revenueLeader,
+                                                                     Double revenuePctChange, String comparisonLabel) {
+        String summary;
+        if (totalOrders == 0) {
+            summary = String.format("No guest transactions were recorded for the %s window. Select a wider date filter or check back as new orders arrive.", periodLabel.toLowerCase());
+        } else {
+            summary = String.format(
+                    "Sizzle generated ₹%s across %d verified orders during %s, maintaining an average order value of ₹%s. " +
+                    "Revenue is spearheaded by %s while volume is anchored by %s.",
+                    totalRevenue.toPlainString(), totalOrders, periodLabel.toLowerCase(), aov.toPlainString(),
+                    revenueLeader, quantityLeader
+            );
+        }
 
         List<PulseInsight> insights = new ArrayList<>();
 
-        // Insight 1: Sales Driver
-        insights.add(PulseInsight.builder()
-                .title("Signature Dish Dominance")
-                .severity("POSITIVE")
-                .description(String.format("%s is driving consistent guest demand and anchors repeat order revenue.", topItem))
-                .evidence(String.format("%d units sold, contributing significantly to ₹%s in %s revenue.", topQty, totalRevenue.toPlainString(), periodLabel.toLowerCase()))
-                .build());
-
-        // Insight 2: Peak Hours
-        insights.add(PulseInsight.builder()
-                .title("Evening Service Concentration")
-                .severity("INFO")
-                .description(String.format("Guest orders surge during %s, requiring dedicated station prep and expedited dispatch.", peakHour))
-                .evidence(String.format("Highest order volume recorded during %s compared to slower pace during %s.", peakHour, slowHour))
-                .build());
-
-        // Insight 3: Inventory or Kitchen Bottleneck
-        if (lowStockCount > 0) {
+        if (totalOrders == 0) {
             insights.add(PulseInsight.builder()
-                    .title("Critical Inventory Threshold Alert")
-                    .severity("WARNING")
-                    .description(String.format("Stock levels for %d ingredients are depleted or below minimum buffer threshold.", lowStockCount))
-                    .evidence(String.format("Restock required for: %s to prevent kitchen stockouts.", lowStockNames))
-                    .build());
-        } else if (activeOrders > 2) {
-            insights.add(PulseInsight.builder()
-                    .title("Kitchen Queue Load")
-                    .severity("WARNING")
-                    .description("Active order volume in kitchen is elevated, potentially extending order preparation times.")
-                    .evidence(String.format("%d orders currently in PENDING or PREPARING queue.", activeOrders))
+                    .title("No Order Activity")
+                    .severity("INFO")
+                    .description("There are no completed or active orders recorded in this operational window.")
+                    .evidence("0 orders in " + periodLabel)
                     .build());
         } else {
+            // Insight 1: Category Mix Asymmetry
             insights.add(PulseInsight.builder()
-                    .title("Kitchen Preparation Efficiency")
+                    .title("Category Mix & Revenue Contribution")
                     .severity("POSITIVE")
-                    .description("Kitchen workload is operating smoothly with minimal queue friction and prompt preparation.")
-                    .evidence(String.format("%d active orders currently in preparation queue.", activeOrders))
+                    .description(String.format("Culinary portfolio shows strong specialization: %s drives top revenue velocity, while %s anchors physical unit volume.", revenueLeader, quantityLeader))
+                    .evidence(String.format("Total culinary sales generated ₹%s across %s.", totalRevenue.toPlainString(), periodLabel.toLowerCase()))
+                    .build());
+
+            // Insight 2: Peak Hours
+            insights.add(PulseInsight.builder()
+                    .title("Service Concentration & Rush Hours")
+                    .severity("INFO")
+                    .description(String.format("Guest ticket volume clusters heavily around %s. Kitchen stations should be manned and prep completed prior to this rush.", peakHour))
+                    .evidence(String.format("Peak traffic recorded at %s vs slower pace at %s.", peakHour, slowHour))
+                    .build());
+
+            // Insight 3: Inventory / Queue Bottleneck
+            if (lowStockCount > 0) {
+                insights.add(PulseInsight.builder()
+                        .title("Critical Inventory Buffer Alert")
+                        .severity("WARNING")
+                        .description(String.format("Stock levels for %d inventory items are depleted or below the minimum safety buffer.", lowStockCount))
+                        .evidence(String.format("Restock recommended for: %s.", lowStockNames))
+                        .build());
+            } else if (activeOrders > 2) {
+                insights.add(PulseInsight.builder()
+                        .title("Active Kitchen Load Elevation")
+                        .severity("WARNING")
+                        .description("Live queue volume in the kitchen is active, which may incrementally increase ticket fulfillment times.")
+                        .evidence(String.format("%d orders currently in preparation queue.", activeOrders))
+                        .build());
+            } else {
+                insights.add(PulseInsight.builder()
+                        .title("Kitchen Operational Throughput")
+                        .severity("POSITIVE")
+                        .description("Kitchen workload is well-balanced with minimal queue pressure and prompt station dispatch.")
+                        .evidence(String.format("%d active orders currently in preparation.", activeOrders))
+                        .build());
+            }
+
+            // Insight 4: Dish Velocity Opportunity
+            insights.add(PulseInsight.builder()
+                    .title("Menu Velocity & Recipe Review")
+                    .severity("INFO")
+                    .description(String.format("%s anchors sales volume with %d units sold, while %s had lowest sales velocity during %s.", topItem, topQty, leastItem, periodLabel.toLowerCase()))
+                    .evidence("Derived from itemized ticket sales.")
                     .build());
         }
 
-        // Insight 4: Menu Opportunity
-        insights.add(PulseInsight.builder()
-                .title("Underperforming Dish Opportunity")
-                .severity("INFO")
-                .description(String.format("%s has lagged behind peer dishes in the %s window.", leastItem, periodLabel.toLowerCase()))
-                .evidence(String.format("Lowest relative sales volume across available menu categories during %s.", periodLabel.toLowerCase()))
-                .build());
-
-        List<String> recommendations = List.of(
-                String.format("Pre-portion and prepare ingredients for %s ahead of the %s rush.", topItem, peakHour),
-                (lowStockCount > 0
-                        ? String.format("Submit immediate purchase orders for depleted ingredients: %s.", lowStockNames)
-                        : "Maintain automated stock thresholds for high-velocity burger and biryani ingredients."),
-                String.format("Bundle %s into an executive lunch combo or feature it with a limited-time 15%% pairing incentive.", leastItem),
-                String.format("Optimize kitchen station scheduling during %s to prepare prep mise-en-place for peak dining.", slowHour)
-        );
+        List<String> recommendations;
+        if (totalOrders == 0) {
+            recommendations = List.of(
+                    "Expand the active date range filter to analyze historical business performance.",
+                    "Verify that kitchen terminals and point-of-sale systems are actively synced.",
+                    "Schedule targeted marketing promotions to generate footfall during quiet periods."
+            );
+        } else {
+            recommendations = List.of(
+                    String.format("Pre-portion and prepare ingredients for %s ahead of the %s rush window.", topItem, peakHour),
+                    (lowStockCount > 0
+                            ? String.format("Generate purchase replenishment orders for depleted stocks: %s.", lowStockNames)
+                            : "Maintain automated inventory minimums for core high-velocity menu items."),
+                    String.format("Pair low-velocity dish '%s' with leading category '%s' in a value bundle.", leastItem, quantityLeader),
+                    String.format("Schedule kitchen prep and deep-cleaning tasks during the quieter %s window.", slowHour)
+            );
+        }
 
         return RestaurantPulseResponse.builder()
                 .period(cleanPeriod)
@@ -1046,7 +1187,7 @@ public class AIServiceImpl implements AIService {
                 .summary(summary)
                 .insights(insights)
                 .recommendations(recommendations)
-                .source("DETERMINISTIC_FALLBACK")
+                .source("DETERMINISTIC_ANALYTICS")
                 .build();
     }
 

@@ -234,19 +234,11 @@ export const FoodCard: React.FC<FoodCardProps> = ({ item }) => {
       </div>
 
       {/* Admin Edit Modal */}
-      <EditFoodModal
-        item={item}
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        onSave={() => forceUpdate({})}
-      />
+      {isEditModalOpen && <EditFoodModal item={item} isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} onSave={() => forceUpdate({})} />}
 
       {/* Customer Food Detail & Reviews Modal */}
-      <FoodDetailModal
-        item={item}
-        isOpen={isDetailModalOpen}
-        onClose={() => setIsDetailModalOpen(false)}
-      />
+      {isDetailModalOpen && <FoodDetailModal item={item} isOpen={isDetailModalOpen} onClose={() => setIsDetailModalOpen(false)} />}
     </>
   );
 };
+

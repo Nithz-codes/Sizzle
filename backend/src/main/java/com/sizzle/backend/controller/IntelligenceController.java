@@ -1,18 +1,12 @@
 package com.sizzle.backend.controller;
 
-import com.sizzle.backend.dto.ApiResponse;
-import com.sizzle.backend.dto.AIResponse;
-import com.sizzle.backend.dto.MealOptimizationRequest;
-import com.sizzle.backend.dto.MealOptimizationResponse;
-import com.sizzle.backend.dto.WaitTimeResponse;
-import com.sizzle.backend.dto.RestaurantPulseResponse;
-import com.sizzle.backend.dto.WhatIfRequest;
-import com.sizzle.backend.dto.WhatIfResponse;
+import com.sizzle.backend.dto.*;
 import com.sizzle.backend.service.AIService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -26,30 +20,35 @@ public class IntelligenceController {
         this.aiService = aiService;
     }
 
+    /**
+     * Connectivity Diagnostic Endpoint.
+     * Accessible by customers or health monitors to verify Sizzle Intelligence engine status.
+     */
     @PostMapping("/test")
-    public ResponseEntity<ApiResponse<AIResponse>> testIntelligence(@RequestBody(required = false) Map<String, String> payload) {
-        String prompt = (payload != null && payload.containsKey("prompt")) ? payload.get("prompt") : null;
+    public ResponseEntity<ApiResponse<AIResponse>> testAIConnectivity(
+            @RequestBody(required = false) Map<String, String> payload) {
+        String prompt = (payload != null) ? payload.get("prompt") : null;
         AIResponse response = aiService.executeTestPrompt(prompt);
         return ResponseEntity.ok(ApiResponse.success("Sizzle Intelligence test executed successfully", response));
     }
 
     /**
-     * Feature 1: AI Smart Preparation & Wait-Time Advisor for a specific menu item.
-     * Accessible by customers (unauthenticated and authenticated).
+     * Feature 1: AI Smart Preparation / Wait-Time Advisor for a single menu item.
+     * Calculates transparent deterministic estimate, then generates short friendly customer explanation.
      */
     @GetMapping("/wait-time/{menuItemId}")
-    public ResponseEntity<ApiResponse<WaitTimeResponse>> getMenuItemWaitTime(@PathVariable Long menuItemId) {
+    public ResponseEntity<ApiResponse<WaitTimeResponse>> getWaitTime(@PathVariable Long menuItemId) {
         WaitTimeResponse response = aiService.getWaitTimeEstimate(menuItemId);
         return ResponseEntity.ok(ApiResponse.success("Wait-time estimate calculated successfully", response));
     }
 
     /**
-     * Feature 1: AI Smart Preparation & Wait-Time Advisor for active cart items.
-     * Accessible by customers (unauthenticated and authenticated).
+     * Feature 1 (Cart Support): AI Smart Preparation / Wait-Time Advisor for multiple items in cart.
      */
     @PostMapping("/wait-time/cart")
-    public ResponseEntity<ApiResponse<WaitTimeResponse>> getCartWaitTime(@RequestBody(required = false) Map<String, List<Long>> payload) {
-        List<Long> itemIds = null;
+    public ResponseEntity<ApiResponse<WaitTimeResponse>> getCartWaitTime(
+            @RequestBody(required = false) Map<String, List<Long>> payload) {
+        List<Long> itemIds = Collections.emptyList();
         if (payload != null) {
             itemIds = payload.get("itemIds");
             if (itemIds == null) {
@@ -72,14 +71,16 @@ public class IntelligenceController {
     }
 
     /**
-     * Feature 3: AI Restaurant Pulse Analytics.
-     * Evaluates verified operational metrics over a specified period (today, 7days, 30days)
-     * and produces concise actionable business insights and recommendations.
+     * Feature 3: AI Restaurant Pulse Analytics & Infographics.
+     * Evaluates verified operational metrics over a specified period (today, 7days, 30days, all, custom)
+     * and produces concise actionable business insights, visual telemetry and recommendations.
      */
     @GetMapping("/restaurant-pulse")
     public ResponseEntity<ApiResponse<RestaurantPulseResponse>> getRestaurantPulse(
-            @RequestParam(defaultValue = "7days") String period) {
-        RestaurantPulseResponse response = aiService.getRestaurantPulse(period);
+            @RequestParam(defaultValue = "7days") String period,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        RestaurantPulseResponse response = aiService.getRestaurantPulse(period, startDate, endDate);
         return ResponseEntity.ok(ApiResponse.success("Restaurant pulse analytics fetched successfully", response));
     }
 

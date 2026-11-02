@@ -7,8 +7,11 @@ public class TopDishDTO {
     private String dishName;
     private String categoryName;
     private long quantitySold;
-    private BigDecimal totalRevenue;
+    private BigDecimal totalRevenue = BigDecimal.ZERO;
     private String imageUrl;
+    private double quantityShare;
+    private double revenueShare;
+    private int rank;
 
     public TopDishDTO() {}
 
@@ -17,8 +20,20 @@ public class TopDishDTO {
         this.dishName = dishName;
         this.categoryName = categoryName;
         this.quantitySold = quantitySold;
-        this.totalRevenue = totalRevenue;
+        this.totalRevenue = totalRevenue != null ? totalRevenue : BigDecimal.ZERO;
         this.imageUrl = imageUrl;
+    }
+
+    public TopDishDTO(Long menuItemId, String dishName, String categoryName, long quantitySold, BigDecimal totalRevenue, String imageUrl, double quantityShare, double revenueShare, int rank) {
+        this.menuItemId = menuItemId;
+        this.dishName = dishName;
+        this.categoryName = categoryName;
+        this.quantitySold = quantitySold;
+        this.totalRevenue = totalRevenue != null ? totalRevenue : BigDecimal.ZERO;
+        this.imageUrl = imageUrl;
+        this.quantityShare = quantityShare;
+        this.revenueShare = revenueShare;
+        this.rank = rank;
     }
 
     public Long getMenuItemId() {
@@ -58,7 +73,7 @@ public class TopDishDTO {
     }
 
     public void setTotalRevenue(BigDecimal totalRevenue) {
-        this.totalRevenue = totalRevenue;
+        this.totalRevenue = totalRevenue != null ? totalRevenue : BigDecimal.ZERO;
     }
 
     public String getImageUrl() {
@@ -67,5 +82,29 @@ public class TopDishDTO {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public double getQuantityShare() {
+        return quantityShare;
+    }
+
+    public void setQuantityShare(double quantityShare) {
+        this.quantityShare = quantityShare;
+    }
+
+    public double getRevenueShare() {
+        return revenueShare;
+    }
+
+    public void setRevenueShare(double revenueShare) {
+        this.revenueShare = revenueShare;
+    }
+
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
     }
 }
