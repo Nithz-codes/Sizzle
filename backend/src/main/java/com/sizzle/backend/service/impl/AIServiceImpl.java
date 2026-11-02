@@ -1072,6 +1072,9 @@ public class AIServiceImpl implements AIService {
             case "PROMOTION_RECOMMENDATION":
                 response = simulatePromotionScenario(rawQuery, qLower, request, allMenuItems, completedOrders);
                 break;
+            case "NEW_ITEM_INTRODUCTION":
+                response = simulateNewItemScenario(rawQuery, qLower, request, allMenuItems, completedOrders);
+                break;
             default:
                 response = simulateGeneralScenario(rawQuery, qLower, request, completedOrders);
                 break;
@@ -1085,6 +1088,17 @@ public class AIServiceImpl implements AIService {
     }
 
     private String determineScenarioType(String qLower, WhatIfRequest request) {
+        if (request.getScenarioType() != null && ("NEW_ITEM".equalsIgnoreCase(request.getScenarioType()) || "NEW_ITEM_INTRODUCTION".equalsIgnoreCase(request.getScenarioType()))) {
+            return "NEW_ITEM_INTRODUCTION";
+        }
+        if (qLower.contains("add a new") || qLower.contains("add new") || qLower.contains("new item") ||
+                qLower.contains("new dish") || qLower.contains("introduce new") || qLower.contains("introduce a new") ||
+                qLower.contains("launch new") || qLower.contains("launch a new") || qLower.contains("add item") ||
+                qLower.contains("add a dish") || qLower.contains("create new item") ||
+                qLower.contains("start serving a new") || qLower.contains("bring a new") ||
+                (qLower.contains("what if i add") && !qLower.contains("discount") && !qLower.contains("price"))) {
+            return "NEW_ITEM_INTRODUCTION";
+        }
         if (request.getDiscountPercentage() != null ||
                 qLower.contains("discount") || qLower.contains("% off") || qLower.contains("price drop") ||
                 qLower.contains("reduce price") || qLower.contains("cheaper") || qLower.contains("lower price")) {
@@ -1438,6 +1452,151 @@ public class AIServiceImpl implements AIService {
                 .build();
     }
 
+    
+    private WhatIfResponse simulateNewItemScenario(String rawQuery, String qLower, WhatIfRequest request,
+                                                  List<MenuItem> allMenuItems, List<Order> completedOrders) {
+        String dishName = extractNewDishName(rawQuery, request.getMenuItemName());
+
+        BigDecimal targetPrice;
+        if (request.getNewItemPrice() != null && request.getNewItemPrice().compareTo(BigDecimal.ZERO) > 0) {
+            targetPrice = request.getNewItemPrice().setScale(2, RoundingMode.HALF_UP);
+        } else {
+            Double queryPrice = extractPriceFromQuery(qLower);
+            if (queryPrice != null && queryPrice > 0) {
+                targetPrice = BigDecimal.valueOf(queryPrice).setScale(2, RoundingMode.HALF_UP);
+            } else if (allMenuItems != null && !allMenuItems.isEmpty()) {
+                BigDecimal sum = allMenuItems.stream()
+                        .map(MenuItem::getPrice)
+                        .filter(Objects::nonNull)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                targetPrice = sum.divide(BigDecimal.valueOf(allMenuItems.size()), 2, RoundingMode.HALF_UP);
+            } else {
+                targetPrice = BigDecimal.valueOf(250.00);
+            }
+        }
+
+        // 1. Current State is STRICTLY ZERO (It is an unreleased new item!)
+        long currentOrders = 0L;
+        BigDecimal currentRevenue = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+
+        // 2. Model Projected Trial Adoption based on restaurant footfall
+        long totalHistoricalOrders = (completedOrders != null && !completedOrders.isEmpty()) ? completedOrders.size() : 25L;
+        // Projected trial rate: ~20% of dining patrons try a new featured menu item
+        long projectedOrders = Math.max(5L, Math.round(totalHistoricalOrders * 0.20));
+        BigDecimal projectedRevenue = targetPrice.multiply(BigDecimal.valueOf(projectedOrders)).setScale(2, RoundingMode.HALF_UP);
+
+        List<String> assumptions = List.of(
+                "Zero Historical Baseline: This item is brand new to the menu; baseline orders and historical revenue are strictly 0.",
+                "Guest Trial Adoption: Projected trial rate assumes 15%–20% of dining patrons sample the new offering during initial rollout.",
+                "Category Cannibalization: Approximately 30%–35% of orders are estimated to substitute from existing menu items rather than purely additive visits.",
+                "Kitchen Station Line Fit: Assumes ingredients can be integrated into current prep stations without extending ticket preparation times beyond standard SLAs."
+        );
+
+        WhatIfImpact impact = WhatIfImpact.builder()
+                .revenue(String.format("+₹%,.0f (New Item Launch Revenue)", projectedRevenue))
+                .orders(String.format("+%d orders (Initial Trial Volume)", projectedOrders))
+                .risk("Operational Risk: Low demand elasticity or inventory over-ordering may cause spoilage of specialty ingredients. Stage a 2-week pilot with limited daily batches.")
+                .build();
+
+        String recommendation = String.format(
+                "Introducing %s at ₹%,.2f is projected to generate ₹%,.0f across %d initial trial orders. " +
+                "Since this item has zero historical orders, we recommend launching it as a 'Chef's Limited Special' for 2 weeks. " +
+                "Monitor reorder frequency, guest sentiment, and food-cost margins before permanently integrating it into the core catalog.",
+                dishName, targetPrice, projectedRevenue, projectedOrders
+        );
+
+        return WhatIfResponse.builder()
+                .scenario(String.format("Add %s to Menu", dishName))
+                .scenarioType("NEW_ITEM_INTRODUCTION")
+                .assumptions(assumptions)
+                .currentState(WhatIfState.builder()
+                        .label(String.format("Pre-Launch Baseline (%s)", dishName))
+                        .orders(currentOrders)
+                        .revenue(currentRevenue)
+                        .averagePrice(targetPrice)
+                        .build())
+                .projectedState(WhatIfState.builder()
+                        .label(String.format("Projected Launch Trial (%s)", dishName))
+                        .orders(projectedOrders)
+                        .revenue(projectedRevenue)
+                        .averagePrice(targetPrice)
+                        .build())
+                .impact(impact)
+                .recommendation(recommendation)
+                .source("DETERMINISTIC_FALLBACK")
+                .build();
+    }
+
+    private String extractNewDishName(String rawQuery, String explicitName) {
+        if (explicitName != null && !explicitName.trim().isEmpty()) {
+            return explicitName.trim();
+        }
+        String clean = rawQuery.trim().replaceAll("[?.,!]", "").trim();
+        String lower = clean.toLowerCase();
+
+        String[] prefixes = {
+                "what if i add a new item in menu",
+                "what if i add a new item on menu",
+                "what if i add a new item to menu",
+                "what if i add a new item",
+                "what if we add a new item",
+                "what if i add new item",
+                "what if we add new item",
+                "what if i add a new dish",
+                "what if we add a new dish",
+                "what if i introduce a new item",
+                "what if we introduce a new item",
+                "what if i launch a new item",
+                "what if we launch a new item",
+                "what if i add",
+                "what if we add",
+                "what if i introduce",
+                "what if we introduce",
+                "what if i launch",
+                "what if we launch",
+                "what happens if i add",
+                "what happens if we add"
+        };
+
+        for (String p : prefixes) {
+            if (lower.startsWith(p)) {
+                String remainder = clean.substring(p.length()).trim();
+                remainder = remainder.replaceAll("(?i)\\b(to the menu|in the menu|on the menu|to menu|in menu|on menu)\\b", "").trim();
+                if (!remainder.isEmpty() && !remainder.equalsIgnoreCase("a new item") && !remainder.equalsIgnoreCase("new item") && !remainder.equalsIgnoreCase("a new dish") && !remainder.equalsIgnoreCase("new dish")) {
+                    return capitalizeWords(remainder);
+                }
+            }
+        }
+        return "New Menu Item";
+    }
+
+    private Double extractPriceFromQuery(String qLower) {
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile("(?:price|at|for|₹|rs\\.?)\\s*([0-9]+(?:\\.[0-9]+)?)");
+        java.util.regex.Matcher m = p.matcher(qLower);
+        if (m.find()) {
+            try {
+                return Double.parseDouble(m.group(1));
+            } catch (Exception ignored) {}
+        }
+        return null;
+    }
+
+    private String capitalizeWords(String str) {
+        if (str == null || str.isEmpty()) return str;
+        String[] words = str.split("\\s+");
+        StringBuilder sb = new StringBuilder();
+        for (String w : words) {
+            if (!w.isEmpty()) {
+                sb.append(Character.toUpperCase(w.charAt(0)));
+                if (w.length() > 1) {
+                    sb.append(w.substring(1).toLowerCase());
+                }
+                sb.append(" ");
+            }
+        }
+        return sb.toString().trim();
+    }
+
     private WhatIfResponse simulateGeneralScenario(String rawQuery, String qLower, WhatIfRequest request,
                                                    List<Order> completedOrders) {
         long currentOrders = completedOrders.isEmpty() ? 50L : completedOrders.size();
@@ -1511,7 +1670,8 @@ public class AIServiceImpl implements AIService {
                             "CRITICAL RULES:\n" +
                             "1. You MUST NOT modify or fabricate numbers or stated assumptions.\n" +
                             "2. You are a simulator for decision support; you must never execute live orders or change menu prices.\n" +
-                            "3. Provide strategic executive interpretation, operational risk assessment (kitchen bottlenecks, stockouts, margin squeeze), and concrete manager recommendations.\n\n" +
+                            "3. IMPORTANT FOR NEW_ITEM_INTRODUCTION: This item is brand new / unreleased, so historical baseline orders and revenue are strictly 0. Do NOT invent or claim that the new item had past orders. Focus on customer trial rate, kitchen station prep, and inventory spoilage risk.\n" +
+                            "4. Provide strategic executive interpretation, operational risk assessment (kitchen bottlenecks, stockouts, margin squeeze), and concrete manager recommendations.\n\n" +
                             "Return ONLY a strictly valid JSON object with this exact structure:\n" +
                             "{\n" +
                             "  \"recommendation\": \"Concise executive analysis and actionable operational advice for the manager...\",\n" +

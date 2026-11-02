@@ -19,7 +19,8 @@ import {
 import { intelligenceApi, WhatIfData } from '../../services/api';
 
 const QUICK_PROMPTS = [
-  'What if I give 10% discount on Chicken Biryani?',
+  'What if I add a new item in menu?',
+            'What if I give 10% discount on Chicken Biryani?',
   'What happens if order volume increases by 20%?',
   'What if I remove Veg Pasta from the menu?',
   'Which item should I promote this weekend?',
@@ -220,7 +221,7 @@ export const WhatIfCopilotPanel: React.FC = () => {
               <div className="space-y-1.5 pt-1">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-[#9CA3AF]">Order Volume:</span>
-                  <span className="font-bold text-[#F9FAFB]">{data.currentState?.orders} orders</span>
+                  <span className="font-bold text-[#F9FAFB]">{data.currentState?.orders === 0 ? '0 orders (New Dish)' : `${data.currentState?.orders} orders`}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-[#9CA3AF]">Gross Revenue:</span>
