@@ -71,8 +71,8 @@ export const MobileCategoryDrawer: React.FC<MobileCategoryDrawerProps> = ({
         ? 'text-[#F97316]'
         : 'text-[#E85D04]'
       : isAdmin
-      ? 'text-[#9CA3AF] group-hover:text-[#F97316]'
-      : 'text-[#6B7280] group-hover:text-[#E85D04]';
+        ? 'text-[#9CA3AF] group-hover:text-[#F97316]'
+        : 'text-[#6B7280] group-hover:text-[#E85D04]';
 
     const baseClass = `w-4 h-4 transition-transform duration-200 ease-out ${baseColor}`;
 
@@ -235,7 +235,7 @@ export const MobileCategoryDrawer: React.FC<MobileCategoryDrawerProps> = ({
 
       {/* Drawer Panel */}
       <div className="fixed inset-y-0 right-0 max-w-sm sm:max-w-md w-full bg-[#FFFFFF] shadow-2xl flex flex-col z-50 animate-in slide-in-from-right duration-300">
-        
+
         {/* Drawer Header */}
         <div className="p-4 sm:p-5 border-b border-[#ECECEC] flex items-center justify-between bg-[#FFFDF8]">
           <div className="flex items-center gap-2.5">
@@ -275,7 +275,7 @@ export const MobileCategoryDrawer: React.FC<MobileCategoryDrawerProps> = ({
 
         {/* Drawer Scrollable Content */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5 custom-scrollbar">
-          
+
           {/* Quick AI Studio Button */}
           {onOpenAiHub && (
             <div className="p-3 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/80 flex items-center justify-between gap-3 shadow-xs">
@@ -288,7 +288,7 @@ export const MobileCategoryDrawer: React.FC<MobileCategoryDrawerProps> = ({
                     Sizzle AI Studio
                   </h3>
                   <p className="text-[10px] text-[#047857]">
-                    Photo Scanner, Mood &amp; Mystery Box
+                    Meal Optimizer, Mood &amp; Mystery Box
                   </p>
                 </div>
               </div>
@@ -313,32 +313,29 @@ export const MobileCategoryDrawer: React.FC<MobileCategoryDrawerProps> = ({
             <div className="grid grid-cols-3 gap-2">
               <button
                 onClick={() => setDietaryFilter('All')}
-                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  dietaryFilter === 'All'
-                    ? 'bg-[#1E1E1E] text-white shadow-xs'
-                    : 'bg-[#FFFDF8] text-[#6B7280] border border-[#ECECEC] hover:border-[#E85D04]/40'
-                }`}
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${dietaryFilter === 'All'
+                  ? 'bg-[#1E1E1E] text-white shadow-xs'
+                  : 'bg-[#FFFDF8] text-[#6B7280] border border-[#ECECEC] hover:border-[#E85D04]/40'
+                  }`}
               >
                 All
               </button>
               <button
                 onClick={() => setDietaryFilter('Veg')}
-                className={`py-2 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                  dietaryFilter === 'Veg'
-                    ? 'bg-[#22C55E] text-white shadow-xs'
-                    : 'bg-[#FFFDF8] text-[#2E7D32] border border-[#2E7D32]/30 hover:bg-[#2E7D32]/10'
-                }`}
+                className={`py-2 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${dietaryFilter === 'Veg'
+                  ? 'bg-[#22C55E] text-white shadow-xs'
+                  : 'bg-[#FFFDF8] text-[#2E7D32] border border-[#2E7D32]/30 hover:bg-[#2E7D32]/10'
+                  }`}
               >
                 <span className="w-2 h-2 rounded-full bg-[#22C55E] outline-1 outline-white" />
                 <span>Veg</span>
               </button>
               <button
                 onClick={() => setDietaryFilter('Non-Veg')}
-                className={`py-2 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                  dietaryFilter === 'Non-Veg'
-                    ? 'bg-[#EF4444] text-white shadow-xs'
-                    : 'bg-[#FFFDF8] text-[#D32F2F] border border-[#D32F2F]/30 hover:bg-[#D32F2F]/10'
-                }`}
+                className={`py-2 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${dietaryFilter === 'Non-Veg'
+                  ? 'bg-[#EF4444] text-white shadow-xs'
+                  : 'bg-[#FFFDF8] text-[#D32F2F] border border-[#D32F2F]/30 hover:bg-[#D32F2F]/10'
+                  }`}
               >
                 <span className="w-2 h-2 rounded-full bg-[#EF4444] outline-1 outline-white" />
                 <span>Non-Veg</span>
@@ -357,11 +354,10 @@ export const MobileCategoryDrawer: React.FC<MobileCategoryDrawerProps> = ({
                 <button
                   key={opt.id}
                   onClick={() => setPriceFilter(opt.id)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                    priceFilter === opt.id
-                      ? 'bg-[#1E1E1E] text-white shadow-xs font-bold'
-                      : 'bg-[#FFFDF8] text-[#6B7280] border border-[#ECECEC] hover:border-[#E85D04]/40'
-                  }`}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${priceFilter === opt.id
+                    ? 'bg-[#1E1E1E] text-white shadow-xs font-bold'
+                    : 'bg-[#FFFDF8] text-[#6B7280] border border-[#ECECEC] hover:border-[#E85D04]/40'
+                    }`}
                 >
                   {opt.label}
                 </button>
@@ -384,29 +380,26 @@ export const MobileCategoryDrawer: React.FC<MobileCategoryDrawerProps> = ({
               {/* All Items Option */}
               <button
                 onClick={() => handleSelectCategory('All')}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer group ${
-                  activeCategory === 'All'
-                    ? 'bg-[#E85D04]/10 text-[#E85D04] border border-[#E85D04]/40 font-bold'
-                    : 'text-[#1E1E1E] hover:bg-[#FFFDF8] hover:text-[#E85D04]'
-                }`}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer group ${activeCategory === 'All'
+                  ? 'bg-[#E85D04]/10 text-[#E85D04] border border-[#E85D04]/40 font-bold'
+                  : 'text-[#1E1E1E] hover:bg-[#FFFDF8] hover:text-[#E85D04]'
+                  }`}
               >
                 <div className="flex items-center gap-2.5">
                   <span className="w-5 h-5 flex items-center justify-center shrink-0">
                     <Sparkles
-                      className={`w-4 h-4 transition-transform duration-200 ease-out group-hover:rotate-12 group-hover:scale-110 ${
-                        activeCategory === 'All' ? 'text-[#E85D04]' : 'text-[#6B7280] group-hover:text-[#E85D04]'
-                      }`}
+                      className={`w-4 h-4 transition-transform duration-200 ease-out group-hover:rotate-12 group-hover:scale-110 ${activeCategory === 'All' ? 'text-[#E85D04]' : 'text-[#6B7280] group-hover:text-[#E85D04]'
+                        }`}
                     />
                   </span>
                   <span>All Categories</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span
-                    className={`text-xs px-2 py-0.5 rounded-md font-bold ${
-                      activeCategory === 'All'
-                        ? 'bg-[#E85D04] text-white'
-                        : 'bg-[#ECECEC] text-[#6B7280]'
-                    }`}
+                    className={`text-xs px-2 py-0.5 rounded-md font-bold ${activeCategory === 'All'
+                      ? 'bg-[#E85D04] text-white'
+                      : 'bg-[#ECECEC] text-[#6B7280]'
+                      }`}
                   >
                     {MENU_ITEMS.length}
                   </span>
@@ -423,11 +416,10 @@ export const MobileCategoryDrawer: React.FC<MobileCategoryDrawerProps> = ({
                   <button
                     key={cat.id}
                     onClick={() => handleSelectCategory(cat.name)}
-                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer group ${
-                      isSelected
-                        ? 'bg-[#E85D04]/10 text-[#E85D04] font-bold border border-[#E85D04]/40'
-                        : 'text-[#1E1E1E] hover:bg-[#FFFDF8] hover:text-[#E85D04]'
-                    }`}
+                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer group ${isSelected
+                      ? 'bg-[#E85D04]/10 text-[#E85D04] font-bold border border-[#E85D04]/40'
+                      : 'text-[#1E1E1E] hover:bg-[#FFFDF8] hover:text-[#E85D04]'
+                      }`}
                   >
                     <div className="flex items-center gap-2.5 truncate pr-2">
                       {renderCategoryIcon(cat.icon, isSelected)}
@@ -435,11 +427,10 @@ export const MobileCategoryDrawer: React.FC<MobileCategoryDrawerProps> = ({
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
                       <span
-                        className={`text-xs px-2 py-0.5 rounded-md font-semibold ${
-                          isSelected
-                            ? 'bg-[#E85D04] text-white font-bold'
-                            : 'bg-[#FFFDF8] text-[#6B7280] border border-[#ECECEC]'
-                        }`}
+                        className={`text-xs px-2 py-0.5 rounded-md font-semibold ${isSelected
+                          ? 'bg-[#E85D04] text-white font-bold'
+                          : 'bg-[#FFFDF8] text-[#6B7280] border border-[#ECECEC]'
+                          }`}
                       >
                         {count}
                       </span>

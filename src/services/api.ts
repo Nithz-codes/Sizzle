@@ -645,3 +645,177 @@ export const analyticsApi = {
 
 
 
+
+
+export interface WaitTimeData {
+  menuItemId: number;
+  menuItemName: string;
+  estimatedMinutes: number;
+  confidence: 'HIGH' | 'MEDIUM' | 'LOW';
+  kitchenStatus: 'LIGHT' | 'MODERATE' | 'BUSY';
+  baseMinutes: number;
+  queueLoadMinutes: number;
+  complexityMinutes: number;
+  activeKitchenOrders: number;
+  reason: string;
+  generatedExplanation: string;
+  timestamp: string;
+}
+
+export const intelligenceApi = {
+  getWaitTime: async (menuItemId: number): Promise<ApiResponse<WaitTimeData>> => {
+    const response = await fetch(`${API_BASE_URL}/intelligence/wait-time/${menuItemId}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch wait time estimate');
+    return data;
+  },
+
+  getCartWaitTime: async (itemIds: number[]): Promise<ApiResponse<WaitTimeData>> => {
+    const response = await fetch(`${API_BASE_URL}/intelligence/wait-time/cart`, {
+      method: 'POST',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ itemIds }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch cart wait time estimate');
+    return data;
+  },
+
+  optimizeMeal: async (params: MealOptimizationParams): Promise<ApiResponse<MealOptimizationData>> => {
+    const response = await fetch(`${API_BASE_URL}/intelligence/optimize-meal`, {
+      method: 'POST',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to optimize meal basket');
+    return data;
+  },
+
+  getRestaurantPulse: async (period: 'today' | '7days' | '30days' = '7days'): Promise<ApiResponse<RestaurantPulseData>> => {
+    const response = await fetch(`${API_BASE_URL}/intelligence/restaurant-pulse?period=${period}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch restaurant pulse analytics');
+    return data;
+  },
+
+  simulateWhatIf: async (params: WhatIfParams): Promise<ApiResponse<WhatIfData>> => {
+    const response = await fetch(`${API_BASE_URL}/intelligence/what-if`, {
+      method: 'POST',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to simulate what-if scenario');
+    return data;
+  },
+};
+
+export interface OptimizedBasketItem {
+  menuItemId: number;
+  name: string;
+  category: string;
+  image?: string;
+  isVeg: boolean;
+  spicyLevel?: number;
+  price: number;
+  quantity: number;
+  lineTotal: number;
+  reason?: string;
+}
+
+export interface MealOptimizationData {
+  items: OptimizedBasketItem[];
+  totalPrice: number;
+  maxBudget: number;
+  budgetRemaining: number;
+  estimatedPreparationMinutes: number;
+  peopleCount: number;
+  summary: string;
+  confidence: 'HIGH' | 'MEDIUM' | 'LOW';
+  source: string;
+  timestamp: string;
+}
+
+export interface MealOptimizationParams {
+  peopleCount?: number;
+  maxBudget: number;
+  dietaryPreference?: 'ANY' | 'VEG_ONLY' | 'NON_VEG' | 'MIXED_ONE_VEG';
+  spicyPreference?: 'ANY' | 'MILD' | 'MEDIUM' | 'SPICY';
+  preferredCategories?: string[];
+  maxPrepTimeMinutes?: number;
+  freeTextRequest?: string;
+}
+
+export interface PulseInsightData {
+  title: string;
+  severity: 'POSITIVE' | 'WARNING' | 'INFO';
+  description: string;
+  evidence: string;
+}
+
+export interface RestaurantPulseData {
+  period: 'today' | '7days' | '30days';
+  totalRevenue: number;
+  totalOrders: number;
+  averageOrderValue: number;
+  topItem: string;
+  topItemQuantity: number;
+  leastPerformingItem: string;
+  peakHour: string;
+  slowHour: string;
+  lowStockItemsCount: number;
+  summary: string;
+  insights: PulseInsightData[];
+  recommendations: string[];
+  source: string;
+  generatedAt: string;
+}
+
+export interface WhatIfState {
+  label: string;
+  orders: number;
+  revenue: number;
+  averagePrice: number;
+}
+
+export interface WhatIfImpact {
+  revenue: string;
+  orders: string;
+  risk: string;
+}
+
+export interface WhatIfData {
+  scenario: string;
+  scenarioType: 'DISCOUNT' | 'VOLUME_INCREASE' | 'MENU_REMOVAL' | 'PROMOTION_RECOMMENDATION' | 'GENERAL' | string;
+  assumptions: string[];
+  currentState: WhatIfState;
+  projectedState: WhatIfState;
+  impact: WhatIfImpact;
+  recommendation: string;
+  source: string;
+  generatedAt: string;
+}
+
+export interface WhatIfParams {
+  query: string;
+  menuItemName?: string;
+  discountPercentage?: number;
+  volumeIncreasePercentage?: number;
+}
+

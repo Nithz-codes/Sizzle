@@ -29,9 +29,10 @@ import { AiNutritionModal } from './components/AiNutritionModal';
 import { AiMoodCuratorModal } from './components/AiMoodCuratorModal';
 import { AiSurpriseBoxModal } from './components/AiSurpriseBoxModal';
 import { AiUsualFeastModal } from './components/AiUsualFeastModal';
-import { AiVisionScannerModal } from './components/AiVisionScannerModal';
+
 import { AiHubModal } from './components/AiHubModal';
 import { MobileCategoryDrawer } from './components/MobileCategoryDrawer';
+import { BuildMealModal } from './components/BuildMealModal';
 
 import { MENU_ITEMS, CATEGORIES } from './data/menuData';
 import { menuApi } from './services/api';
@@ -47,8 +48,9 @@ const MainAppContent: React.FC = () => {
   const [isAiMoodOpen, setIsAiMoodOpen] = useState<boolean>(false);
   const [isAiSurpriseOpen, setIsAiSurpriseOpen] = useState<boolean>(false);
   const [isAiUsualOpen, setIsAiUsualOpen] = useState<boolean>(false);
-  const [isAiVisionOpen, setIsAiVisionOpen] = useState<boolean>(false);
+
   const [isMobileCategoryDrawerOpen, setIsMobileCategoryDrawerOpen] = useState<boolean>(false);
+  const [isBuildMealOpen, setIsBuildMealOpen] = useState<boolean>(false);
 
   const {
     activeCategory,
@@ -251,7 +253,7 @@ const MainAppContent: React.FC = () => {
 
   return (
     <div className={isAdmin ? "min-h-screen bg-[#111827] text-[#F9FAFB] flex flex-col justify-between font-['Plus_Jakarta_Sans'] transition-colors duration-500" : "min-h-screen bg-[#FFFDF8] text-[#1E1E1E] flex flex-col justify-between font-['Plus_Jakarta_Sans'] transition-colors duration-500"}>
-      
+
       {/* Admin Top Command Banner (Only shown in Admin Mode) */}
       {isAdmin && (
         <div className="bg-[#1F2937] text-[#F97316] border-b border-[#374151] px-4 py-2 text-xs font-semibold flex items-center justify-between shadow-lg sticky top-0 z-50">
@@ -321,12 +323,13 @@ const MainAppContent: React.FC = () => {
             onOpenAiMood={() => setIsAiMoodOpen(true)}
             onOpenAiSurprise={() => setIsAiSurpriseOpen(true)}
             onOpenAiUsual={() => setIsAiUsualOpen(true)}
+            onOpenBuildMeal={() => setIsBuildMealOpen(true)}
           />
 
           {/* Main Content Area: Category Sidebar + Food Grid */}
           <main id="menu-section" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 w-full flex-1">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-              
+
               {/* Left Column: Category & Dietary Sidebar - HIDDEN on mobile/tablet (< lg), visible on desktop (lg:block) */}
               <aside className="hidden lg:block lg:col-span-3 lg:sticky lg:top-24 space-y-6">
                 <CategorySidebar />
@@ -353,11 +356,10 @@ const MainAppContent: React.FC = () => {
                       setActiveCategory('All');
                       setCategoryFilter('All');
                     }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer ${
-                      activeCategory === 'All'
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer ${activeCategory === 'All'
                         ? 'bg-[#1E1E1E] text-white font-bold shadow-xs'
                         : 'bg-[#FFFFFF] text-[#1E1E1E] border border-[#ECECEC] hover:border-[#E85D04]/40'
-                    }`}
+                      }`}
                   >
                     All ({itemsList.length})
                   </button>
@@ -368,17 +370,16 @@ const MainAppContent: React.FC = () => {
                         setActiveCategory(cat.name);
                         setCategoryFilter(cat.name);
                       }}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer ${
-                        activeCategory === cat.name
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer ${activeCategory === cat.name
                           ? 'bg-[#1E1E1E] text-white font-bold shadow-xs'
                           : 'bg-[#FFFFFF] text-[#1E1E1E] border border-[#ECECEC] hover:border-[#E85D04]/40'
-                      }`}
+                        }`}
                     >
                       {cat.displayName}
                     </button>
                   ))}
                 </div>
-                
+
                 {/* Header Title for Current Category */}
                 <div className={isAdmin ? "bg-[#1E293B] border border-[#374151] rounded-2xl p-4 sm:p-5 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4" : "bg-[#FFFFFF] border border-[#ECECEC] rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4"}>
                   <div>
@@ -469,16 +470,14 @@ const MainAppContent: React.FC = () => {
                       {/* Dietary Filter Chip */}
                       {dietaryFilter !== 'All' && (
                         <span
-                          className={`inline-flex items-center gap-1.5 font-semibold px-2.5 py-1 rounded-xl shadow-2xs ${
-                            dietaryFilter === 'Veg'
+                          className={`inline-flex items-center gap-1.5 font-semibold px-2.5 py-1 rounded-xl shadow-2xs ${dietaryFilter === 'Veg'
                               ? 'bg-[#22C55E]/10 border border-[#22C55E]/30 text-[#22C55E]'
                               : 'bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#EF4444]'
-                          }`}
+                            }`}
                         >
                           <span
-                            className={`w-2 h-2 rounded-full ${
-                              dietaryFilter === 'Veg' ? 'bg-[#22C55E]' : 'bg-[#EF4444]'
-                            }`}
+                            className={`w-2 h-2 rounded-full ${dietaryFilter === 'Veg' ? 'bg-[#22C55E]' : 'bg-[#EF4444]'
+                              }`}
                           />
                           <span>{dietaryFilter} Only</span>
                           <button
@@ -578,28 +577,26 @@ const MainAppContent: React.FC = () => {
           setIsAiHubOpen(true);
         }}
       />
-      <AiVisionScannerModal
-        isOpen={isAiVisionOpen}
-        onClose={() => setIsAiVisionOpen(false)}
-        onBackToHub={() => {
-          setIsAiVisionOpen(false);
-          setIsAiHubOpen(true);
-        }}
-      />
       <AiHubModal
         isOpen={isAiHubOpen}
+        onSelectBuildMeal={() => setIsBuildMealOpen(true)}
         onClose={() => setIsAiHubOpen(false)}
         onSelectUsual={() => setIsAiUsualOpen(true)}
         onSelectSurprise={() => setIsAiSurpriseOpen(true)}
         onSelectMood={() => setIsAiMoodOpen(true)}
         onSelectNutrition={() => setIsAiNutritionOpen(true)}
-        onSelectVision={() => setIsAiVisionOpen(true)}
+
       />
       <MobileCategoryDrawer
         isOpen={isMobileCategoryDrawerOpen}
         onClose={() => setIsMobileCategoryDrawerOpen(false)}
         onOpenAiHub={() => setIsAiHubOpen(true)}
         onOpenHistory={() => setIsHistoryOpen(true)}
+      />
+      <BuildMealModal
+        isOpen={isBuildMealOpen}
+        onClose={() => setIsBuildMealOpen(false)}
+        itemsList={itemsList}
       />
       <Toast />
       <AdminNotificationToast />

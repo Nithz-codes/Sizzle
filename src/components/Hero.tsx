@@ -27,9 +27,10 @@ interface HeroProps {
   onOpenAiMood?: () => void;
   onOpenAiSurprise?: () => void;
   onOpenAiUsual?: () => void;
+  onOpenBuildMeal?: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onOpenAiHub, onOpenAiNutrition, onOpenAiMood, onOpenAiSurprise, onOpenAiUsual }) => {
+export const Hero: React.FC<HeroProps> = ({ onOpenAiHub, onOpenAiNutrition, onOpenAiMood, onOpenAiSurprise, onOpenAiUsual, onOpenBuildMeal }) => {
   const {
     searchQuery,
     setSearchQuery,
@@ -91,7 +92,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAiHub, onOpenAiNutrition, onOp
   return (
     <section className={isAdmin ? "bg-[#111827] border-b border-[#374151] text-[#F9FAFB] pt-6 pb-8 transition-all duration-300" : "bg-linear-to-b from-[#FFFDF8] via-[#FFFFFF] to-[#FFFDF8] border-b border-[#ECECEC] pt-6 pb-8 transition-all duration-300"}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        
+
         {/* Top Header / Branding Subtitle */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2">
           <div>
@@ -110,6 +111,39 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAiHub, onOpenAiNutrition, onOp
             {isAdmin ? 'MySQL Persistence Active • Full Administrative Privileges' : '52 fresh handcrafted dishes • Express preparation • Instant checkout'}
           </p>
         </div>
+
+        {/* Sizzle Intelligence Feature: Build My Meal Banner */}
+        {!isAdmin && onOpenBuildMeal && (
+          <div className="max-w-3xl mx-auto w-full p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50/50 border border-orange-200 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#E85D04] text-white flex items-center justify-center shrink-0 shadow-sm shadow-[#E85D04]/25">
+                <Sparkles className="w-5 h-5 text-amber-200" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-stone-900 font-['Poppins']">
+                    Build My Meal with Sizzle Intelligence
+                  </span>
+                  <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#E85D04]/10 text-[#E85D04] border border-[#E85D04]/25">
+                    Feature
+                  </span>
+                </div>
+                <p className="text-[11px] text-stone-600 mt-0.5">
+                  Ordering for a group or budget? Get an optimized basket matched to your party size, spice &amp; dietary preferences.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={onOpenBuildMeal}
+              className="w-full sm:w-auto bg-[#E85D04] hover:bg-[#C94B00] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm shadow-[#E85D04]/20 flex items-center justify-center gap-1.5 transition-all cursor-pointer hover:scale-102 shrink-0 active:scale-98"
+            >
+              <span>Build My Meal</span>
+              <Sparkles className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
 
         {/* Food-First Search Input Bar with Live Autocomplete */}
         <div className="relative max-w-3xl mx-auto w-full z-30">
@@ -220,14 +254,12 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAiHub, onOpenAiNutrition, onOp
 
                     <div className="absolute top-2.5 left-2.5 bg-white/95 backdrop-blur-md px-2 py-0.5 rounded-md border border-white/40 flex items-center gap-1 shadow-xs">
                       <div
-                        className={`w-3 h-3 border-2 flex items-center justify-center p-0.5 rounded-2xs ${
-                          dish.isVeg ? 'border-[#2E7D32]' : 'border-[#D32F2F]'
-                        }`}
+                        className={`w-3 h-3 border-2 flex items-center justify-center p-0.5 rounded-2xs ${dish.isVeg ? 'border-[#2E7D32]' : 'border-[#D32F2F]'
+                          }`}
                       >
                         <div
-                          className={`w-1 h-1 rounded-full ${
-                            dish.isVeg ? 'bg-[#2E7D32]' : 'bg-[#D32F2F]'
-                          }`}
+                          className={`w-1 h-1 rounded-full ${dish.isVeg ? 'bg-[#2E7D32]' : 'bg-[#D32F2F]'
+                            }`}
                         />
                       </div>
                       <span className="text-[10px] font-bold text-[#1E1E1E]">
@@ -286,11 +318,10 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAiHub, onOpenAiNutrition, onOp
                       ) : (
                         <button
                           onClick={() => handleAddFeaturedItem(dish)}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5 ${
-                            isJustAdded
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5 ${isJustAdded
                               ? 'bg-[#2E7D32] text-white'
                               : 'bg-[#E85D04] hover:bg-[#C94B00] text-white active:scale-95'
-                          }`}
+                            }`}
                         >
                           {isJustAdded ? (
                             <>
@@ -345,15 +376,14 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAiHub, onOpenAiNutrition, onOp
                 <button
                   key={option.id}
                   onClick={() => setCategoryFilter(option.id)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1 ${
-                    isSelected
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1 ${isSelected
                       ? isAdmin
                         ? 'bg-[#F97316] text-white shadow-md shadow-[#F97316]/20 ring-1 ring-[#F97316]'
                         : 'bg-[#E85D04] text-white shadow-xs shadow-[#E85D04]/25 scale-102 ring-1 ring-[#E85D04]'
                       : isAdmin
-                      ? 'bg-[#1E293B] text-[#D1D5DB] border border-[#374151] hover:border-[#F97316]/50 hover:bg-[#1F2937] hover:text-[#F9FAFB]'
-                      : 'bg-[#FFFFFF] text-[#1E1E1E] border border-[#ECECEC] hover:border-[#E85D04]/40 hover:bg-[#FFFDF8]'
-                  }`}
+                        ? 'bg-[#1E293B] text-[#D1D5DB] border border-[#374151] hover:border-[#F97316]/50 hover:bg-[#1F2937] hover:text-[#F9FAFB]'
+                        : 'bg-[#FFFFFF] text-[#1E1E1E] border border-[#ECECEC] hover:border-[#E85D04]/40 hover:bg-[#FFFDF8]'
+                    }`}
                 >
                   <span>{option.label}</span>
                 </button>
@@ -373,15 +403,14 @@ export const Hero: React.FC<HeroProps> = ({ onOpenAiHub, onOpenAiNutrition, onOp
                 <button
                   key={option.id}
                   onClick={() => setPriceFilter(option.id)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1 ${
-                    isSelected
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1 ${isSelected
                       ? isAdmin
                         ? 'bg-[#F97316] text-white shadow-md shadow-[#F97316]/20 ring-1 ring-[#F97316]'
                         : 'bg-[#1E1E1E] text-white shadow-xs scale-102 ring-1 ring-[#1E1E1E]'
                       : isAdmin
-                      ? 'bg-[#1E293B] text-[#D1D5DB] border border-[#374151] hover:border-[#F97316]/50 hover:bg-[#1F2937] hover:text-[#F9FAFB]'
-                      : 'bg-[#FFFFFF] text-[#1E1E1E] border border-[#ECECEC] hover:border-[#1E1E1E]/40 hover:bg-[#FFFDF8]'
-                  }`}
+                        ? 'bg-[#1E293B] text-[#D1D5DB] border border-[#374151] hover:border-[#F97316]/50 hover:bg-[#1F2937] hover:text-[#F9FAFB]'
+                        : 'bg-[#FFFFFF] text-[#1E1E1E] border border-[#ECECEC] hover:border-[#1E1E1E]/40 hover:bg-[#FFFDF8]'
+                    }`}
                 >
                   <span>{option.label}</span>
                 </button>

@@ -8,28 +8,26 @@ import {
   CloudRain,
   Dumbbell,
   ArrowRight,
-  Flame,
-  Camera,
 } from 'lucide-react';
 
 interface AiHubModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSelectBuildMeal?: () => void;
   onSelectUsual: () => void;
   onSelectSurprise: () => void;
   onSelectMood: () => void;
   onSelectNutrition: () => void;
-  onSelectVision: () => void;
 }
 
 export const AiHubModal: React.FC<AiHubModalProps> = ({
   isOpen,
   onClose,
+  onSelectBuildMeal,
   onSelectUsual,
   onSelectSurprise,
   onSelectMood,
   onSelectNutrition,
-  onSelectVision,
 }) => {
   const theme = MODAL_THEMES[MODAL_THEMES.active];
 
@@ -37,18 +35,19 @@ export const AiHubModal: React.FC<AiHubModalProps> = ({
 
   const aiFeatures = [
     {
-      id: 'vision',
-      title: ' Sizzle Vision AI Scanner',
-      subtitle: 'Multimodal Photo Inspector',
+      id: 'build-meal',
+      title: 'AI Meal & Basket Optimizer',
+      subtitle: 'Sizzle Intelligence Planner',
       description:
-        'Upload or snap a photo of any meal to instantly detect calories, protein, macros & order matching Sizzle dishes!',
-      icon: Camera,
-      gradient: 'from-emerald-600 to-teal-600',
-      badge: '📸 Photo Scanner',
-      badgeBg: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        'Tell us your party size, budget & dietary cravings. Sizzle Intelligence curates an optimal real-menu basket within your budget and prep time.',
+      icon: Sparkles,
+      gradient: 'from-orange-500 to-amber-600',
+      badge: 'Sizzle Intelligence',
+      badgeIcon: Sparkles,
+      badgeBg: 'bg-orange-50 text-[#E85D04] border-orange-200',
       action: () => {
         onClose();
-        onSelectVision();
+        if (onSelectBuildMeal) onSelectBuildMeal();
       },
     },
     {
@@ -59,7 +58,8 @@ export const AiHubModal: React.FC<AiHubModalProps> = ({
         'Instantly reorders your favorite dishes based on your order history and habitual dining time.',
       icon: Zap,
       gradient: 'from-red-500 to-rose-600',
-      badge: '⚡ 1-Tap Reorder',
+      badge: '1-Tap Reorder',
+      badgeIcon: Zap,
       badgeBg: 'bg-rose-50 text-rose-700 border-rose-200',
       action: () => {
         onClose();
@@ -74,7 +74,8 @@ export const AiHubModal: React.FC<AiHubModalProps> = ({
         'Unbox a 2-3 dish mystery meal bundle tailored to your budget and vibe with an instant 10% discount!',
       icon: Gift,
       gradient: 'from-emerald-500 to-teal-600',
-      badge: '🎁 10% OFF Deal',
+      badge: '10% OFF Deal',
+      badgeIcon: Gift,
       badgeBg: 'bg-emerald-50 text-emerald-700 border-emerald-200',
       action: () => {
         onClose();
@@ -89,7 +90,8 @@ export const AiHubModal: React.FC<AiHubModalProps> = ({
         'Curates meals matched to your current mood, weather, post-workout, or custom craving prompt.',
       icon: CloudRain,
       gradient: 'from-blue-600 to-cyan-600',
-      badge: '🌧️ Mood Matching',
+      badge: 'Mood Matching',
+      badgeIcon: CloudRain,
       badgeBg: 'bg-blue-50 text-blue-700 border-blue-200',
       action: () => {
         onClose();
@@ -104,7 +106,8 @@ export const AiHubModal: React.FC<AiHubModalProps> = ({
         'Builds meal combos matched to your exact target calories, protein, keto, or low-calorie goals.',
       icon: Dumbbell,
       gradient: 'from-purple-600 to-indigo-600',
-      badge: '🏋️ Macro Solver',
+      badge: 'Macro Solver',
+      badgeIcon: Dumbbell,
       badgeBg: 'bg-purple-50 text-purple-700 border-purple-200',
       action: () => {
         onClose();
@@ -137,10 +140,10 @@ export const AiHubModal: React.FC<AiHubModalProps> = ({
                   <span className="bg-[#E85D04]/20 text-[#E85D04] border border-[#E85D04]/40 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                     Sizzle AI Suite
                   </span>
-                  <span className={`text-xs ${theme.subtitleText}`}>Dual-Engine Powered</span>
+                  <span className={`text-xs ${theme.subtitleText}`}>Sizzle Intelligence</span>
                 </div>
                 <h2 className={`text-xl sm:text-2xl font-extrabold font-['Poppins'] mt-1 ${theme.titleText}`}>
-                  ✨ Sizzle AI Dining Studio
+                  Sizzle AI Dining Studio
                 </h2>
               </div>
             </div>
@@ -162,6 +165,7 @@ export const AiHubModal: React.FC<AiHubModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
             {aiFeatures.map((feat) => {
               const IconComponent = feat.icon;
+              const BadgeIconComponent = feat.badgeIcon;
               return (
                 <div
                   key={feat.id}
@@ -173,8 +177,9 @@ export const AiHubModal: React.FC<AiHubModalProps> = ({
                       <div className={`p-2.5 rounded-xl bg-gradient-to-r ${feat.gradient} text-white shadow-md group-hover:scale-110 transition-all`}>
                         <IconComponent className="w-5 h-5" />
                       </div>
-                      <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${feat.badgeBg}`}>
-                        {feat.badge}
+                      <span className={`inline-flex items-center gap-1.5 text-[10px] font-extrabold px-2.5 py-1 rounded-full border ${feat.badgeBg}`}>
+                        <BadgeIconComponent className="w-3 h-3 shrink-0" />
+                        <span>{feat.badge}</span>
                       </span>
                     </div>
 

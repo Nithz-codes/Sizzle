@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { ReceiptData, Reservation, CustomerRecord, RestaurantSettings, AdminNotification } from '../types';
 import { adminApi, orderApi } from '../services/api';
+import { MENU_ITEMS } from '../data/menuData';
 import { useAuth } from './AuthContext';
 
 export type AdminTab = 'dashboard' | 'kitchen' | 'inventory' | 'orders' | 'reservations' | 'customers' | 'reports' | 'settings' | 'menu';
@@ -358,19 +359,24 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             phoneNumber: ord.customerPhone || '',
             paymentMethod: (ord.paymentMethod === 'CARD' ? 'Card' : ord.paymentMethod === 'UPI' ? 'UPI' : 'Cash') as 'UPI' | 'Card' | 'Cash',
           },
-          items: (ord.items || []).map((item: any) => ({
-            foodItem: {
-              id: item.menuItemId || 1,
-              name: item.itemName || 'Menu Dish',
-              category: 'Main',
-              price: item.price || 0,
-              description: item.itemName || '',
-              image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500',
-              isVeg: true,
-            },
-            quantity: item.quantity || 1,
-            totalPrice: item.subtotal || (item.price || 0) * (item.quantity || 1),
-          })),
+          items: (ord.items || []).map((item: any) => {
+            const catalog = MENU_ITEMS.find(
+              (m) => m.id === item.menuItemId || m.name.toLowerCase() === (item.itemName || '').toLowerCase()
+            );
+            return {
+              foodItem: {
+                id: item.menuItemId || catalog?.id || 1,
+                name: item.itemName || catalog?.name || 'Menu Dish',
+                category: item.category || catalog?.category || 'Main',
+                price: item.price || catalog?.price || 0,
+                description: item.description || catalog?.description || item.itemName || '',
+                image: item.image || catalog?.image || 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80',
+                isVeg: item.isVeg !== undefined ? item.isVeg : (catalog?.isVeg ?? true),
+              },
+              quantity: item.quantity || 1,
+              totalPrice: item.subtotal || (item.price || 0) * (item.quantity || 1),
+            };
+          }),
           bill: {
             subtotal: ord.subtotal || 0,
             gst: ord.taxAmount || 0,

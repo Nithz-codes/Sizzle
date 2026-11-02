@@ -69,6 +69,24 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error("Access denied: You do not have permission to access this resource."));
     }
 
+    @ExceptionHandler(AIException.class)
+    public ResponseEntity<ApiResponse<com.sizzle.backend.dto.AIResponse>> handleAIException(AIException ex) {
+        com.sizzle.backend.dto.AIResponse fallbackResponse = com.sizzle.backend.dto.AIResponse.builder()
+                .status("FALLBACK")
+                .text(ex.getFallbackMessage())
+                .fallback(true)
+                .fallbackReason(ex.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<com.sizzle.backend.dto.AIResponse>builder()
+                        .success(false)
+                        .message("Sizzle Intelligence service notice: " + ex.getMessage())
+                        .data(fallbackResponse)
+                        .timestamp(java.time.LocalDateTime.now())
+                        .build());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGlobalException(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -1,5 +1,6 @@
-import React from 'react';
-import { X, Trash2, Plus, Minus, ArrowRight, ShoppingBag, Sparkles, AlertCircle, Percent } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Trash2, Plus, Minus, ArrowRight, ShoppingBag, Sparkles, AlertCircle, Percent, Clock } from 'lucide-react';
+import { intelligenceApi, WaitTimeData } from '../services/api';
 import { useCart } from '../context/CartContext';
 
 export const CartDrawer: React.FC = () => {
@@ -21,6 +22,42 @@ export const CartDrawer: React.FC = () => {
 
   const neededForDiscount = Math.max(0, 1000 - subtotal);
   const discountProgress = Math.min(100, (subtotal / 1000) * 100);
+
+  // Sizzle Intelligence Cart Wait Time State
+  const [cartWaitTime, setCartWaitTime] = useState<WaitTimeData | null>(null);
+  const [loadingWaitTime, setLoadingWaitTime] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      setCartWaitTime(null);
+      return;
+    }
+    const itemIds = cartItems.map((c) => c.foodItem.id);
+    let isMounted = true;
+    setLoadingWaitTime(true);
+
+    const timer = setTimeout(() => {
+      intelligenceApi
+        .getCartWaitTime(itemIds)
+        .then((data) => {
+          if (isMounted) {
+            setCartWaitTime(data);
+            setLoadingWaitTime(false);
+          }
+        })
+        .catch((err) => {
+          console.warn('Could not fetch cart wait time:', err);
+          if (isMounted) {
+            setLoadingWaitTime(false);
+          }
+        });
+    }, 300);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, [cartItems.map((c) => `${c.foodItem.id}:${c.quantity}`).join(',')]);
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -184,6 +221,31 @@ export const CartDrawer: React.FC = () => {
           {/* Footer Bill Calculations */}
           {cartItems.length > 0 && (
             <div className="p-4 sm:p-6 bg-[#FFFFFF] border-t border-[#ECECEC] space-y-3">
+              {/* Sizzle Intelligence Wait-Time Advisor Banner */}
+              {(loadingWaitTime || cartWaitTime) && (
+                <div className="rounded-xl p-3 bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50/50 border border-orange-200/70 text-xs">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 font-bold text-stone-800">
+                      <Sparkles className="w-3.5 h-3.5 text-[#E85D04]" />
+                      <span>Estimated Order Prep Time:</span>
+                    </div>
+                    {loadingWaitTime ? (
+                      <span className="w-12 h-4 bg-orange-200/50 animate-pulse rounded"></span>
+                    ) : (
+                      <div className="flex items-baseline gap-0.5">
+                        <span className="text-[11px] text-stone-500">~</span>
+                        <span className="font-extrabold text-[#E85D04] text-sm">{cartWaitTime?.estimatedMinutes}</span>
+                        <span className="text-[11px] font-bold text-stone-700">min</span>
+                      </div>
+                    )}
+                  </div>
+                  {!loadingWaitTime && cartWaitTime && (
+                    <p className="mt-1 text-[11px] text-stone-600 leading-snug">
+                      {cartWaitTime.generatedExplanation || cartWaitTime.reason}
+                    </p>
+                  )}
+                </div>
+              )}
               <div className="space-y-2 text-xs text-[#6B7280]">
                 <div className="flex justify-between">
                   <span>Subtotal</span>

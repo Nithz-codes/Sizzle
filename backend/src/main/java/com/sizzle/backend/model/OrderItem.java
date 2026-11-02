@@ -58,10 +58,22 @@ public class OrderItem {
     public BigDecimal getPrice() { return price; }
     public void setPrice(BigDecimal price) { this.price = price; }
 
+    @PrePersist
+    @PreUpdate
+    protected void calculateSubtotal() {
+        if (this.subtotal == null && this.price != null && this.quantity != null) {
+            this.subtotal = this.price.multiply(BigDecimal.valueOf(this.quantity));
+        }
+    }
+
     public Integer getQuantity() { return quantity; }
     public void setQuantity(Integer quantity) { this.quantity = quantity; }
 
-    public BigDecimal getSubtotal() { return subtotal; }
+    public BigDecimal getSubtotal() {
+        if (subtotal != null) return subtotal;
+        if (price != null && quantity != null) return price.multiply(BigDecimal.valueOf(quantity));
+        return BigDecimal.ZERO;
+    }
     public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
 
     public static OrderItemBuilder builder() {

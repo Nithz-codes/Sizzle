@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { getUsualFeast } from '../services/smartReorderEngine';
 
 import { MODAL_THEMES } from './AiNutritionModal';
-import { AiEngineToggle, AiEngineMode } from './AiEngineToggle';
 import {
   X,
   Zap,
@@ -30,7 +29,6 @@ export const AiUsualFeastModal: React.FC<AiUsualFeastModalProps> = ({ isOpen, on
   const theme = MODAL_THEMES[MODAL_THEMES.active];
 
   const [addedToCart, setAddedToCart] = useState<boolean>(false);
-  const [engineMode, setEngineMode] = useState<AiEngineMode>('LOCAL');
 
   const customerName = user?.name || 'Gourmet Diner';
 
@@ -110,14 +108,6 @@ export const AiUsualFeastModal: React.FC<AiUsualFeastModalProps> = ({ isOpen, on
                 AI One-Tap &quot;Usual Feast&quot;
               </h2>
             </div>
-          </div>
-
-          {/* Dual-Engine Mode Switcher Toggle */}
-          <div className="relative z-10">
-            <AiEngineToggle
-              mode={engineMode}
-              onModeChange={(m) => setEngineMode(m)}
-            />
           </div>
 
           {/* Personalization Banner */}

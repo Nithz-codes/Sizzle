@@ -21,6 +21,7 @@ import { FoodItem, DishReview } from '../types';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { getDishFullDetails, saveDishReview } from '../data/dishReviewsAndIngredients';
+import { intelligenceApi, WaitTimeData } from '../services/api';
 
 interface FoodDetailModalProps {
   item: FoodItem | null;
@@ -44,6 +45,39 @@ export const FoodDetailModal: React.FC<FoodDetailModalProps> = ({ item, isOpen, 
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [reviewComment, setReviewComment] = useState<string>('');
   const [likedReviews, setLikedReviews] = useState<Record<string, boolean>>({});
+
+  // Sizzle Intelligence Wait-Time Advisor State
+  const [waitTime, setWaitTime] = useState<WaitTimeData | null>(null);
+  const [loadingWaitTime, setLoadingWaitTime] = useState<boolean>(false);
+  const [showWaitBreakdown, setShowWaitBreakdown] = useState<boolean>(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (isOpen && item?.id) {
+      setLoadingWaitTime(true);
+      setShowWaitBreakdown(false);
+      intelligenceApi
+        .getWaitTime(item.id)
+        .then((data) => {
+          if (isMounted) {
+            setWaitTime(data);
+            setLoadingWaitTime(false);
+          }
+        })
+        .catch((err) => {
+          console.warn('Could not fetch wait time estimate:', err);
+          if (isMounted) {
+            setWaitTime(null);
+            setLoadingWaitTime(false);
+          }
+        });
+    } else {
+      setWaitTime(null);
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [isOpen, item?.id]);
 
   // Reset state when opening a new dish
   useEffect(() => {
@@ -239,6 +273,88 @@ export const FoodDetailModal: React.FC<FoodDetailModalProps> = ({ item, isOpen, 
               {item.description}
             </p>
           </div>
+
+          {/* Sizzle Intelligence Wait-Time Advisor */}
+          {(loadingWaitTime || waitTime) && (
+            <div className="rounded-2xl p-4 bg-gradient-to-r from-orange-50 via-amber-50 to-stone-50 border border-orange-200/80 shadow-xs transition-all">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="p-1.5 rounded-lg bg-[#E85D04] text-white shadow-2xs">
+                    <Sparkles className="w-3.5 h-3.5" />
+                  </span>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-stone-800 tracking-tight">Sizzle Intelligence</span>
+                      {waitTime && (
+                        <span
+                          className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                            waitTime.confidence === 'HIGH'
+                              ? 'bg-emerald-100 text-emerald-700'
+                              : waitTime.confidence === 'MEDIUM'
+                              ? 'bg-amber-100 text-amber-700'
+                              : 'bg-stone-100 text-stone-600'
+                          }`}
+                        >
+                          {waitTime.confidence} Confidence
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[11px] text-stone-500">Live Kitchen Wait-Time Estimate</span>
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  {loadingWaitTime ? (
+                    <div className="h-6 w-16 bg-orange-200/50 animate-pulse rounded-md"></div>
+                  ) : (
+                    <div className="flex items-baseline gap-1 justify-end">
+                      <span className="text-xs font-medium text-stone-500">~</span>
+                      <span className="text-xl font-extrabold text-[#E85D04]">{waitTime?.estimatedMinutes}</span>
+                      <span className="text-xs font-bold text-stone-700">min</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {!loadingWaitTime && waitTime && (
+                <div className="mt-3 pt-2.5 border-t border-orange-200/50">
+                  <p className="text-xs text-stone-700 leading-snug">
+                    {waitTime.generatedExplanation || waitTime.reason}
+                  </p>
+
+                  {/* Toggle Breakdown */}
+                  {waitTime.baseMinutes !== undefined && (
+                    <div className="mt-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowWaitBreakdown(!showWaitBreakdown)}
+                        className="text-[11px] font-semibold text-[#E85D04] hover:underline flex items-center gap-1 cursor-pointer"
+                      >
+                        {showWaitBreakdown ? 'Hide calculation breakdown' : 'Why this time?'}
+                      </button>
+
+                      {showWaitBreakdown && (
+                        <div className="mt-2 grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-white/80 border border-orange-100 text-[11px]">
+                          <div>
+                            <span className="text-stone-400 block text-[10px]">Dish Base</span>
+                            <span className="font-bold text-stone-800">{waitTime.baseMinutes}m</span>
+                          </div>
+                          <div>
+                            <span className="text-stone-400 block text-[10px]">Queue ({waitTime.activeKitchenOrders} active)</span>
+                            <span className="font-bold text-stone-800">+{waitTime.queueLoadMinutes}m</span>
+                          </div>
+                          <div>
+                            <span className="text-stone-400 block text-[10px]">Complexity</span>
+                            <span className="font-bold text-stone-800">+{waitTime.complexityMinutes}m</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Macro Nutrition Pills Row */}
           {(item.calories || item.protein) && (

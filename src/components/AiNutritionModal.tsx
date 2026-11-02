@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { buildMacroMeal, getItemMacros } from '../services/macroAiBuilder';
-import { generateGeminiMacroMeal } from '../services/geminiAiService';
+
 import { FitnessPreset, FoodItem, MacroMealResponse } from '../types';
 import { MENU_ITEMS } from '../data/menuData';
-import { AiEngineToggle, AiEngineMode } from './AiEngineToggle';
+
 import {
   X,
   Sparkles,
@@ -91,11 +91,6 @@ export const AiNutritionModal: React.FC<AiNutritionModalProps> = ({ isOpen, onCl
   const [activeComboIndex, setActiveComboIndex] = useState<number>(0);
   const [addedToCart, setAddedToCart] = useState<boolean>(false);
 
-  // Dual-Engine AI Mode State
-  const [engineMode, setEngineMode] = useState<AiEngineMode>('LOCAL');
-  const [geminiMealState, setGeminiMealState] = useState<MacroMealResponse | null>(null);
-  const [isGeminiLoading, setIsGeminiLoading] = useState<boolean>(false);
-
   const currentMenuItemsList: FoodItem[] = useMemo(() => {
     const windowList = (window as any).sizzleMenuItems || [];
     return windowList.length >= 20 ? windowList : MENU_ITEMS;
@@ -112,25 +107,7 @@ export const AiNutritionModal: React.FC<AiNutritionModalProps> = ({ isOpen, onCl
       currentMenuItemsList
     );
   }, [targetCalories, minProtein, dietaryFilter, preset, currentMenuItemsList]);
-
-  // Effect to trigger Gemini API when engineMode === 'GEMINI'
-  useEffect(() => {
-    if (engineMode === 'GEMINI') {
-      setIsGeminiLoading(true);
-      generateGeminiMacroMeal({ targetCalories, minProtein, dietaryFilter, preset })
-        .then((res) => {
-          setGeminiMealState(res);
-          setIsGeminiLoading(false);
-        })
-        .catch(() => {
-          setIsGeminiLoading(false);
-        });
-    } else {
-      setGeminiMealState(null);
-    }
-  }, [engineMode, targetCalories, minProtein, dietaryFilter, preset]);
-
-  const generatedMeal = engineMode === 'GEMINI' && geminiMealState ? geminiMealState : localMeal;
+  const generatedMeal = localMeal;
 
   const currentCombo = useMemo(() => {
     if (generatedMeal.topCombos && generatedMeal.topCombos[activeComboIndex]) {
@@ -239,14 +216,6 @@ export const AiNutritionModal: React.FC<AiNutritionModalProps> = ({ isOpen, onCl
               </h2>
             </div>
           </div>
-
-        {/* Dual-Engine Mode Switcher Toggle */}
-        <div className="relative z-10">
-          <AiEngineToggle
-            mode={engineMode}
-            onModeChange={(m) => setEngineMode(m)}
-          />
-        </div>
 
         <div className="space-y-3 relative z-10">
           <label className={`text-xs font-extrabold uppercase tracking-wider block ${theme.labelTitle}`}>
