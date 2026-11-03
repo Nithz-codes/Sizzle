@@ -31,6 +31,7 @@
 | **3. Operational Blind Spots in Sales & Peak Hours** | Manually compiling register paper chits or viewing flat weekly sales spreadsheets hours or days late. | **Restaurant Pulse Analytics & Infographics** (`/api/intelligence/restaurant-pulse`). | Analyzes valid order records, computes Average Order Value (AOV), top revenue anchors, underperforming items, 24-hour demand histograms, and inventory stockout risks. | Executive summary generated in sub-second time with 4 actionable operational recommendations for kitchen prep and staffing. |
 | **4. High Risk in Menu Pricing & Item Changes** | Managers launch new dishes or run discounts blindly, discovering revenue cannibalization or margin erosion after weeks of losses. | **Restaurant What-If Copilot** (`/api/intelligence/what-if`). | Simulation engine with distinct modeling archetypes (Discount elasticity, Volume surges, Menu item deletions, and **New Dish Pre-Launch Zero Baseline modeling**). | Allows managers to test business assumptions before spending on inventory or marketing; strictly shows 0 orders baseline for unreleased dishes. |
 | **5. Nutritional Tracking & Dietary Blindness** | Generic web searches or third-party fitness apps detached from the restaurant's actual recipes. | **AI Nutrition & Macro Profiler** (`AiNutritionModal.tsx`, `macroAiBuilder.ts`). | Integrates verified nutritional database ([`sizzleNutritionalDatabase.json`](file:///d:/Sizzle/Sizzle/src/data/sizzleNutritionalDatabase.json)) with macro balancing algorithms. | Health-conscious diners can optimize meals for protein, carbs, calories, and fats directly from real restaurant dishes. |
+| **6. Unpredictable Kitchen Wait Times & Queue Blindness** | Static rule-of-thumb numbers (e.g. printed "20 mins for all dishes") or verbal estimates by waitstaff. | **AI Smart Preparation & Wait-Time Advisor** (`/api/intelligence/wait-time/{id}` and `/cart`). | Evaluates dish base prep + recipe complexity factor + active live kitchen queue (PENDING & PREPARING orders in MySQL) + multi-item buffer with LLM explanation. | Eliminates customer friction caused by unexpected dining delays; aligns delivery expectations with factual kitchen queue load. |
 
 ---
 
@@ -102,6 +103,25 @@
 - **7. Output:** `WhatIfResponse` (`currentState`, `projectedState`, `impact` [revenue, orders, risk], `assumptions`, `recommendation`).
 - **8. Frontend UI:** [`WhatIfCopilotPanel.tsx`](file:///d:/Sizzle/Sizzle/src/components/admin/WhatIfCopilotPanel.tsx) with scenario badges, transparent assumptions box, and risk assessment alerts.
 - **9. Verification:** Fully verified with unit tests `simulateScenario_DiscountCalculation_Success` and `simulateScenario_NewItemIntroduction_ZeroHistoricalActuals`.
+
+---
+
+### Feature 5: AI Smart Preparation & Wait-Time Advisor (KDS Integration)
+- **1. Real-World Problem:** Static wait times deceive customers when the kitchen is overwhelmed, leading to order cancellations and poor dining sentiment.
+- **2. Existing Approach:** Waitstaff guess 15–20 minutes regardless of how many orders are ahead.
+- **3. Limitation:** Does not factor in active prep station saturation, dish complexity (e.g. baking raw pizza vs. scooping ice cream), or multi-order cart combinations.
+- **4. Proposed AI Solution:** A live calculation combining base prep time, recipe complexity weight, real-time database queries of active pending tickets (`PENDING`, `PREPARING`), and multi-item line buffers, explained via LLM.
+- **5. Technical Implementation:** 
+  - **Backend Controller:** [`IntelligenceController.java`](file:///d:/Sizzle/Sizzle/backend/src/main/java/com/sizzle/backend/controller/IntelligenceController.java) (`GET /api/intelligence/wait-time/{menuItemId}`, `POST /api/intelligence/wait-time/cart`).
+  - **Backend Service:** [`AIServiceImpl.java`](file:///d:/Sizzle/Sizzle/backend/src/main/java/com/sizzle/backend/service/impl/AIServiceImpl.java) (`getWaitTimeEstimate`, `calculatePrepTimeForItems`).
+  - **Formula:**
+    $$\text{WaitTime} = \max\left(5,\; \text{BasePrep} + \text{QueueLoad}(\text{ActiveOrders}) + \text{Complexity} + \text{MultiDishBuffer}\right)$$
+  - **Prompt / AI Layer:** When Gemini is active, `generateCustomerExplanation` produces an empathetic explanation. If API is offline or quota-limited, it falls back to a deterministic explanation string.
+- **6. Input:** `menuItemId` or list of cart IDs `[1, 5, 12]`.
+- **7. Processing:** Queries `MenuItem` table for `prepTime`, `spicyLevel`, `category`, and counts `orderRepository.countByOrderStatusIn(PENDING, PREPARING)`.
+- **8. Output:** `WaitTimeResponse` JSON (`estimatedMinutes`, `basePrepMinutes`, `queueLoadMinutes`, `activeOrdersInKitchen`, `kitchenStatus`, `confidence`, `explanation`).
+- **9. Frontend UI:** Live badge in [`FoodDetailModal.tsx`](file:///d:/Sizzle/Sizzle/src/components/FoodDetailModal.tsx) and live cart summary in [`CartDrawer.tsx`](file:///d:/Sizzle/Sizzle/src/components/CartDrawer.tsx).
+- **10. Verification:** Fully implemented and covered by unit test `testCartWaitTimeAdvisor` in `SizzleIntelligenceTest.java`.
 
 ---
 
@@ -204,7 +224,7 @@ flowchart TD
 ### Slide 4: Objectives of the Project
 - **Primary Objective:** Build a secure, decoupled full-stack platform for end-to-end restaurant management, kitchen order dispatch, and predictive analytics.
 - **Functional Objectives:** Complete user authentication (JWT), dynamic category menu browsing, cart management with tax calculation, KDS lifecycle tracking, and inventory threshold monitoring.
-- **AI-Related Objectives:** Implement task-specialized AI services (AI Mood & Occasion Curator, Meal & Basket Optimizer, Restaurant Pulse Analytics, What-If Copilot) with 100% offline deterministic fallbacks.
+- **AI-Related Objectives:** Implement task-specialized AI services (AI Mood & Occasion Curator, Meal & Basket Optimizer, Restaurant Pulse Analytics, What-If Copilot, and Smart Preparation & Wait-Time Advisor) with 100% offline deterministic fallbacks.
 - **Engineering Quality Objectives:** Strict type safety (TypeScript + Java strict compilation), zero hallucination of database IDs, sub-second response times, and comprehensive unit test coverage.
 
 ### Slide 5: Academic Project Profile
@@ -482,6 +502,11 @@ During the practical examination, demonstrate the following sequential views:
 
 #### Q6: How does the AI Mood & Occasion Curator work in Sizzle?
 **Answer:** The AI Mood & Occasion Curator addresses diner decision fatigue by mapping psychological dining contexts (such as Rainy Day Comfort, Post-Workout Fuel, Movie Night, Romantic Dinner) or freeform natural language prompts into complete, harmonious culinary feasts. The curator resolves authentic menu items from the catalog, computes exact calorie and protein totals by querying the verified Sizzle nutritional database, and generates itemized combos with chef recommendations. Diners can add an entire balanced feast directly into their cart with a single click.
+
+#### Q6b: How does the AI Smart Preparation & Wait-Time Advisor (KDS Integration) calculate preparation time?
+**Answer:** It uses an additive operational formula:
+$$\text{Estimated Time} = \max\left(5,\; \text{BasePrep} + \text{QueueLoad}(\text{ActiveOrders}) + \text{Complexity} + \text{MultiDishBuffer}\right)$$
+Base prep time comes from the catalog. Queue load is computed by querying active `PENDING` and `PREPARING` tickets in the kitchen via MySQL. Recipe complexity adds buffer minutes for intricate dishes, and multiple items in a cart add an interleaving buffer. Gemini then wraps this calculation in an empathetic explanation for the diner.
 
 #### Q7: In the What-If Copilot, what happens when a user asks about adding a new dish?
 **Answer:** Naive systems mistakenly use the entire restaurant's past revenue as the baseline. Sizzle's What-If engine classifies queries like *"What if I add a new item in menu?"* as `NEW_ITEM_INTRODUCTION`. It strictly sets the historical baseline to **0 orders and ₹0.00 revenue**, because an unreleased dish has zero historical orders. It then models trial adoption (15%–20% of regular customer footfall) and potential category cannibalization.
