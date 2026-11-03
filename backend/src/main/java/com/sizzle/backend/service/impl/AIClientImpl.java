@@ -178,8 +178,10 @@ public class AIClientImpl implements AIClient {
     private boolean isValidKey(String key) {
         return key != null &&
                 !key.isBlank() &&
-                key.trim().startsWith("AIza") &&
-                key.trim().length() > 20;
+                !key.equalsIgnoreCase("MY_GEMINI_API_KEY") &&
+                !key.equalsIgnoreCase("your-api-key-here") &&
+                !key.contains("AQ.A") &&
+                key.trim().length() > 5;
     }
 
     private List<Path> getCandidateEnvPaths() {

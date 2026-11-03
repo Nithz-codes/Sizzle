@@ -749,6 +749,9 @@ public class AIServiceImpl implements AIService {
         }
 
         List<Order> allOrders = orderRepository.findAllByOrderByCreatedAtDesc();
+        if (allOrders == null || allOrders.isEmpty()) {
+            allOrders = orderRepository.findByCreatedAtAfterOrderByCreatedAtDesc(since != null ? since : LocalDateTime.MIN);
+        }
         final LocalDateTime fSince = since;
         final LocalDateTime fUntil = until;
 
@@ -860,11 +863,33 @@ public class AIServiceImpl implements AIService {
             quantityShareLeader = String.format("%s (%.1f%%)", qTop.getCategoryName(), qTop.getQuantityShare());
         }
 
+        Map<String, Long> dishQtyMap = new HashMap<>();
+        for (Order o : validOrders) {
+            if (o.getItems() == null) continue;
+            for (OrderItem item : o.getItems()) {
+                String name = item.getItemName();
+                if (name == null && item.getMenuItem() != null) {
+                    name = item.getMenuItem().getName();
+                }
+                if (name == null || name.isBlank()) continue;
+                long qty = item.getQuantity() != null ? item.getQuantity() : 1L;
+                dishQtyMap.merge(name, qty, Long::sum);
+            }
+        }
+
         String topItem = "None";
         long topQty = 0;
-        if (!topPerformingDishes.isEmpty()) {
+        if (topPerformingDishes != null && !topPerformingDishes.isEmpty()) {
             topItem = topPerformingDishes.get(0).getDishName();
             topQty = topPerformingDishes.get(0).getQuantitySold();
+        } else if (!dishQtyMap.isEmpty()) {
+            Map.Entry<String, Long> topEntry = dishQtyMap.entrySet().stream()
+                    .max(Map.Entry.comparingByValue())
+                    .orElse(null);
+            if (topEntry != null) {
+                topItem = topEntry.getKey();
+                topQty = topEntry.getValue();
+            }
         }
 
         String leastItem = "None";
@@ -1187,7 +1212,7 @@ public class AIServiceImpl implements AIService {
                 .summary(summary)
                 .insights(insights)
                 .recommendations(recommendations)
-                .source("DETERMINISTIC_ANALYTICS")
+                .source("DETERMINISTIC_FALLBACK")
                 .build();
     }
 
