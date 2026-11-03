@@ -26,7 +26,7 @@
 
 | Real-World Restaurant Problem | Traditional Industry Approach | Sizzle's Verified Implementation | AI & Algorithmic Contribution | Measured / Practical Benefit |
 |---|---|---|---|---|
-| **1. Unpredictable Kitchen Wait Times** | Static rule-of-thumb numbers (e.g. printed "20 mins for all dishes") or verbal estimates by waiters. | **Dynamic Kitchen Telemetry Engine** (`/api/intelligence/wait-time/{id}` and `/cart`). | Evaluates dish base prep + recipe complexity factor + active live kitchen queue (PENDING & PREPARING orders in MySQL) + multi-item buffer. Gemini generates friendly context. | Eliminates customer friction caused by unexpected dining delays; aligns delivery expectations with factual kitchen queue load. |
+| **1. Dining Indecision & Context-Blind Menus** | Static paper or PDF menus displaying 50+ isolated items without considering the diner's emotional mood, time of day, or dining occasion. | **AI Mood & Occasion Curator** (`AiMoodCuratorModal.tsx`, `moodAiCurator.ts`). | Evaluates customer emotional context (Rainy Day, Post-Workout, Late-Night Binge, Movie Night, Romantic Dinner) and freeform natural language prompts to curate balanced, multi-dish culinary combos with chef quotes, calorie/protein totals, and single-click cart ordering. | Eliminates decision paralysis; elevates dining satisfaction through context-driven flavor pairings; boosts restaurant average ticket value. |
 | **2. Budget & Dietary Group Ordering Friction** | Customers manually browse 50+ items on a PDF menu, calculate prices on phone calculators, and negotiate mixed dietary needs. | **AI Meal & Basket Optimizer** (`/api/intelligence/optimize-meal`). | Multi-constraint Knapsack Solver combined with Gemini JSON planner. Enforces budget bounds, guest count, strict veg/non-veg splits, and spice ratings. | Customers configure a group meal in seconds without manual arithmetic; guarantees orders stay strictly within budget. |
 | **3. Operational Blind Spots in Sales & Peak Hours** | Manually compiling register paper chits or viewing flat weekly sales spreadsheets hours or days late. | **Restaurant Pulse Analytics & Infographics** (`/api/intelligence/restaurant-pulse`). | Analyzes valid order records, computes Average Order Value (AOV), top revenue anchors, underperforming items, 24-hour demand histograms, and inventory stockout risks. | Executive summary generated in sub-second time with 4 actionable operational recommendations for kitchen prep and staffing. |
 | **4. High Risk in Menu Pricing & Item Changes** | Managers launch new dishes or run discounts blindly, discovering revenue cannibalization or margin erosion after weeks of losses. | **Restaurant What-If Copilot** (`/api/intelligence/what-if`). | Simulation engine with distinct modeling archetypes (Discount elasticity, Volume surges, Menu item deletions, and **New Dish Pre-Launch Zero Baseline modeling**). | Allows managers to test business assumptions before spending on inventory or marketing; strictly shows 0 orders baseline for unreleased dishes. |
@@ -36,22 +36,21 @@
 
 # PART C — COMPLETE AI FEATURE INVESTIGATION
 
-### Feature 1: AI Smart Preparation & Wait-Time Advisor
-- **1. Real-World Problem:** Static wait times deceive customers when the kitchen is overwhelmed, leading to order cancellations and poor dining sentiment.
-- **2. Existing Approach:** Waitstaff guess 15–20 minutes regardless of how many orders are ahead.
-- **3. Limitation:** Does not factor in active prep station saturation, dish complexity (e.g. baking raw pizza vs. scooping ice cream), or multi-order cart combinations.
-- **4. Proposed AI Solution:** A live calculation combining base prep time, recipe complexity weight, real-time database queries of active pending tickets (`PENDING`, `PREPARING`), and multi-item line buffers, explained via LLM.
-- **5. Technical Implementation:** 
-  - **Backend Controller:** [`IntelligenceController.java`](file:///d:/Sizzle/Sizzle/backend/src/main/java/com/sizzle/backend/controller/IntelligenceController.java) (`GET /api/intelligence/wait-time/{menuItemId}`, `POST /api/intelligence/wait-time/cart`).
-  - **Backend Service:** [`AIServiceImpl.java`](file:///d:/Sizzle/Sizzle/backend/src/main/java/com/sizzle/backend/service/impl/AIServiceImpl.java) (`getWaitTimeEstimate`, `calculatePrepTimeForItems`).
-  - **Formula:**
-    $$\text{WaitTime} = \max\left(5,\; \text{BasePrep} + \text{QueueLoad}(\text{ActiveOrders}) + \text{Complexity} + \text{MultiDishBuffer}\right)$$
-  - **Prompt / AI Layer:** When Gemini is active, `generateCustomerExplanation` produces an empathetic explanation. If API is offline or quota-limited, it falls back to a deterministic explanation string.
-- **6. Input:** `menuItemId` or list of cart IDs `[1, 5, 12]`.
-- **7. Processing:** Queries `MenuItem` table for `prepTime`, `spicyLevel`, `category`, and counts `orderRepository.countByOrderStatusIn(PENDING, PREPARING)`.
-- **8. Output:** `WaitTimeResponse` JSON (`estimatedMinutes`, `basePrepMinutes`, `queueLoadMinutes`, `activeOrdersInKitchen`, `kitchenStatus`, `confidence`, `explanation`).
-- **9. Frontend UI:** Live badge in [`FoodDetailModal.tsx`](file:///d:/Sizzle/Sizzle/src/components/FoodDetailModal.tsx) and live cart summary in [`CartDrawer.tsx`](file:///d:/Sizzle/Sizzle/src/components/CartDrawer.tsx).
-- **10. Verification:** Fully implemented and covered by unit test `testCartWaitTimeAdvisor` in `SizzleIntelligenceTest.java`.
+### Feature 1: AI Mood & Occasion Curator
+- **1. Real-World Problem:** Diners frequently experience choice overload and decision paralysis when presented with extensive static menus. Traditional menus fail to adapt to how a guest feels (stressed, celebrating, exhausted after a gym session, or craving warmth during a rainstorm).
+- **2. Existing Approach:** Customers spend 10–15 minutes scrolling through disparate menu sections (soups, starters, mains, breads, beverages) attempting to assemble a cohesive meal manually.
+- **3. Limitation:** High drop-off rate, repetitive ordering of familiar basic items, poor flavor pairings, and missed opportunities for complementary side dishes and beverages.
+- **4. Proposed AI Solution:** An intelligent conversational and mood-driven curator that translates emotional vibes and freeform natural language requests (e.g., *"hot cheesy comfort food"* or *"high-protein post-workout fuel"*) into curated multi-dish feasts with automated calorie, protein, and pricing rollups.
+- **5. Technical Implementation:**
+  - **Frontend Component:** [`AiMoodCuratorModal.tsx`](file:///d:/Sizzle/Sizzle/src/components/AiMoodCuratorModal.tsx) featuring responsive vibe chips, custom natural language input, option rank badges (`🥇 AI Chef Special`, `🥈 Flavor Match`, `🥉 Express Pair`), and instant `addItem` cart injection.
+  - **Engine & Service:** [`moodAiCurator.ts`](file:///d:/Sizzle/Sizzle/src/services/moodAiCurator.ts) (`curateMoodFeast`, `buildCombo`).
+  - **Nutritional Integration:** Bridges directly with [`macroAiBuilder.ts`](file:///d:/Sizzle/Sizzle/src/services/macroAiBuilder.ts) and [`sizzleNutritionalDatabase.json`](file:///d:/Sizzle/Sizzle/src/data/sizzleNutritionalDatabase.json) to dynamically calculate `totalCalories`, `totalProtein`, and `totalPrice` across each combo.
+  - **Heuristic Flavor & Vibe Mapping:** Maps emotional archetypes (`RAINY_DAY`, `POST_WORKOUT`, `MOVIE_NIGHT`, `ROMANTIC_DATE`, `LATE_NIGHT_BINGE`, `EXAM_FOCUS`, `CELEBRATION`) to verified harmonious dishes from [`menuData.ts`](file:///d:/Sizzle/Sizzle/src/data/menuData.ts).
+- **6. Input:** Mood occasion enum or custom prompt string (e.g. `"I want hot spicy chicken biryani with gravy"`).
+- **7. Processing:** Matches flavor profiles, resolves authentic menu IDs, retrieves verified caloric and protein attributes from the Sizzle nutritional layer, aggregates line totals, and crafts personalized culinary endorsements.
+- **8. Output:** `MoodFeastResponse` containing headline, categorized combos with itemized dishes, nutritional summaries, and chef quotes.
+- **9. Frontend UI:** Interactive modal accessible from the Header and AI Hub (`AiMoodCuratorModal.tsx`) with 1-click "Add Feast to Cart" interaction.
+- **10. Verification:** Fully implemented in active production code, client-tested across preset moods and freeform inputs with real-time cart state synchronization.
 
 ---
 
@@ -205,7 +204,7 @@ flowchart TD
 ### Slide 4: Objectives of the Project
 - **Primary Objective:** Build a secure, decoupled full-stack platform for end-to-end restaurant management, kitchen order dispatch, and predictive analytics.
 - **Functional Objectives:** Complete user authentication (JWT), dynamic category menu browsing, cart management with tax calculation, KDS lifecycle tracking, and inventory threshold monitoring.
-- **AI-Related Objectives:** Implement task-specialized AI services (Wait-Time Advisor, Meal & Basket Optimizer, Restaurant Pulse Analytics, What-If Copilot) with 100% offline deterministic fallbacks.
+- **AI-Related Objectives:** Implement task-specialized AI services (AI Mood & Occasion Curator, Meal & Basket Optimizer, Restaurant Pulse Analytics, What-If Copilot) with 100% offline deterministic fallbacks.
 - **Engineering Quality Objectives:** Strict type safety (TypeScript + Java strict compilation), zero hallucination of database IDs, sub-second response times, and comprehensive unit test coverage.
 
 ### Slide 5: Academic Project Profile
@@ -262,7 +261,7 @@ flowchart TD
 - **Execution Result:** Maven Surefire reports `15 Tests Run, 0 Failures, 0 Errors, 0 Skipped` (BUILD SUCCESS in 1.76s).
 
 ### Slide 13: Project Demonstration & Interface Flow
-- **Flow 1 (Diner Journey):** Browse Menu &rarr; Inspect dish & view dynamic prep time &rarr; Open "Build My Ideal Meal" modal & set ₹700 budget &rarr; Add AI-optimized basket to cart &rarr; Checkout.
+- **Flow 1 (Diner Journey):** Browse Menu &rarr; Launch AI Mood & Occasion Curator & select "Rainy Day Warmth" or enter custom craving &rarr; Review chef-curated combos with macros &rarr; Add curated feast to cart &rarr; Checkout.
 - **Flow 2 (Chef KDS Journey):** View active pending orders in Kitchen Display System &rarr; Advance status to "PREPARING" &rarr; Observe live wait times update across all diner clients.
 - **Flow 3 (Manager Intelligence Journey):** Open Admin Command Center &rarr; Review Executive Pulse Summary &rarr; Explore interactive Category Mix and Hourly Pace infographics &rarr; Launch What-If Copilot simulation.
 
@@ -481,10 +480,8 @@ During the practical examination, demonstrate the following sequential views:
 #### Q5: How is your database designed to handle order history if dish prices change later?
 **Answer:** We implemented historical snapshotting in our `OrderItem` entity. `OrderItem` contains its own `itemName` (`VARCHAR(150)`) and `price` (`DECIMAL(10,2)`) fields alongside the foreign key reference to `MenuItem`. When an order is placed, the price at that exact moment is persisted to the order item. Even if a restaurant manager later updates the dish's price in `menu_items`, historical accounting and receipts remain 100% accurate.
 
-#### Q6: How does the AI Smart Preparation & Wait-Time Advisor calculate preparation time?
-**Answer:** It uses an additive operational formula:
-$$\text{Estimated Time} = \max\left(5,\; \text{BasePrep} + \text{QueueLoad}(\text{ActiveOrders}) + \text{Complexity} + \text{MultiDishBuffer}\right)$$
-Base prep time comes from the catalog. Queue load is computed by querying active `PENDING` and `PREPARING` tickets in the kitchen. Recipe complexity adds buffer minutes for intricate dishes, and multiple items in a cart add an interleaving buffer. Gemini then wraps this calculation in an empathetic explanation for the diner.
+#### Q6: How does the AI Mood & Occasion Curator work in Sizzle?
+**Answer:** The AI Mood & Occasion Curator addresses diner decision fatigue by mapping psychological dining contexts (such as Rainy Day Comfort, Post-Workout Fuel, Movie Night, Romantic Dinner) or freeform natural language prompts into complete, harmonious culinary feasts. The curator resolves authentic menu items from the catalog, computes exact calorie and protein totals by querying the verified Sizzle nutritional database, and generates itemized combos with chef recommendations. Diners can add an entire balanced feast directly into their cart with a single click.
 
 #### Q7: In the What-If Copilot, what happens when a user asks about adding a new dish?
 **Answer:** Naive systems mistakenly use the entire restaurant's past revenue as the baseline. Sizzle's What-If engine classifies queries like *"What if I add a new item in menu?"* as `NEW_ITEM_INTRODUCTION`. It strictly sets the historical baseline to **0 orders and ₹0.00 revenue**, because an unreleased dish has zero historical orders. It then models trial adoption (15%–20% of regular customer footfall) and potential category cannibalization.
@@ -542,3 +539,4 @@ In our What-If simulation engine for discounts, we use a calibrated restaurant i
 1. Provision cloud infrastructure using containerization (Docker & Kubernetes) with an automated CI/CD pipeline.
 2. Complete live webhook integration with payment aggregators (Razorpay / Stripe) to support automated refunds and digital chargebacks.
 3. Add multi-restaurant tenant isolation to license Sizzle as a SaaS platform for multiple dining establishments.
+
