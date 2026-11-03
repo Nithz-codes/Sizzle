@@ -57,7 +57,9 @@ export interface BillSummary {
 }
 
 export interface ReceiptData {
+  id?: number;
   billNumber: number;
+  orderNumber?: string;
   dateTime: string;
   customer: Customer;
   items: CartItem[];
@@ -67,6 +69,8 @@ export interface ReceiptData {
   transactionId?: string;
   tableNumber?: string;
   orderNotes?: string;
+  estimatedMinutes?: number;
+  preparationStartedAt?: number;
   updatedAt?: string;
 }
 

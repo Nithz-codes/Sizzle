@@ -604,6 +604,19 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     // Fire backend update if target order has numeric backend id or bill number
     const orderIdToUpdate = targetOrder && (targetOrder as any).id ? (targetOrder as any).id : billNumber;
+
+    // Broadcast status update event for real-time customer KDS sync
+    window.dispatchEvent(new CustomEvent('sizzle_order_status_updated', {
+      detail: { billNumber, orderId: orderIdToUpdate, status, updatedAt: new Date().toISOString() }
+    }));
+    try {
+      localStorage.setItem('sizzle_last_status_update', JSON.stringify({
+        billNumber,
+        orderId: orderIdToUpdate,
+        status,
+        timestamp: Date.now()
+      }));
+    } catch {}
     orderApi.updateOrderStatus(orderIdToUpdate, status).catch((err) => {
       console.warn(`Backend order status update for #${billNumber} skipped/failed:`, err.message);
     });

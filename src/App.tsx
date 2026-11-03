@@ -13,6 +13,7 @@ import { OrderHistoryModal } from './components/OrderHistoryModal';
 import { AuthModal } from './components/AuthModal';
 import { ProfileModal } from './components/ProfileModal';
 import { StickyCartBar } from './components/StickyCartBar';
+import { FloatingOrderTrackerPill } from './components/FloatingOrderTrackerPill';
 import { Toast } from './components/Toast';
 
 // Admin Components
@@ -541,6 +542,9 @@ const MainAppContent: React.FC = () => {
 
       {/* Floating Sticky Cart Summary */}
       <StickyCartBar />
+
+      {/* Live KDS Customer Order Tracker Pill */}
+      <FloatingOrderTrackerPill />
 
       {/* Drawers & Modals */}
       <CartDrawer />

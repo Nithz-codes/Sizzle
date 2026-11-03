@@ -309,13 +309,31 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       '0'
     )}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
 
+    // Calculate preparation estimate based on items
+    let maxBasePrep = 15;
+    let totalItems = 0;
+    cartItems.forEach((ci) => {
+      totalItems += ci.quantity;
+      const prepStr = ci.foodItem.prepTime || '15 mins';
+      const m = parseInt(prepStr.replace(/\D/g, ''), 10) || 15;
+      if (m > maxBasePrep) maxBasePrep = m;
+    });
+    const multiBuffer = Math.min(8, Math.max(0, (totalItems - 1) * 2));
+    const estimatedMinutes = maxBasePrep + 4 + multiBuffer;
+
     const receipt: ReceiptData = {
       billNumber: nextBillNumber,
       dateTime: formattedDate,
       customer: custDetails,
       items: [...cartItems],
       bill: { ...billSummary },
+      orderStatus: 'PENDING',
+      estimatedMinutes: estimatedMinutes,
+      preparationStartedAt: Date.now(),
     };
+    try {
+      localStorage.setItem('sizzle_active_customer_order', JSON.stringify(receipt));
+    } catch {}
 
     // Fire backend database order persistence and payment processing
     const backendPaymentMethod: 'CASH' | 'CARD' | 'UPI' = 
@@ -334,6 +352,21 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }).then(async (createdOrderRes) => {
       if (createdOrderRes.success && createdOrderRes.data) {
         const orderId = createdOrderRes.data.id;
+        const orderNum = createdOrderRes.data.orderNumber;
+        const updatedStatus = createdOrderRes.data.orderStatus || 'PENDING';
+        setActiveReceipt((prev) => {
+          if (!prev) return prev;
+          const updated = {
+            ...prev,
+            id: orderId,
+            orderNumber: orderNum,
+            orderStatus: updatedStatus,
+          };
+          try {
+            localStorage.setItem('sizzle_active_customer_order', JSON.stringify(updated));
+          } catch {}
+          return updated;
+        });
         // Initiate Payment
         const initRes = await paymentApi.initiatePayment({
           orderId,
